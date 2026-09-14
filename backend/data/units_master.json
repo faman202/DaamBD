@@ -1,0 +1,12 @@
+[
+  { "unit_id": 1, "unit_name": "Kg", "unit_name_bn": "কেজি", "standard_multiplier": 1.0, "type": "weight" },
+  { "unit_id": 2, "unit_name": "Gram", "unit_name_bn": "গ্রাম", "standard_multiplier": 0.001, "type": "weight" },
+  { "unit_id": 3, "unit_name": "Quintal (100kg)", "unit_name_bn": "কুইন্টাল (১০০ কেজি)", "standard_multiplier": 100.0, "type": "weight" },
+  { "unit_id": 4, "unit_name": "Palla (5kg)", "unit_name_bn": "পাল্লা (৫ কেজি)", "standard_multiplier": 5.0, "type": "weight" },
+  { "unit_id": 5, "unit_name": "Maund / Mon (40kg)", "unit_name_bn": "মণ (৪০ কেজি)", "standard_multiplier": 40.0, "type": "weight" },
+  { "unit_id": 6, "unit_name": "Liter", "unit_name_bn": "লিটার", "standard_multiplier": 1.0, "type": "volume" },
+  { "unit_id": 7, "unit_name": "Piece (Hali - 4 pcs)", "unit_name_bn": "হালি (৪টি)", "standard_multiplier": 4.0, "type": "count" },
+  { "unit_id": 8, "unit_name": "Piece (Single)", "unit_name_bn": "টি (১টি)", "standard_multiplier": 1.0, "type": "count" },
+  { "unit_id": 9, "unit_name": "Dozen (12 pcs)", "unit_name_bn": "ডজন (১২টি)", "standard_multiplier": 12.0, "type": "count" },
+  { "unit_id": 10, "unit_name": "Bundle (Aati)", "unit_name_bn": "আঁটি", "standard_multiplier": 1.0, "type": "bundle" }
+]

@@ -1,0 +1,167 @@
+// DaamBD - Market Price Intelligence Platform
+// PostgreSQL Database Schema (Prisma)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PriceType {
+  retail
+  wholesale
+}
+
+enum AnomalyStatus {
+  normal
+  warning
+  critical
+}
+
+enum TrustLevel {
+  official_gov
+  verified_field
+  crowdsourced
+}
+
+model Category {
+  id            String    @id @default(uuid())
+  slug          String    @unique
+  nameBn        String    @map("name_bn")
+  nameEn        String    @map("name_en")
+  displayOrder  Int       @default(0) @map("display_order")
+  icon          String?   @default("package")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  products      Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id                     String    @id @default(uuid())
+  slug                   String    @unique
+  nameBn                 String    @map("name_bn")
+  nameEn                 String    @map("name_en")
+  categoryId             String    @map("category_id")
+  defaultUnit            String    @default("kg") @map("default_unit")
+  isConvertibleByWeight  Boolean   @default(true) @map("is_convertible_by_weight")
+  moaCommodityId         Int?      @unique @map("moa_commodity_id")
+  imageUrl               String?   @map("image_url")
+  createdAt              DateTime  @default(now()) @map("created_at")
+  updatedAt              DateTime  @updatedAt @map("updated_at")
+
+  category               Category       @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  prices                 Price[]
+  priceHistories         PriceHistory[]
+
+  @@index([categoryId])
+  @@index([nameEn])
+  @@index([nameBn])
+  @@map("products")
+}
+
+model Location {
+  id          String   @id @default(uuid())
+  divisionBn  String   @map("division_bn")
+  divisionEn  String   @map("division_en")
+  districtBn  String   @map("district_bn")
+  districtEn  String   @map("district_en")
+  upazilaBn   String?  @map("upazila_bn")
+  upazilaEn   String?  @map("upazila_en")
+  latitude    Float?
+  longitude   Float?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  markets     Market[]
+
+  @@index([districtEn])
+  @@index([divisionEn])
+  @@map("locations")
+}
+
+model Market {
+  id          String   @id @default(uuid())
+  locationId  String   @map("location_id")
+  nameBn      String   @map("name_bn")
+  nameEn      String   @map("name_en")
+  marketCode  String   @unique @map("market_code")
+  marketType  String?  @default("retail_wholesale") @map("market_type")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  location    Location       @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  prices      Price[]
+  priceHistories PriceHistory[]
+
+  @@index([locationId])
+  @@map("markets")
+}
+
+model PriceSource {
+  id          String     @id @default(uuid())
+  code        String     @unique
+  nameBn      String     @map("name_bn")
+  nameEn      String     @map("name_en")
+  sourceUrl   String?    @map("source_url")
+  trustLevel  TrustLevel @default(official_gov) @map("trust_level")
+  description String?
+  createdAt   DateTime   @default(now()) @map("created_at")
+
+  prices      Price[]
+  priceHistories PriceHistory[]
+
+  @@map("price_sources")
+}
+
+model Price {
+  id             String        @id @default(uuid())
+  productId      String        @map("product_id")
+  marketId       String        @map("market_id")
+  sourceId       String        @map("source_id")
+  priceType      PriceType     @default(retail) @map("price_type")
+  unit           String        @default("kg")
+  minPrice       Decimal       @db.Decimal(10, 2) @map("min_price")
+  maxPrice       Decimal       @db.Decimal(10, 2) @map("max_price")
+  avgPrice       Decimal       @db.Decimal(10, 2) @map("avg_price")
+  currency       String        @default("BDT")
+  anomalyStatus  AnomalyStatus @default(normal) @map("anomaly_status")
+  effectiveDate  DateTime      @db.Date @map("effective_date")
+  collectedAt    DateTime      @default(now()) @map("collected_at")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+
+  product        Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
+  market         Market        @relation(fields: [marketId], references: [id], onDelete: Cascade)
+  source         PriceSource   @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, marketId, priceType, effectiveDate])
+  @@index([effectiveDate])
+  @@index([productId, effectiveDate])
+  @@index([marketId, effectiveDate])
+  @@map("prices")
+}
+
+model PriceHistory {
+  id             String    @id @default(uuid())
+  productId      String    @map("product_id")
+  marketId       String    @map("market_id")
+  sourceId       String    @map("source_id")
+  unit           String    @default("kg")
+  minPrice       Decimal   @db.Decimal(10, 2) @map("min_price")
+  maxPrice       Decimal   @db.Decimal(10, 2) @map("max_price")
+  avgPrice       Decimal   @db.Decimal(10, 2) @map("avg_price")
+  effectiveDate  DateTime  @db.Date @map("effective_date")
+  collectedAt    DateTime  @default(now()) @map("collected_at")
+
+  product        Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  market         Market      @relation(fields: [marketId], references: [id], onDelete: Cascade)
+  source         PriceSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+
+  @@index([productId, marketId, effectiveDate])
+  @@index([effectiveDate])
+  @@map("price_history")
+}
