@@ -16,9 +16,17 @@ export interface PriceSource {
 }
 
 export interface PriceRecord {
-  lowestPrice: number;
-  highestPrice: number;
+  minPrice: number;
+  maxPrice: number;
   avgPrice: number;
+
+  // Unit information used by PriceConverter
+  unitBn: string;
+  unitEn: string;
+
+  // API-compatible aliases
+  lowestPrice?: number;
+  highestPrice?: number;
 }
 
 export interface DailyPriceItem {
@@ -38,7 +46,7 @@ export interface DailyPriceItem {
   districtBn: string;
   districtEn: string;
 
-  // Unit is provided by the official commodity API
+  // Main commodity unit
   unitBn: string;
   unitEn: string;
 
