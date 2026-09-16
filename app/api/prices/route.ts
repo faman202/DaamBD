@@ -1091,30 +1091,34 @@ export async function GET(
     }
 
     /* -----------------------------------------
-       12. PRICE CHANGE COUNTS
-    ----------------------------------------- */
+   12. PRICE CHANGE COUNTS
+----------------------------------------- */
 
-    const priceChangeCounts = {
-      increase: 0,
-      decrease: 0,
-      unchanged: 0,
-      no_data: 0,
-    };
+const priceChangeCounts: {
+  increase: number;
+  decrease: number;
+  unchanged: number;
+  no_data: number;
+} = {
+  increase: 0,
+  decrease: 0,
+  unchanged: 0,
+  no_data: 0,
+};
 
-    for (const product of finalProducts) {
-      const type =
-        product.priceChangeType;
+for (const product of finalProducts) {
+  const type = product.priceChangeType;
 
-      if (
-        type === "increase" ||
-        type === "decrease" ||
-        type === "unchanged" ||
-        type === "no_data"
-      ) {
-        priceChangeCounts[type]++;
-      }
-    }
-
+  if (type === "increase") {
+    priceChangeCounts.increase++;
+  } else if (type === "decrease") {
+    priceChangeCounts.decrease++;
+  } else if (type === "unchanged") {
+    priceChangeCounts.unchanged++;
+  } else {
+    priceChangeCounts.no_data++;
+  }
+}
     /* -----------------------------------------
        13. RESPONSE
     ----------------------------------------- */
