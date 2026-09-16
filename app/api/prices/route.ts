@@ -8,25 +8,13 @@ const COMMODITY_API =
 
 type AnyObject = Record<string, any>;
 
-function findArray(obj: any, keys: string[]): any[] {
-  if (!obj || typeof obj !== "object") return [];
-
-  for (const key of keys) {
-    if (Array.isArray(obj?.[key])) {
-      return obj[key];
-    }
-  }
-
-  return [];
-}
-
 function getNumber(...values: any[]): number {
   for (const value of values) {
     if (
       value !== null &&
       value !== undefined &&
       value !== "" &&
-      !Number.isNaN(Number(value))
+      Number.isFinite(Number(value))
     ) {
       return Number(value);
     }
@@ -63,7 +51,7 @@ export async function GET(request: NextRequest) {
       new Date().toISOString().split("T")[0];
 
     // =========================================================
-    // 1. FETCH OFFICIAL COMMON DROPDOWN / COMMODITY DATA
+    // 1. FETCH OFFICIAL COMMON DROPDOWNS
     // =========================================================
 
     const commodityResponse = await fetch(COMMODITY_API, {
@@ -83,93 +71,85 @@ export async function GET(request: NextRequest) {
     const commodityData = await commodityResponse.json();
 
     // =========================================================
-    // 2. FIND COMMODITY LIST
+    // 2. IMPORTANT:
+    // Actual MOA structure is:
+    //
+    // commodityData.data.commoditySubGroupList
+    // commodityData.data.measurementUnitList
     // =========================================================
 
-    const possibleLists = [
-      commodityData?.commodityList,
-      commodityData?.data?.commodityList,
-      commodityData?.result?.commodityList,
-      commodityData?.data,
-      commodityData?.result,
-    ];
+    const commodityList: AnyObject[] = Array.isArray(
+      commodityData?.data?.commoditySubGroupList
+    )
+      ? commodityData.data.commoditySubGroupList
+      : [];
 
-    let commodityList: AnyObject[] = [];
+    const measurementUnitList: AnyObject[] = Array.isArray(
+      commodityData?.data?.measurementUnitList
+    )
+      ? commodityData.data.measurementUnitList
+      : [];
 
-    for (const list of possibleLists) {
-      if (Array.isArray(list) && list.length > 0) {
-        commodityList = list;
-        break;
-      }
-    }
+    console.log(
+      "DaamBD commoditySubGroupList:",
+      commodityList.length
+    );
 
-    /*
-     * Sometimes the API returns the commodity list deeper
-     * inside another object.
-     */
-
-    if (commodityList.length === 0) {
-      const recursiveFind = (obj: any): any[] => {
-        if (!obj || typeof obj !== "object") return [];
-
-        if (Array.isArray(obj)) {
-          const found = obj.find(
-            (item) =>
-              item &&
-              typeof item === "object" &&
-              (
-                item.commodity_id !== undefined ||
-                item.commodityId !== undefined ||
-                item.commodity_name_bn !== undefined ||
-                item.commodity_name !== undefined
-              )
-          );
-
-          if (found) return obj;
-        }
-
-        for (const value of Object.values(obj)) {
-          const result = recursiveFind(value);
-
-          if (result.length > 0) {
-            return result;
-          }
-        }
-
-        return [];
-      };
-
-      commodityList = recursiveFind(commodityData);
-    }
+    console.log(
+      "DaamBD measurementUnitList:",
+      measurementUnitList.length
+    );
 
     // =========================================================
     // 3. CREATE COMMODITY MAP
+    //
+    // Example:
+    // value: 604
+    // text_bn: "চাল -আমন - মোটা"
+    // unit_retail: 2
+    // unit_whole_sale: 1
     // =========================================================
 
-    const commodities = new Map<number, AnyObject>();
+    const commodityMap = new Map<number, AnyObject>();
 
     for (const item of commodityList) {
-      if (!item || typeof item !== "object") continue;
+      const id = Number(item?.value);
 
-      const id = getNumber(
-        item.commodity_id,
-        item.commodityId,
-        item.value,
-        item.id
-      );
+      if (Number.isFinite(id) && id > 0) {
+        commodityMap.set(id, item);
+      }
+    }
 
-      if (id > 0) {
-        commodities.set(id, item);
+    // =========================================================
+    // 4. CREATE UNIT MAP
+    //
+    // Example:
+    // 2 => Kilogram / কিলোগ্রাম
+    // 1 => Quintal / কুইন্টাল
+    // =========================================================
+
+    const unitMap = new Map<number, AnyObject>();
+
+    for (const item of measurementUnitList) {
+      const id = Number(item?.value);
+
+      if (Number.isFinite(id) && id > 0) {
+        unitMap.set(id, item);
       }
     }
 
     console.log(
-      "DaamBD commodity count:",
-      commodities.size
+      "DaamBD commodity map size:",
+      commodityMap.size
+    );
+
+    console.log(
+      "DaamBD unit map size:",
+      unitMap.size
     );
 
     // =========================================================
-    // 4. OFFICIAL DAILY PRICE API
+    // 5. FETCH OFFICIAL DAILY PRICE
     // =========================================================
 
     const priceResponse = await fetch(PRICE_API, {
@@ -193,7 +173,7 @@ export async function GET(request: NextRequest) {
         select_type: "Daily",
 
         month_id: 0,
-        year: 0,
+        year_id: 0,
         week_id: 0,
       }),
 
@@ -209,7 +189,7 @@ export async function GET(request: NextRequest) {
     const priceData = await priceResponse.json();
 
     // =========================================================
-    // 5. FIND PRICE ROWS
+    // 6. FIND PRICE ROWS
     // =========================================================
 
     const possibleRows = [
@@ -230,12 +210,21 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    console.log(
+      "DaamBD price rows:",
+      rows.length
+    );
+
     // =========================================================
-    // 6. MAP OFFICIAL DATA
+    // 7. MAP OFFICIAL PRICE DATA
     // =========================================================
 
     const items = rows
       .map((row: AnyObject) => {
+        // -----------------------------------------------------
+        // COMMODITY ID
+        // -----------------------------------------------------
+
         const commodityId = getNumber(
           row?.commodity_id,
           row?.commodityId,
@@ -243,10 +232,10 @@ export async function GET(request: NextRequest) {
           row?.product_id
         );
 
-        const commodity = commodities.get(commodityId);
+        const commodity = commodityMap.get(commodityId);
 
         // -----------------------------------------------------
-        // NAME
+        // OFFICIAL COMMODITY NAME
         // -----------------------------------------------------
 
         const nameBn = getText(
@@ -255,10 +244,12 @@ export async function GET(request: NextRequest) {
           row?.name_bn,
           row?.text_bn,
 
+          commodity?.text_bn,
+          commodity?.text,
+
           commodity?.commodity_name_bn,
           commodity?.commodityNameBn,
           commodity?.name_bn,
-          commodity?.text_bn,
 
           row?.commodity_name,
           commodity?.commodity_name,
@@ -272,94 +263,86 @@ export async function GET(request: NextRequest) {
           row?.name_en,
           row?.text_en,
 
+          commodity?.text_en,
+          commodity?.text,
+
           commodity?.commodity_name,
           commodity?.commodityName,
           commodity?.name_en,
-          commodity?.text_en,
 
           `Product ${commodityId}`
         );
 
         // -----------------------------------------------------
-        // UNIT
+        // OFFICIAL UNIT IDs
+        //
+        // Commodity example:
+        //
+        // unit_retail: 2
+        // unit_whole_sale: 1
         // -----------------------------------------------------
 
-        /*
-         * IMPORTANT:
-         * MOA price response may contain rUnitObj.
-         * This is much more reliable than assuming
-         * unit_name_bn directly exists on commodity master.
-         */
+        const retailUnitId = getNumber(
+          commodity?.unit_retail,
+          row?.unit_retail,
+          row?.retail_unit,
+          row?.retailUnitId,
+          row?.retail_unit_id
+        );
 
-        const rUnitObj =
-          row?.rUnitObj ??
-          row?.retailUnitObj ??
-          row?.unitObj ??
-          commodity?.rUnitObj ??
-          commodity?.retailUnitObj;
+        const wholesaleUnitId = getNumber(
+          commodity?.unit_whole_sale,
+          row?.unit_wholesale,
+          row?.wholesale_unit,
+          row?.wholesaleUnitId,
+          row?.wholesale_unit_id
+        );
 
-        const wUnitObj =
-          row?.wUnitObj ??
-          row?.wholesaleUnitObj ??
-          commodity?.wUnitObj ??
-          commodity?.wholesaleUnitObj;
+        const retailUnit = unitMap.get(retailUnitId);
+
+        const wholesaleUnit = unitMap.get(
+          wholesaleUnitId
+        );
+
+        // -----------------------------------------------------
+        // UNIT NAME
+        // -----------------------------------------------------
 
         const unitBn = getText(
-          rUnitObj?.unit_name_bn,
-          rUnitObj?.unitNameBn,
-          rUnitObj?.name_bn,
-          rUnitObj?.text_bn,
+          row?.rUnitObj?.text_bn,
+          row?.rUnitObj?.unit_name_bn,
+          row?.rUnitObj?.text,
+          row?.retailUnitObj?.text_bn,
+          row?.retailUnitObj?.unit_name_bn,
+
+          retailUnit?.text_bn,
+          retailUnit?.text,
 
           row?.unit_name_bn,
           row?.unitBn,
-          row?.retail_unit_name_bn,
 
-          commodity?.unit_name_bn,
-          commodity?.unitBn,
-
-          "কেজি"
+          "কিলোগ্রাম"
         );
 
         const unitEn = getText(
-          rUnitObj?.unit_name,
-          rUnitObj?.unitName,
-          rUnitObj?.name_en,
-          rUnitObj?.text_en,
+          row?.rUnitObj?.text_en,
+          row?.rUnitObj?.unit_name,
+          row?.rUnitObj?.text,
+
+          row?.retailUnitObj?.text_en,
+          row?.retailUnitObj?.unit_name,
+
+          retailUnit?.text_en,
+          retailUnit?.text,
 
           row?.unit_name,
           row?.unitEn,
-          row?.retail_unit_name,
 
-          commodity?.unit_name,
-          commodity?.unitEn,
-
-          "kg"
+          "Kilogram"
         );
 
         // -----------------------------------------------------
-        // UNIT IDs
-        // -----------------------------------------------------
-
-        const unitRetailId =
-          rUnitObj?.id ??
-          rUnitObj?.unit_id ??
-          rUnitObj?.unitId ??
-          row?.unit_retail ??
-          row?.retail_unit ??
-          commodity?.unit_retail ??
-          null;
-
-        const unitWholesaleId =
-          wUnitObj?.id ??
-          wUnitObj?.unit_id ??
-          wUnitObj?.unitId ??
-          row?.unit_wholesale ??
-          row?.wholesale_unit ??
-          commodity?.unit_wholesale ??
-          null;
-
-        // -----------------------------------------------------
-        // RETAIL
+        // RETAIL PRICE
         // -----------------------------------------------------
 
         const retailAvg = getNumber(
@@ -368,7 +351,9 @@ export async function GET(request: NextRequest) {
           row?.retailAvg,
           row?.retail?.avg,
           row?.r_avg_price,
-          row?.rAvgPrice
+          row?.rAvgPrice,
+          row?.retail_average_price,
+          row?.retailAveragePrice
         );
 
         const retailLow = getNumber(
@@ -377,7 +362,9 @@ export async function GET(request: NextRequest) {
           row?.retailLow,
           row?.retail?.low,
           row?.r_low_price,
-          row?.rLowestPrice
+          row?.rLowestPrice,
+          row?.retail_lowest_price,
+          row?.retailLowestPrice
         );
 
         const retailHigh = getNumber(
@@ -386,11 +373,13 @@ export async function GET(request: NextRequest) {
           row?.retailHigh,
           row?.retail?.high,
           row?.r_high_price,
-          row?.rHighestPrice
+          row?.rHighestPrice,
+          row?.retail_highest_price,
+          row?.retailHighestPrice
         );
 
         // -----------------------------------------------------
-        // WHOLESALE
+        // WHOLESALE PRICE
         // -----------------------------------------------------
 
         const wholesaleAvg = getNumber(
@@ -399,7 +388,9 @@ export async function GET(request: NextRequest) {
           row?.wholesaleAvg,
           row?.wholesale?.avg,
           row?.w_avg_price,
-          row?.wAvgPrice
+          row?.wAvgPrice,
+          row?.wholesale_average_price,
+          row?.wholesaleAveragePrice
         );
 
         const wholesaleLow = getNumber(
@@ -408,7 +399,9 @@ export async function GET(request: NextRequest) {
           row?.wholesaleLow,
           row?.wholesale?.low,
           row?.w_low_price,
-          row?.wLowestPrice
+          row?.wLowestPrice,
+          row?.wholesale_lowest_price,
+          row?.wholesaleLowestPrice
         );
 
         const wholesaleHigh = getNumber(
@@ -417,7 +410,9 @@ export async function GET(request: NextRequest) {
           row?.wholesaleHigh,
           row?.wholesale?.high,
           row?.w_high_price,
-          row?.wHighestPrice
+          row?.wHighestPrice,
+          row?.wholesale_highest_price,
+          row?.wholesaleHighestPrice
         );
 
         // -----------------------------------------------------
@@ -428,8 +423,10 @@ export async function GET(request: NextRequest) {
           row?.commodity_group_name_bn,
           row?.commodityGroupNameBn,
           row?.group_name_bn,
+
           commodity?.commodity_group_name_bn,
           commodity?.group_name_bn,
+
           ""
         );
 
@@ -437,10 +434,16 @@ export async function GET(request: NextRequest) {
           row?.commodity_group_name,
           row?.commodityGroupName,
           row?.group_name,
+
           commodity?.commodity_group_name,
           commodity?.group_name,
+
           ""
         );
+
+        // -----------------------------------------------------
+        // FINAL ITEM
+        // -----------------------------------------------------
 
         return {
           commodityId,
@@ -454,8 +457,8 @@ export async function GET(request: NextRequest) {
           unitBn,
           unitEn,
 
-          unitRetailId,
-          unitWholesaleId,
+          unitRetailId: retailUnitId || null,
+          unitWholesaleId: wholesaleUnitId || null,
 
           retail: {
             avgPrice: retailAvg,
@@ -469,11 +472,7 @@ export async function GET(request: NextRequest) {
             highestPrice: wholesaleHigh,
           },
 
-          /*
-           * Historical comparison will be added later.
-           * Do NOT invent movement data.
-           */
-
+          // Historical comparison will be added later.
           priceChange: 0,
 
           source: "Ministry of Agriculture / DAM",
@@ -483,6 +482,11 @@ export async function GET(request: NextRequest) {
           reportDate: date,
         };
       })
+
+      // -------------------------------------------------------
+      // REMOVE INVALID ITEMS
+      // -------------------------------------------------------
+
       .filter((item: AnyObject) => {
         return (
           item.commodityId > 0 &&
@@ -494,7 +498,18 @@ export async function GET(request: NextRequest) {
       });
 
     // =========================================================
-    // 7. RESPONSE
+    // 8. DEBUG
+    // =========================================================
+
+    if (items.length > 0) {
+      console.log(
+        "DaamBD first mapped item:",
+        JSON.stringify(items[0], null, 2)
+      );
+    }
+
+    // =========================================================
+    // 9. RESPONSE
     // =========================================================
 
     return NextResponse.json({
@@ -522,7 +537,10 @@ export async function GET(request: NextRequest) {
       timestamp: new Date().toISOString(),
     });
   } catch (error: any) {
-    console.error("DaamBD API Error:", error);
+    console.error(
+      "DaamBD API Error:",
+      error
+    );
 
     return NextResponse.json(
       {
