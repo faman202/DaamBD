@@ -21,11 +21,316 @@ import {
   RefreshCw,
 } from 'lucide-react';
 
+type AnyObject = Record<string, unknown>;
+
+function isObject(value: unknown): value is AnyObject {
+  return typeof value === 'object' && value !== null;
+}
+
+function getText(...values: unknown[]): string {
+  for (const value of values) {
+    if (typeof value === 'string' && value.trim() !== '') {
+      return value.trim();
+    }
+
+    if (typeof value === 'number') {
+      return String(value);
+    }
+  }
+
+  return '';
+}
+
+function getPrice(
+  item: DailyPriceItem,
+  priceType: PriceType
+): number {
+  const object = item as unknown as AnyObject;
+
+  const selected =
+    priceType === 'retail'
+      ? object?.retail
+      : object?.wholesale;
+
+  if (isObject(selected)) {
+    const values = [
+      selected.avgPrice,
+      selected.averagePrice,
+      selected.avg,
+      selected.average,
+      selected.retailAvg,
+      selected.wholesaleAvg,
+      selected.retailAverage,
+      selected.wholesaleAverage,
+      selected.retail_price,
+      selected.wholesale_price,
+      selected.retailPrice,
+      selected.wholesalePrice,
+      selected.price,
+    ];
+
+    for (const value of values) {
+      const number = Number(value);
+
+      if (
+        Number.isFinite(number) &&
+        number > 0
+      ) {
+        return number;
+      }
+    }
+  }
+
+  const fallbackValues =
+    priceType === 'retail'
+      ? [
+          object?.retailAvg,
+          object?.retailAverage,
+          object?.retailPrice,
+          object?.retail_price,
+          object?.price,
+          object?.avgPrice,
+          object?.averagePrice,
+        ]
+      : [
+          object?.wholesaleAvg,
+          object?.wholesaleAverage,
+          object?.wholesalePrice,
+          object?.wholesale_price,
+          object?.wholesale,
+          object?.avgPrice,
+          object?.averagePrice,
+        ];
+
+  for (const value of fallbackValues) {
+    const number = Number(value);
+
+    if (
+      Number.isFinite(number) &&
+      number > 0
+    ) {
+      return number;
+    }
+  }
+
+  return 0;
+}
+
+function normalizeCategory(value: unknown): string {
+  return getText(value)
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, ' ')
+    .replace(/[-_]/g, ' ');
+}
+
+function categoryMatches(
+  item: DailyPriceItem,
+  selectedCategory: string
+): boolean {
+  if (
+    !selectedCategory ||
+    selectedCategory === 'all'
+  ) {
+    return true;
+  }
+
+  const object = item as unknown as AnyObject;
+
+  const selected = normalizeCategory(
+    selectedCategory
+  );
+
+  const possibleCategories = [
+    object?.categorySlug,
+    object?.category,
+    object?.categoryBn,
+    object?.categoryEn,
+    object?.categoryName,
+    object?.category_name,
+    object?.category_name_bn,
+    object?.category_name_en,
+  ]
+    .map(normalizeCategory)
+    .filter(Boolean);
+
+  if (
+    possibleCategories.includes(selected)
+  ) {
+    return true;
+  }
+
+  const aliases: Record<string, string[]> = {
+    'চাল ও খাদ্যশস্য': [
+      'চাল ও খাদ্যশস্য',
+      'rice',
+      'rice and grains',
+      'grains',
+      'food grains',
+      'চাল',
+      'খাদ্যশস্য',
+      'rice grains',
+    ],
+
+    rice: [
+      'চাল ও খাদ্যশস্য',
+      'rice',
+      'rice and grains',
+      'grains',
+      'food grains',
+    ],
+
+    grains: [
+      'চাল ও খাদ্যশস্য',
+      'rice',
+      'rice and grains',
+      'grains',
+    ],
+
+    'ডাল ও শিম': [
+      'ডাল ও শিম',
+      'ডাল',
+      'শিম',
+      'pulses',
+      'pulse',
+      'lentil',
+      'legumes',
+    ],
+
+    pulses: [
+      'ডাল ও শিম',
+      'ডাল',
+      'শিম',
+      'pulses',
+      'pulse',
+      'lentil',
+      'legumes',
+    ],
+
+    'শাকসবজি': [
+      'শাকসবজি',
+      'সবজি',
+      'vegetables',
+      'vegetable',
+      'veggies',
+    ],
+
+    vegetables: [
+      'শাকসবজি',
+      'সবজি',
+      'vegetables',
+      'vegetable',
+      'veggies',
+    ],
+
+    'মাংস ও ডিম': [
+      'মাংস ও ডিম',
+      'মাংস',
+      'ডিম',
+      'meat and eggs',
+      'meat',
+      'eggs',
+      'egg',
+      'poultry',
+    ],
+
+    meat: [
+      'মাংস ও ডিম',
+      'মাংস',
+      'ডিম',
+      'meat and eggs',
+      'meat',
+      'eggs',
+      'egg',
+      'poultry',
+    ],
+
+    eggs: [
+      'মাংস ও ডিম',
+      'ডিম',
+      'egg',
+      'eggs',
+      'meat and eggs',
+    ],
+
+    মাছ: [
+      'মাছ',
+      'fish',
+      'fishes',
+    ],
+
+    fish: [
+      'মাছ',
+      'fish',
+      'fishes',
+    ],
+
+    মসলা: [
+      'মসলা',
+      'মশলা',
+      'spices',
+      'spice',
+    ],
+
+    spices: [
+      'মসলা',
+      'মশলা',
+      'spices',
+      'spice',
+    ],
+
+    ভোজ্যতেল: [
+      'ভোজ্যতেল',
+      'তেল',
+      'edible oil',
+      'cooking oil',
+      'oil',
+    ],
+
+    oil: [
+      'ভোজ্যতেল',
+      'তেল',
+      'edible oil',
+      'cooking oil',
+      'oil',
+    ],
+
+    নিত্যপণ্য: [
+      'নিত্যপণ্য',
+      'essential',
+      'essentials',
+      'daily essentials',
+    ],
+
+    essentials: [
+      'নিত্যপণ্য',
+      'essential',
+      'essentials',
+      'daily essentials',
+    ],
+  };
+
+  const allowed =
+    aliases[selected] || [selected];
+
+  return possibleCategories.some(
+    (category) =>
+      allowed.includes(category) ||
+      allowed.some(
+        (alias) =>
+          category.includes(alias) ||
+          alias.includes(category)
+      )
+  );
+}
+
 export default function Home() {
   // =========================
   // Global State
   // =========================
-  const [lang, setLang] = useState<Language>('bn');
+
+  const [lang, setLang] =
+    useState<Language>('bn');
 
   const [selectedDistrict, setSelectedDistrict] =
     useState<string>('Dhaka');
@@ -48,6 +353,7 @@ export default function Home() {
   // =========================
   // Modal State
   // =========================
+
   const [calculatorItem, setCalculatorItem] =
     useState<DailyPriceItem | null>(null);
 
@@ -66,6 +372,7 @@ export default function Home() {
   // =========================
   // API Data State
   // =========================
+
   const [allDistrictItems, setAllDistrictItems] =
     useState<DailyPriceItem[]>([]);
 
@@ -75,11 +382,13 @@ export default function Home() {
   const [error, setError] =
     useState<string | null>(null);
 
+  const [lastUpdated, setLastUpdated] =
+    useState<string | null>(null);
+
   // =========================
   // District ID Mapping
   // =========================
-  // Header থেকে যদি district name আসে,
-  // এখানে official district ID পাঠানো হবে।
+
   const districtIds: Record<string, number> = {
     Dhaka: 46,
   };
@@ -87,7 +396,10 @@ export default function Home() {
   // =========================
   // Load Official Market Prices
   // =========================
+
   useEffect(() => {
+    let cancelled = false;
+
     const loadPrices = async () => {
       try {
         setLoading(true);
@@ -118,12 +430,34 @@ export default function Home() {
           );
         }
 
-        setAllDistrictItems(
-          Array.isArray(data?.items)
-            ? data.items
-            : []
+        if (cancelled) {
+          return;
+        }
+
+        const items = Array.isArray(data?.items)
+          ? data.items
+          : [];
+
+        setAllDistrictItems(items);
+
+        // API timestamp থাকলে সেটি ব্যবহার করবে,
+        // না থাকলে fetch-এর সময় ব্যবহার করবে।
+        const apiTimestamp =
+          getText(
+            data?.timestamp,
+            data?.updatedAt,
+            data?.lastUpdated
+          );
+
+        setLastUpdated(
+          apiTimestamp ||
+            new Date().toISOString()
         );
       } catch (err) {
+        if (cancelled) {
+          return;
+        }
+
         console.error(
           'DaamBD Price API Error:',
           err
@@ -134,200 +468,280 @@ export default function Home() {
         );
 
         setAllDistrictItems([]);
+        setLastUpdated(null);
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     };
 
     loadPrices();
+
+    return () => {
+      cancelled = true;
+    };
   }, [selectedDistrict]);
 
   // =========================
   // Summary Statistics
   // =========================
-const summaryStats = useMemo(() => {
-  const totalItems = allDistrictItems.length;
 
-  const increasedCount = allDistrictItems.filter(
-    (item) => item.priceChange > 0
-  ).length;
+  const summaryStats = useMemo(() => {
+    const totalItems =
+      allDistrictItems.length;
 
-  const decreasedCount = allDistrictItems.filter(
-    (item) => item.priceChange < 0
-  ).length;
+    const increasedCount =
+      allDistrictItems.filter(
+        (item) =>
+          Number(item.priceChange || 0) > 0
+      ).length;
 
-  const stableCount = allDistrictItems.filter(
-    (item) => item.priceChange === 0
-  ).length;
+    const decreasedCount =
+      allDistrictItems.filter(
+        (item) =>
+          Number(item.priceChange || 0) < 0
+      ).length;
 
-  const sortedByChange = [...allDistrictItems].sort(
-    (a, b) => b.priceChange - a.priceChange
-  );
+    const stableCount =
+      allDistrictItems.filter(
+        (item) =>
+          Number(item.priceChange || 0) === 0
+      ).length;
 
-  const sortedByDrop = [...allDistrictItems].sort(
-    (a, b) => a.priceChange - b.priceChange
-  );
+    const sortedByChange =
+      [...allDistrictItems].sort(
+        (a, b) =>
+          Number(b.priceChange || 0) -
+          Number(a.priceChange || 0)
+      );
 
-  const topSpike = sortedByChange[0];
-  const topDrop = sortedByDrop[0];
+    const sortedByDrop =
+      [...allDistrictItems].sort(
+        (a, b) =>
+          Number(a.priceChange || 0) -
+          Number(b.priceChange || 0)
+      );
 
-  return {
-    totalItems,
-    increasedCount,
-    decreasedCount,
-    stableCount,
+    const topSpike =
+      sortedByChange[0];
 
-    topSpikeItem:
-      topSpike && topSpike.priceChange > 0
-        ? {
-            nameBn: topSpike.nameBn,
-            nameEn: topSpike.nameEn,
-            change: topSpike.priceChange,
-            pctChange: topSpike.priceChange,
-          }
-        : null,
+    const topDrop =
+      sortedByDrop[0];
 
-    topDropItem:
-      topDrop && topDrop.priceChange < 0
-        ? {
-            nameBn: topDrop.nameBn,
-            nameEn: topDrop.nameEn,
-            change: topDrop.priceChange,
-            pctChange: Math.abs(topDrop.priceChange),
-          }
-        : null,
+    return {
+      totalItems,
 
-    lastUpdated: new Date().toISOString(),
-  };
-}, [allDistrictItems]);
+      increasedCount,
+
+      decreasedCount,
+
+      stableCount,
+
+      topSpikeItem:
+        topSpike &&
+        Number(topSpike.priceChange || 0) > 0
+          ? {
+              nameBn: topSpike.nameBn,
+              nameEn: topSpike.nameEn,
+              change: Number(
+                topSpike.priceChange || 0
+              ),
+              pctChange: Number(
+                topSpike.priceChange || 0
+              ),
+            }
+          : null,
+
+      topDropItem:
+        topDrop &&
+        Number(topDrop.priceChange || 0) < 0
+          ? {
+              nameBn: topDrop.nameBn,
+              nameEn: topDrop.nameEn,
+              change: Number(
+                topDrop.priceChange || 0
+              ),
+              pctChange: Math.abs(
+                Number(
+                  topDrop.priceChange || 0
+                )
+              ),
+            }
+          : null,
+
+      lastUpdated:
+        lastUpdated ||
+        new Date().toISOString(),
+    };
+  }, [
+    allDistrictItems,
+    lastUpdated,
+  ]);
 
   // =========================
   // Filtered & Sorted Items
   // =========================
-  const filteredItems = useMemo(() => {
-    let result = [...allDistrictItems];
 
-    // -------------------------
+  const filteredItems = useMemo(() => {
+    let result =
+      [...allDistrictItems];
+
+    // =========================
     // Category Filter
-    // -------------------------
-    if (selectedCategory !== 'all') {
-      result = result.filter(
-        (item: any) =>
-          item?.categorySlug ===
-          selectedCategory
-      );
+    // =========================
+
+    if (
+      selectedCategory !== 'all'
+    ) {
+      result =
+        result.filter((item) =>
+          categoryMatches(
+            item,
+            selectedCategory
+          )
+        );
     }
 
-    // -------------------------
+    // =========================
     // Search Filter
-    // -------------------------
-    if (searchQuery.trim() !== '') {
+    // =========================
+
+    if (
+      searchQuery.trim() !== ''
+    ) {
       const q =
         searchQuery
           .toLowerCase()
           .trim();
 
-      result = result.filter(
-        (item: any) =>
-          String(
-            item?.nameBn || ''
-          )
-            .toLowerCase()
-            .includes(q) ||
+      result =
+        result.filter(
+          (item: DailyPriceItem) => {
+            const object =
+              item as unknown as AnyObject;
 
-          String(
-            item?.nameEn || ''
-          )
-            .toLowerCase()
-            .includes(q) ||
+            const searchableText =
+              [
+                object?.nameBn,
+                object?.nameEn,
+                object?.commodityNameBn,
+                object?.commodity_name_bn,
+                object?.commodityName,
+                object?.commodity_name,
+                object?.textBn,
+                object?.text_bn,
+                object?.textEn,
+                object?.text_en,
+                object?.categoryBn,
+                object?.categoryEn,
+                object?.category,
+              ]
+                .map((value) =>
+                  getText(value)
+                    .toLowerCase()
+                )
+                .filter(Boolean)
+                .join(' ');
 
-          String(
-            item?.categoryBn || ''
-          )
-            .toLowerCase()
-            .includes(q) ||
-
-          String(
-            item?.categoryEn || ''
-          )
-            .toLowerCase()
-            .includes(q)
-      );
+            return searchableText.includes(q);
+          }
+        );
     }
 
-    // -------------------------
+    // =========================
     // Price Movement Filter
-    // -------------------------
-    if (movementFilter !== 'all') {
-      result = result.filter(
-        (item: any) =>
-          item?.movement ===
-          movementFilter
+    // =========================
+
+    if (
+      movementFilter !== 'all'
+    ) {
+      result =
+        result.filter(
+          (item: DailyPriceItem) => {
+            const change =
+              Number(
+                item.priceChange || 0
+              );
+
+            if (
+              movementFilter ===
+              'up'
+            ) {
+              return change > 0;
+            }
+
+            if (
+              movementFilter ===
+              'down'
+            ) {
+              return change < 0;
+            }
+
+            if (
+              movementFilter ===
+              'stable'
+            ) {
+              return change === 0;
+            }
+
+            return (
+              item as unknown as AnyObject
+            )?.movement ===
+              movementFilter;
+          }
+        );
+    }
+
+    // =========================
+    // Sorting
+    // =========================
+
+    if (
+      sortBy === 'price-low'
+    ) {
+      result.sort(
+        (a, b) =>
+          getPrice(
+            a,
+            priceType
+          ) -
+          getPrice(
+            b,
+            priceType
+          )
       );
     }
 
-    // -------------------------
-    // Sorting
-    // -------------------------
-    if (sortBy === 'price-low') {
-      result.sort((a: any, b: any) => {
-        const priceA =
-          priceType === 'retail'
-            ? Number(
-                a?.retail?.avgPrice || 0
-              )
-            : Number(
-                a?.wholesale?.avgPrice || 0
-              );
-
-        const priceB =
-          priceType === 'retail'
-            ? Number(
-                b?.retail?.avgPrice || 0
-              )
-            : Number(
-                b?.wholesale?.avgPrice || 0
-              );
-
-        return priceA - priceB;
-      });
-    }
-
-    if (sortBy === 'price-high') {
-      result.sort((a: any, b: any) => {
-        const priceA =
-          priceType === 'retail'
-            ? Number(
-                a?.retail?.avgPrice || 0
-              )
-            : Number(
-                a?.wholesale?.avgPrice || 0
-              );
-
-        const priceB =
-          priceType === 'retail'
-            ? Number(
-                b?.retail?.avgPrice || 0
-              )
-            : Number(
-                b?.wholesale?.avgPrice || 0
-              );
-
-        return priceB - priceA;
-      });
-    }
-
-    if (sortBy === 'change') {
+    if (
+      sortBy === 'price-high'
+    ) {
       result.sort(
-        (a: any, b: any) =>
+        (a, b) =>
+          getPrice(
+            b,
+            priceType
+          ) -
+          getPrice(
+            a,
+            priceType
+          )
+      );
+    }
+
+    if (
+      sortBy === 'change'
+    ) {
+      result.sort(
+        (a, b) =>
           Math.abs(
             Number(
-              b?.priceChange || 0
+              b.priceChange || 0
             )
           ) -
           Math.abs(
             Number(
-              a?.priceChange || 0
+              a.priceChange || 0
             )
           )
       );
@@ -343,11 +757,13 @@ const summaryStats = useMemo(() => {
     priceType,
   ]);
 
-  const t = translations[lang];
+  const t =
+    translations[lang];
 
   // =========================
   // Modal Handlers
   // =========================
+
   const handleOpenCalculator = (
     item: DailyPriceItem
   ) => {
@@ -365,6 +781,7 @@ const summaryStats = useMemo(() => {
   // =========================
   // District Display Name
   // =========================
+
   const districtDisplayName =
     lang === 'bn'
       ? selectedDistrict === 'Dhaka'
@@ -373,40 +790,107 @@ const summaryStats = useMemo(() => {
       : selectedDistrict;
 
   // =========================
+  // Format Update Time
+  // =========================
+
+  const formattedUpdatedTime =
+    useMemo(() => {
+      if (!lastUpdated) {
+        return '';
+      }
+
+      const date =
+        new Date(lastUpdated);
+
+      if (
+        Number.isNaN(
+          date.getTime()
+        )
+      ) {
+        return '';
+      }
+
+      return new Intl.DateTimeFormat(
+        lang === 'bn'
+          ? 'bn-BD'
+          : 'en-BD',
+        {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric',
+          hour: 'numeric',
+          minute: '2-digit',
+          hour12: true,
+          timeZone:
+            'Asia/Dhaka',
+        }
+      ).format(date);
+    }, [
+      lastUpdated,
+      lang,
+    ]);
+
+  // =========================
+  // Reset Filters
+  // =========================
+
+  const resetFilters = () => {
+    setSearchQuery('');
+    setSelectedCategory('all');
+    setMovementFilter('all');
+    setSortBy('default');
+  };
+
+  // =========================
   // UI
   // =========================
+
   return (
     <div className="min-h-screen flex flex-col bg-[#F8FAF8]">
 
-      {/* =====================================
+      {/* =========================
           1. Header
-      ====================================== */}
+      ========================== */}
+
       <Header
         lang={lang}
-        onLanguageChange={setLang}
-        selectedDistrict={selectedDistrict}
+        onLanguageChange={
+          setLang
+        }
+        selectedDistrict={
+          selectedDistrict
+        }
         onDistrictChange={
           setSelectedDistrict
         }
         onOpenTransparency={() =>
-          setIsTransparencyOpen(true)
+          setIsTransparencyOpen(
+            true
+          )
         }
       />
 
-      {/* =====================================
+      {/* =========================
           2. Hero & Search
-      ====================================== */}
+      ========================== */}
+
       <HeroSearch
         lang={lang}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
+        searchQuery={
+          searchQuery
+        }
+        onSearchChange={
+          setSearchQuery
+        }
         selectedCategory={
           selectedCategory
         }
         onCategoryChange={
           setSelectedCategory
         }
-        priceType={priceType}
+        priceType={
+          priceType
+        }
         onPriceTypeChange={
           setPriceType
         }
@@ -417,28 +901,33 @@ const summaryStats = useMemo(() => {
           setMovementFilter
         }
         sortBy={sortBy}
-        onSortByChange={setSortBy}
+        onSortByChange={
+          setSortBy
+        }
         totalFound={
           filteredItems.length
         }
       />
 
-      {/* =====================================
+      {/* =========================
           3. Market Stats
-      ====================================== */}
+      ========================== */}
+
       <MarketStats
         lang={lang}
-        stats={summaryStats}
+        stats={
+          summaryStats
+        }
       />
 
-      {/* =====================================
+      {/* =========================
           4. Main Content
-      ====================================== */}
+      ========================== */}
+
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-8">
 
-        {/* =================================
-            Section Heading
-        ================================== */}
+        {/* Section Heading */}
+
         <div className="flex items-center justify-between">
           <div>
 
@@ -454,17 +943,27 @@ const summaryStats = useMemo(() => {
 
             <p className="text-xs text-content-muted mt-0.5 font-semibold">
               {lang === 'bn'
-                ? `প্রতিদিন সকাল ৯:০০ টা ও দুপুর ২:০০ টায় তথ্য হালনাগাদ করা হয়`
-                : `Updated daily via official government feeds`}
+                ? 'সরকারি DAM-এর দৈনিক বাজারদর'
+                : 'Daily market prices sourced from DAM'}
             </p>
+
+            {formattedUpdatedTime && (
+              <p className="text-[11px] text-content-muted mt-1">
+                {lang === 'bn'
+                  ? `সর্বশেষ আপডেট: ${formattedUpdatedTime}`
+                  : `Last updated: ${formattedUpdatedTime}`}
+              </p>
+            )}
 
           </div>
         </div>
 
-        {/* =================================
+        {/* =========================
             Loading State
-        ================================== */}
+        ========================== */}
+
         {loading ? (
+
           <div className="bg-white rounded-3xl p-10 text-center border border-surface-border shadow-card-subtle max-w-md mx-auto my-8 space-y-4">
 
             <div className="w-16 h-16 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center mx-auto text-brand-700">
@@ -483,18 +982,20 @@ const summaryStats = useMemo(() => {
 
               <p className="text-xs text-content-muted mt-1">
                 {lang === 'bn'
-                  ? 'সরকারি উৎস থেকে সর্বশেষ তথ্য আনা হচ্ছে।'
-                  : 'Fetching the latest official government data.'}
+                  ? 'সরকারি DAM উৎস থেকে সর্বশেষ তথ্য আনা হচ্ছে।'
+                  : 'Fetching the latest data from the official DAM source.'}
               </p>
 
             </div>
 
           </div>
+
         ) : error ? (
 
-          /* =================================
+          /* =========================
              API Error State
-          ================================== */
+          ========================== */
+
           <div className="bg-white rounded-3xl p-10 text-center border border-red-200 shadow-card-subtle max-w-md mx-auto my-8 space-y-4">
 
             <div className="w-16 h-16 rounded-full bg-red-50 border border-red-200 flex items-center justify-center mx-auto text-red-600">
@@ -532,21 +1033,30 @@ const summaryStats = useMemo(() => {
 
         ) : filteredItems.length > 0 ? (
 
-          /* =================================
+          /* =========================
              Price Cards Grid
-          ================================== */
+          ========================== */
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
 
             {filteredItems.map(
-              (item: DailyPriceItem) => (
+              (
+                item: DailyPriceItem
+              ) => (
                 <PriceCard
                   key={
-                    (item as any).id ??
-                    (item as any).commodityId
+                    String(
+                      (item as any).id ??
+                      (item as any).commodityId ??
+                      (item as any).commodity_id ??
+                      item.nameBn
+                    )
                   }
                   item={item}
                   lang={lang}
-                  priceType={priceType}
+                  priceType={
+                    priceType
+                  }
                   onOpenCalculator={
                     handleOpenCalculator
                   }
@@ -561,9 +1071,10 @@ const summaryStats = useMemo(() => {
 
         ) : (
 
-          /* =================================
+          /* =========================
              No Items State
-          ================================== */
+          ========================== */
+
           <div className="bg-white rounded-3xl p-10 text-center border border-surface-border shadow-card-subtle max-w-md mx-auto my-8 space-y-4">
 
             <div className="w-16 h-16 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center mx-auto text-brand-700">
@@ -575,27 +1086,29 @@ const summaryStats = useMemo(() => {
             <div>
 
               <h4 className="text-lg font-bold text-content-main">
-                {t.noItemsFound}
+                {allDistrictItems.length > 0
+                  ? lang === 'bn'
+                    ? 'এই ফিল্টারে কোনো পণ্য পাওয়া যায়নি'
+                    : 'No products match these filters'
+                  : t.noItemsFound}
               </h4>
 
               <p className="text-xs text-content-muted mt-1">
-                {lang === 'bn'
-                  ? 'অনুগ্রহ করে অনুসন্ধানের শব্দ পরিবর্তন করে দেখুন।'
-                  : 'Try clearing your search query or choosing another category.'}
+                {allDistrictItems.length > 0
+                  ? lang === 'bn'
+                    ? 'ক্যাটাগরি, অনুসন্ধান বা দামের ফিল্টার পরিবর্তন করে দেখুন।'
+                    : 'Try changing your category, search or price movement filter.'
+                  : lang === 'bn'
+                    ? 'বর্তমানে এই এলাকার জন্য কোনো বাজারদরের তথ্য পাওয়া যায়নি।'
+                    : 'No market price data is currently available for this area.'}
               </p>
 
             </div>
 
             <button
-              onClick={() => {
-                setSearchQuery('');
-                setSelectedCategory(
-                  'all'
-                );
-                setMovementFilter(
-                  'all'
-                );
-              }}
+              onClick={
+                resetFilters
+              }
               className="px-4 py-2 rounded-xl bg-brand-700 text-white font-bold text-xs hover:bg-brand-800 transition-all shadow-md"
             >
               {lang === 'bn'
@@ -606,55 +1119,80 @@ const summaryStats = useMemo(() => {
           </div>
         )}
 
-        {/* =====================================
+        {/* =========================
             5. District Comparison
-        ====================================== */}
+        ========================== */}
+
         <DistrictCompare
           lang={lang}
         />
 
       </main>
 
-      {/* =====================================
+      {/* =========================
           6. Calculator Modal
-      ====================================== */}
+      ========================== */}
+
       <PriceConverter
-        item={calculatorItem}
+        item={
+          calculatorItem
+        }
         lang={lang}
-        priceType={priceType}
-        isOpen={isCalculatorOpen}
+        priceType={
+          priceType
+        }
+        isOpen={
+          isCalculatorOpen
+        }
         onClose={() =>
-          setIsCalculatorOpen(false)
+          setIsCalculatorOpen(
+            false
+          )
         }
       />
 
-      {/* =====================================
+      {/* =========================
           7. Price Trend Modal
-      ====================================== */}
+      ========================== */}
+
       <PriceTrendModal
-        item={trendItem}
+        item={
+          trendItem
+        }
         lang={lang}
-        priceType={priceType}
-        isOpen={isTrendOpen}
+        priceType={
+          priceType
+        }
+        isOpen={
+          isTrendOpen
+        }
         onClose={() =>
-          setIsTrendOpen(false)
+          setIsTrendOpen(
+            false
+          )
         }
       />
 
-      {/* =====================================
+      {/* =========================
           8. Transparency Modal
-      ====================================== */}
+      ========================== */}
+
       <TransparencyModal
         lang={lang}
-        isOpen={isTransparencyOpen}
+        isOpen={
+          isTransparencyOpen
+        }
         onClose={() =>
-          setIsTransparencyOpen(false)
+          setIsTransparencyOpen(
+            false
+          )
         }
       />
 
-      {/* =====================================
+      {/* =========================
           9. Footer
-      ====================================== */}
+      ========================== */}
+
       <footer className="bg-[#14532D] text-white border-t border-emerald-900 mt-12 py-10">
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
@@ -662,6 +1200,7 @@ const summaryStats = useMemo(() => {
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 pb-6 border-b border-emerald-800/60">
 
             {/* Brand */}
+
             <div className="flex items-center space-x-3">
 
               <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white font-black text-xl">
@@ -691,6 +1230,7 @@ const summaryStats = useMemo(() => {
             </div>
 
             {/* Footer Links */}
+
             <div className="flex items-center space-x-4 text-xs font-semibold text-emerald-200">
 
               <button
@@ -713,7 +1253,9 @@ const summaryStats = useMemo(() => {
                 className="hover:text-white transition-colors flex items-center gap-1"
               >
 
-                <span>DAM Portal</span>
+                <span>
+                  DAM Portal
+                </span>
 
                 <ExternalLink className="w-3 h-3" />
 
@@ -724,11 +1266,12 @@ const summaryStats = useMemo(() => {
           </div>
 
           {/* Copyright */}
+
           <div className="flex flex-col sm:flex-row items-center justify-between text-xs text-emerald-200/70 gap-2 text-center sm:text-left">
 
             <p>
               © {new Date().getFullYear()} DaamBD Intelligence Platform.
-              Powered by Ministry of Agriculture (MOA / DAM) verified data.
+              Data sourced from Ministry of Agriculture (MOA / DAM).
             </p>
 
             <p className="flex items-center justify-center space-x-1">
