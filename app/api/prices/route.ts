@@ -394,11 +394,9 @@ export async function GET(
         .toISOString()
         .split("T")[0];
 
-    /*
-     * --------------------------------------------------
-     * 1. OFFICIAL COMMODITY + UNIT DATA
-     * --------------------------------------------------
-     */
+    /* -----------------------------------------
+       1. OFFICIAL COMMODITY + UNIT DATA
+    ----------------------------------------- */
 
     const commodityResponse = await fetch(
       COMMODITY_API,
@@ -434,11 +432,9 @@ export async function GET(
         ? commodityData.measurementUnitList
         : [];
 
-    /*
-     * --------------------------------------------------
-     * 2. BUILD OFFICIAL COMMODITY MAP
-     * --------------------------------------------------
-     */
+    /* -----------------------------------------
+       2. OFFICIAL COMMODITY MAP
+    ----------------------------------------- */
 
     const commodityMap =
       new Map<number, AnyObject>();
@@ -450,33 +446,29 @@ export async function GET(
       );
 
       if (id > 0) {
-        commodityMap.set(id, commodity);
+        commodityMap.set(
+          id,
+          commodity
+        );
       }
     }
 
-    /*
-     * --------------------------------------------------
-     * 3. CURRENT OFFICIAL PRICE DATA
-     * --------------------------------------------------
-     */
+    /* -----------------------------------------
+       3. CURRENT OFFICIAL PRICE DATA
+    ----------------------------------------- */
 
-    const priceRows = await fetchPriceRows(
-      date,
-      division,
-      district,
-      upazila,
-      market
-    );
+    const priceRows =
+      await fetchPriceRows(
+        date,
+        division,
+        district,
+        upazila,
+        market
+      );
 
-    /*
-     * --------------------------------------------------
-     * 4. FETCH 30 CALENDAR DAYS
-     *
-     * Today + previous 29 days.
-     *
-     * Batch size = 5
-     * --------------------------------------------------
-     */
+    /* -----------------------------------------
+       4. FETCH 30 CALENDAR DAYS
+    ----------------------------------------- */
 
     const historyRequests: {
       date: string;
@@ -485,11 +477,13 @@ export async function GET(
 
     for (let index = 0; index < 30; index++) {
       const historyDate =
-        getPreviousDate(date, index);
+        getPreviousDate(
+          date,
+          index
+        );
 
       historyRequests.push({
         date: historyDate,
-
         promise:
           index === 0
             ? Promise.resolve(priceRows)
@@ -554,15 +548,14 @@ export async function GET(
       }
     }
 
-    /*
-     * --------------------------------------------------
-     * 5. BUILD COMMODITY-WISE HISTORY
-     *
-     * Map.forEach() is intentionally used here.
-     * This avoids TypeScript downlevelIteration
-     * problems on Vercel.
-     * --------------------------------------------------
-     */
+    /* -----------------------------------------
+       5. BUILD COMMODITY-WISE HISTORY
+
+       IMPORTANT:
+       Map.forEach() ব্যবহার করা হয়েছে।
+       সরাসরি "for...of Map" না,
+       যাতে Vercel target error না আসে।
+    ----------------------------------------- */
 
     const historyMap =
       new Map<
@@ -576,7 +569,10 @@ export async function GET(
     historyRowsByDate.forEach(
       (rows, historyDate) => {
         const dailyCommodityPrices =
-          new Map<number, number[]>();
+          new Map<
+            number,
+            number[]
+          >();
 
         for (const row of rows) {
           const commodityId =
@@ -639,11 +635,9 @@ export async function GET(
       }
     );
 
-    /*
-     * --------------------------------------------------
-     * 6. SORT + DEDUPE HISTORY
-     * --------------------------------------------------
-     */
+    /* -----------------------------------------
+       6. SORT + DEDUPE HISTORY
+    ----------------------------------------- */
 
     historyMap.forEach(
       (history, commodityId) => {
@@ -680,20 +674,19 @@ export async function GET(
       }
     );
 
-    /*
-     * --------------------------------------------------
-     * 7. FIND PREVIOUS AVAILABLE DAM DATE
-     *
-     * Search previous 7 calendar days.
-     * First date having official data wins.
-     * --------------------------------------------------
-     */
+    /* -----------------------------------------
+       7. FIND PREVIOUS AVAILABLE DATE
+    ----------------------------------------- */
 
     let previousDate:
       | string
       | null = null;
 
-    for (let daysBack = 1; daysBack <= 7; daysBack++) {
+    for (
+      let daysBack = 1;
+      daysBack <= 7;
+      daysBack++
+    ) {
       const candidateDate =
         getPreviousDate(
           date,
@@ -713,11 +706,9 @@ export async function GET(
       }
     }
 
-    /*
-     * --------------------------------------------------
-     * 8. PREVIOUS PRICE MAP
-     * --------------------------------------------------
-     */
+    /* -----------------------------------------
+       8. PREVIOUS PRICE MAP
+    ----------------------------------------- */
 
     const previousPriceMap =
       new Map<number, number>();
@@ -784,11 +775,9 @@ export async function GET(
       );
     }
 
-    /*
-     * --------------------------------------------------
-     * 9. BUILD CURRENT PRODUCTS
-     * --------------------------------------------------
-     */
+    /* -----------------------------------------
+       9. BUILD CURRENT PRODUCTS
+    ----------------------------------------- */
 
     const products: AnyObject[] = [];
 
@@ -819,7 +808,8 @@ export async function GET(
           officialCommodity?.text,
           row?.commodity_name_bn,
           row?.commodityNameBn,
-          row?.commodity_name
+          row?.commodity_name,
+          row?.commodityName
         ) ||
         `পণ্য ${commodityId}`;
 
@@ -834,12 +824,9 @@ export async function GET(
         ) ||
         commodityNameBn;
 
-      /*
-       * Official unit:
-       *
-       * unit_retail from commodityNameList
-       * has priority.
-       */
+      /* ---------------------------------------
+         OFFICIAL RETAIL UNIT
+      --------------------------------------- */
 
       const officialRetailUnitId =
         getNumber(
@@ -859,6 +846,10 @@ export async function GET(
           unitId,
           measurementUnitList
         );
+
+      /* ---------------------------------------
+         RETAIL LOW / HIGH
+      --------------------------------------- */
 
       const retailLow =
         getNumber(
@@ -887,6 +878,10 @@ export async function GET(
           row?.retailPriceMax,
           0
         );
+
+      /* ---------------------------------------
+         WHOLESALE
+      --------------------------------------- */
 
       const wholesaleAvg =
         getNumber(
@@ -934,11 +929,9 @@ export async function GET(
           0
         );
 
-      /*
-       * ------------------------------------------------
-       * ACTUAL PREVIOUS PRICE
-       * ------------------------------------------------
-       */
+      /* ---------------------------------------
+         PREVIOUS PRICE
+      --------------------------------------- */
 
       const previousAvgPrice =
         previousPriceMap.get(
@@ -987,11 +980,9 @@ export async function GET(
         }
       }
 
-      /*
-       * ------------------------------------------------
-       * 30 DAY HISTORY
-       * ------------------------------------------------
-       */
+      /* ---------------------------------------
+         30 DAY HISTORY
+      --------------------------------------- */
 
       const history30Days =
         historyMap.get(
@@ -1000,17 +991,13 @@ export async function GET(
 
       products.push({
         id: commodityId,
-
         commodityId,
 
         name: commodityNameBn,
-
         nameBn: commodityNameBn,
-
         nameEn: commodityName,
 
         commodityNameBn,
-
         commodityName,
 
         category: getCategory({
@@ -1022,11 +1009,9 @@ export async function GET(
         }),
 
         price: retailAvg,
-
         retailAvg,
 
         retailLow,
-
         retailHigh,
 
         wholesaleAvg:
@@ -1053,9 +1038,7 @@ export async function GET(
           previousDate,
 
         priceChange,
-
         priceChangePercent,
-
         priceChangeType,
 
         history30Days,
@@ -1069,60 +1052,47 @@ export async function GET(
       });
     }
 
-    /*
-     * --------------------------------------------------
-     * 10. REMOVE DUPLICATE PRODUCTS
-     * --------------------------------------------------
-     */
+    /* -----------------------------------------
+       10. REMOVE DUPLICATES
+    ----------------------------------------- */
 
     const uniqueProducts =
       new Map<number, AnyObject>();
 
     for (const product of products) {
-      const existing =
-        uniqueProducts.get(
-          product.commodityId
-        );
-
-      if (!existing) {
-        uniqueProducts.set(
-          product.commodityId,
-          product
-        );
-      }
+      uniqueProducts.set(
+        product.commodityId,
+        product
+      );
     }
 
-    const items =
+    const finalProducts =
       Array.from(
         uniqueProducts.values()
       );
 
-    /*
-     * --------------------------------------------------
-     * 11. CATEGORY COUNTS
-     * --------------------------------------------------
-     */
+    /* -----------------------------------------
+       11. CATEGORY COUNTS
+    ----------------------------------------- */
 
     const categoryCounts: Record<
       string,
       number
     > = {};
 
-    for (const item of items) {
+    for (const product of finalProducts) {
       const category =
-        item.category ||
+        product.category ||
         "অন্যান্য";
 
       categoryCounts[category] =
-        (categoryCounts[category] ||
-          0) + 1;
+        (categoryCounts[category] || 0) +
+        1;
     }
 
-    /*
-     * --------------------------------------------------
-     * 12. PRICE CHANGE COUNTS
-     * --------------------------------------------------
-     */
+    /* -----------------------------------------
+       12. PRICE CHANGE COUNTS
+    ----------------------------------------- */
 
     const priceChangeCounts = {
       increase: 0,
@@ -1131,32 +1101,23 @@ export async function GET(
       no_data: 0,
     };
 
-    for (const item of items) {
+    for (const product of finalProducts) {
       const type =
-        item.priceChangeType;
+        product.priceChangeType;
 
       if (
-        type === "increase"
+        type === "increase" ||
+        type === "decrease" ||
+        type === "unchanged" ||
+        type === "no_data"
       ) {
-        priceChangeCounts.increase++;
-      } else if (
-        type === "decrease"
-      ) {
-        priceChangeCounts.decrease++;
-      } else if (
-        type === "unchanged"
-      ) {
-        priceChangeCounts.unchanged++;
-      } else {
-        priceChangeCounts.no_data++;
+        priceChangeCounts[type]++;
       }
     }
 
-    /*
-     * --------------------------------------------------
-     * 13. FINAL RESPONSE
-     * --------------------------------------------------
-     */
+    /* -----------------------------------------
+       13. RESPONSE
+    ----------------------------------------- */
 
     return NextResponse.json({
       success: true,
@@ -1169,21 +1130,19 @@ export async function GET(
       },
 
       district,
-
       upazila,
-
       market,
 
       date,
 
-      reportDate: date,
-
       previousPriceDate:
         previousDate,
 
-      total: items.length,
+      total:
+        finalProducts.length,
 
-      items,
+      items:
+        finalProducts,
 
       categoryCounts,
 
@@ -1204,17 +1163,10 @@ export async function GET(
     return NextResponse.json(
       {
         success: false,
-
         error:
           error instanceof Error
             ? error.message
-            : "Failed to fetch DAM price data",
-
-        source:
-          "Ministry of Agriculture / DAM",
-
-        timestamp:
-          new Date().toISOString(),
+            : "Unknown API error",
       },
       {
         status: 500,
