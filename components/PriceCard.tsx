@@ -36,41 +36,145 @@ export const PriceCard: React.FC<PriceCardProps> = ({
 }) => {
   const t = translations[lang];
 
-  const priceData = priceType === 'retail' ? item.retail : item.wholesale;
+  const priceData =
+    priceType === 'retail'
+      ? item.retail
+      : item.wholesale;
 
-  // API এখন unit সরাসরি item-এর মধ্যে দেয়
+  /*
+   * DAM API বিভিন্ন field name ব্যবহার করতে পারে।
+   * তাই একাধিক possible field থেকে actual price নেওয়া হচ্ছে।
+   */
+  const getNumber = (...values: unknown[]): number => {
+    for (const value of values) {
+      if (
+        typeof value === 'number' &&
+        Number.isFinite(value)
+      ) {
+        return value;
+      }
+
+      if (
+        typeof value === 'string' &&
+        value.trim() !== ''
+      ) {
+        const parsed = Number(
+          value.replace(/,/g, '').trim()
+        );
+
+        if (Number.isFinite(parsed)) {
+          return parsed;
+        }
+      }
+    }
+
+    return 0;
+  };
+
+  /*
+   * Unit
+   */
   const unit =
     lang === 'bn'
       ? item.unitBn || 'কেজি'
       : item.unitEn || 'Kilogram';
 
-  // API field:
-  // avgPrice
-  // lowestPrice
-  // highestPrice
-  const avgPrice = Number(priceData?.avgPrice ?? 0);
-  const lowestPrice = Number(priceData?.lowestPrice ?? 0);
-  const highestPrice = Number(priceData?.highestPrice ?? 0);
+  /*
+   * Average price
+   *
+   * Priority:
+   * priceData.avgPrice
+   * priceData.averagePrice
+   * priceData.avg
+   * priceData.average
+   * priceData.price
+   * item.retailAvg
+   * item.averagePrice
+   * item.price
+   */
+  const avgPrice = getNumber(
+    priceData?.avgPrice,
+    priceData?.averagePrice,
+    priceData?.avg,
+    priceData?.average,
+    priceData?.price,
+    priceType === 'retail' ? item.retailAvg : item.wholesaleAvg,
+    item.averagePrice,
+    item.price
+  );
 
-  // Category fallback
+  /*
+   * Lowest price
+   */
+  const lowestPrice = getNumber(
+    priceData?.lowestPrice,
+    priceData?.lowPrice,
+    priceData?.lowest,
+    priceData?.low,
+    priceData?.minPrice,
+    priceData?.minimumPrice
+  );
+
+  /*
+   * Highest price
+   */
+  const highestPrice = getNumber(
+    priceData?.highestPrice,
+    priceData?.highPrice,
+    priceData?.highest,
+    priceData?.high,
+    priceData?.maxPrice,
+    priceData?.maximumPrice
+  );
+
+  /*
+   * যদি low/high API থেকে না আসে,
+   * তাহলে average price দিয়েই fallback করা হবে।
+   */
+  const displayLowest =
+    lowestPrice > 0 ? lowestPrice : avgPrice;
+
+  const displayHighest =
+    highestPrice > 0
+      ? highestPrice
+      : avgPrice;
+
+  /*
+   * Category
+   */
   const category =
     lang === 'bn'
       ? item.categoryBn || 'পণ্য'
       : item.categoryEn || 'Product';
 
-  // Movement
+  /*
+   * Movement
+   */
   const movement = item.movement ?? 'stable';
-  const priceChange = Number(item.priceChange ?? 0);
 
+  const priceChange = getNumber(
+    item.priceChange,
+    item.change,
+    item.priceDifference
+  );
+
+  /*
+   * Movement badge
+   */
   const renderMovementBadge = () => {
     if (movement === 'down') {
       return (
         <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-bold bg-[#ECFDF5] text-[#16A34A] border border-[#16A34A]/30">
           <TrendingDown className="w-3.5 h-3.5" />
+
           <span>
             {lang === 'bn'
-              ? `↓ ${toBanglaNumber(Math.abs(priceChange))} টাকা কমেছে`
-              : `↓ ৳${Math.abs(priceChange)} dropped`}
+              ? `↓ ${toBanglaNumber(
+                  Math.abs(priceChange)
+                )} টাকা কমেছে`
+              : `↓ ৳${Math.abs(
+                  priceChange
+                )} dropped`}
           </span>
         </span>
       );
@@ -80,10 +184,15 @@ export const PriceCard: React.FC<PriceCardProps> = ({
       return (
         <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-bold bg-[#FEF2F2] text-[#DC2626] border border-[#DC2626]/30">
           <TrendingUp className="w-3.5 h-3.5" />
+
           <span>
             {lang === 'bn'
-              ? `↑ ${toBanglaNumber(Math.abs(priceChange))} টাকা বেড়েছে`
-              : `↑ ৳${Math.abs(priceChange)} increased`}
+              ? `↑ ${toBanglaNumber(
+                  Math.abs(priceChange)
+                )} টাকা বেড়েছে`
+              : `↑ ৳${Math.abs(
+                  priceChange
+                )} increased`}
           </span>
         </span>
       );
@@ -92,7 +201,12 @@ export const PriceCard: React.FC<PriceCardProps> = ({
     return (
       <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700 border border-gray-200">
         <Minus className="w-3.5 h-3.5" />
-        <span>{lang === 'bn' ? '— অপরিবর্তিত' : '— Stable'}</span>
+
+        <span>
+          {lang === 'bn'
+            ? '— অপরিবর্তিত'
+            : '— Stable'}
+        </span>
       </span>
     );
   };
@@ -113,11 +227,15 @@ export const PriceCard: React.FC<PriceCardProps> = ({
         {/* Product Names */}
         <div className="mb-3">
           <h4 className="text-base sm:text-lg font-bold text-content-main group-hover:text-brand-700 transition-colors leading-snug">
-            {lang === 'bn' ? item.nameBn : item.nameEn}
+            {lang === 'bn'
+              ? item.nameBn
+              : item.nameEn}
           </h4>
 
           <p className="text-xs text-content-muted font-medium mt-0.5">
-            {lang === 'bn' ? item.nameEn : item.nameBn}
+            {lang === 'bn'
+              ? item.nameEn
+              : item.nameBn}
           </p>
         </div>
 
@@ -125,6 +243,7 @@ export const PriceCard: React.FC<PriceCardProps> = ({
         {item.anomalyStatus === 'warning' && (
           <div className="mb-3 bg-amber-50 border border-amber-300 text-amber-900 rounded-xl p-2 text-xs flex items-center space-x-1.5">
             <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+
             <span className="font-semibold">
               {t.anomalyAlert}
             </span>
@@ -143,8 +262,12 @@ export const PriceCard: React.FC<PriceCardProps> = ({
 
             <span className="text-[11px] text-content-light">
               {t.averagePrice}:{' '}
+
               <strong className="text-content-main font-bold">
-                {formatPrice(avgPrice, lang)}
+                {formatPrice(
+                  avgPrice,
+                  lang
+                )}
               </strong>
             </span>
           </div>
@@ -152,13 +275,14 @@ export const PriceCard: React.FC<PriceCardProps> = ({
           <div className="mt-1 flex items-baseline space-x-1">
             <span className="text-xl sm:text-2xl font-black text-brand-900 tracking-tight">
               {formatPriceRange(
-                lowestPrice,
-                highestPrice,
+                displayLowest,
+                displayHighest,
                 unit,
                 lang
               )}
             </span>
           </div>
+
         </div>
 
         {/* Source & Time */}
@@ -190,6 +314,7 @@ export const PriceCard: React.FC<PriceCardProps> = ({
                 : 'Today'}
             </span>
           </div>
+
         </div>
       </div>
 
@@ -197,23 +322,31 @@ export const PriceCard: React.FC<PriceCardProps> = ({
       <div className="grid grid-cols-2 gap-2 mt-3 pt-1">
 
         <button
-          onClick={() => onOpenCalculator(item)}
+          onClick={() =>
+            onOpenCalculator(item)
+          }
           className="flex items-center justify-center space-x-1.5 py-2 px-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300/70 text-xs font-bold transition-all shadow-sm active:scale-95"
           title={t.calculatorSubtitle}
         >
           <Calculator className="w-3.5 h-3.5 text-amber-700" />
 
-          <span>{t.calculatorBtn}</span>
+          <span>
+            {t.calculatorBtn}
+          </span>
         </button>
 
         <button
-          onClick={() => onOpenTrend(item)}
+          onClick={() =>
+            onOpenTrend(item)
+          }
           className="flex items-center justify-center space-x-1.5 py-2 px-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300/70 text-xs font-bold transition-all shadow-sm active:scale-95"
           title={t.trendSubtitle}
         >
           <LineChart className="w-3.5 h-3.5 text-brand-700" />
 
-          <span>{t.trendBtn}</span>
+          <span>
+            {t.trendBtn}
+          </span>
         </button>
 
       </div>
