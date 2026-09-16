@@ -71,17 +71,22 @@ export async function GET(request: NextRequest) {
     const commodityData = await commodityResponse.json();
 
     // =========================================================
-    // 2. IMPORTANT:
-    // Actual MOA structure is:
+    // 2. OFFICIAL COMMODITY + UNIT LIST
     //
-    // commodityData.data.commoditySubGroupList
-    // commodityData.data.measurementUnitList
+    // IMPORTANT:
+    // Commodity IDs are in commodityNameList
+    //
+    // Example:
+    // value: 608
+    // text_bn: "চাল -বোরো - হাইব্রিড -সরু"
+    // unit_retail: 2
+    // unit_whole_sale: 1
     // =========================================================
 
     const commodityList: AnyObject[] = Array.isArray(
-      commodityData?.data?.commoditySubGroupList
+      commodityData?.data?.commodityNameList
     )
-      ? commodityData.data.commoditySubGroupList
+      ? commodityData.data.commodityNameList
       : [];
 
     const measurementUnitList: AnyObject[] = Array.isArray(
@@ -91,7 +96,7 @@ export async function GET(request: NextRequest) {
       : [];
 
     console.log(
-      "DaamBD commoditySubGroupList:",
+      "DaamBD commodityNameList:",
       commodityList.length
     );
 
@@ -102,12 +107,6 @@ export async function GET(request: NextRequest) {
 
     // =========================================================
     // 3. CREATE COMMODITY MAP
-    //
-    // Example:
-    // value: 604
-    // text_bn: "চাল -আমন - মোটা"
-    // unit_retail: 2
-    // unit_whole_sale: 1
     // =========================================================
 
     const commodityMap = new Map<number, AnyObject>();
@@ -122,10 +121,6 @@ export async function GET(request: NextRequest) {
 
     // =========================================================
     // 4. CREATE UNIT MAP
-    //
-    // Example:
-    // 2 => Kilogram / কিলোগ্রাম
-    // 1 => Quintal / কুইন্টাল
     // =========================================================
 
     const unitMap = new Map<number, AnyObject>();
@@ -147,6 +142,20 @@ export async function GET(request: NextRequest) {
       "DaamBD unit map size:",
       unitMap.size
     );
+
+    // Debug specifically for commodity 608
+    const debug608 = commodityMap.get(608);
+
+    if (debug608) {
+      console.log(
+        "DaamBD commodity 608:",
+        JSON.stringify(debug608, null, 2)
+      );
+    } else {
+      console.log(
+        "DaamBD commodity 608 NOT FOUND"
+      );
+    }
 
     // =========================================================
     // 5. FETCH OFFICIAL DAILY PRICE
@@ -229,7 +238,8 @@ export async function GET(request: NextRequest) {
           row?.commodity_id,
           row?.commodityId,
           row?.commodityID,
-          row?.product_id
+          row?.product_id,
+          row?.productId
         );
 
         const commodity = commodityMap.get(commodityId);
@@ -239,51 +249,54 @@ export async function GET(request: NextRequest) {
         // -----------------------------------------------------
 
         const nameBn = getText(
+          // Direct price API names
           row?.commodity_name_bn,
           row?.commodityNameBn,
           row?.name_bn,
           row?.text_bn,
 
+          // Official common-dropdown commodity name
           commodity?.text_bn,
-          commodity?.text,
 
+          // Fallbacks
           commodity?.commodity_name_bn,
           commodity?.commodityNameBn,
           commodity?.name_bn,
 
           row?.commodity_name,
+          commodity?.text,
           commodity?.commodity_name,
 
           `পণ্য ${commodityId}`
         );
 
         const nameEn = getText(
+          // Direct price API names
           row?.commodity_name,
           row?.commodityName,
           row?.name_en,
           row?.text_en,
 
+          // Official common-dropdown commodity name
           commodity?.text_en,
-          commodity?.text,
 
+          // Fallbacks
           commodity?.commodity_name,
           commodity?.commodityName,
           commodity?.name_en,
+
+          commodity?.text,
 
           `Product ${commodityId}`
         );
 
         // -----------------------------------------------------
         // OFFICIAL UNIT IDs
-        //
-        // Commodity example:
-        //
-        // unit_retail: 2
-        // unit_whole_sale: 1
         // -----------------------------------------------------
 
         const retailUnitId = getNumber(
           commodity?.unit_retail,
+
           row?.unit_retail,
           row?.retail_unit,
           row?.retailUnitId,
@@ -292,29 +305,37 @@ export async function GET(request: NextRequest) {
 
         const wholesaleUnitId = getNumber(
           commodity?.unit_whole_sale,
+
+          row?.unit_whole_sale,
           row?.unit_wholesale,
           row?.wholesale_unit,
           row?.wholesaleUnitId,
           row?.wholesale_unit_id
         );
 
-        const retailUnit = unitMap.get(retailUnitId);
+        const retailUnit = unitMap.get(
+          retailUnitId
+        );
 
         const wholesaleUnit = unitMap.get(
           wholesaleUnitId
         );
 
         // -----------------------------------------------------
-        // UNIT NAME
+        // RETAIL UNIT
         // -----------------------------------------------------
 
         const unitBn = getText(
+          // Price API unit object
           row?.rUnitObj?.text_bn,
           row?.rUnitObj?.unit_name_bn,
           row?.rUnitObj?.text,
+
           row?.retailUnitObj?.text_bn,
           row?.retailUnitObj?.unit_name_bn,
+          row?.retailUnitObj?.text,
 
+          // Official measurementUnitList
           retailUnit?.text_bn,
           retailUnit?.text,
 
@@ -325,13 +346,16 @@ export async function GET(request: NextRequest) {
         );
 
         const unitEn = getText(
+          // Price API unit object
           row?.rUnitObj?.text_en,
           row?.rUnitObj?.unit_name,
           row?.rUnitObj?.text,
 
           row?.retailUnitObj?.text_en,
           row?.retailUnitObj?.unit_name,
+          row?.retailUnitObj?.text,
 
+          // Official measurementUnitList
           retailUnit?.text_en,
           retailUnit?.text,
 
@@ -457,8 +481,11 @@ export async function GET(request: NextRequest) {
           unitBn,
           unitEn,
 
-          unitRetailId: retailUnitId || null,
-          unitWholesaleId: wholesaleUnitId || null,
+          unitRetailId:
+            retailUnitId || null,
+
+          unitWholesaleId:
+            wholesaleUnitId || null,
 
           retail: {
             avgPrice: retailAvg,
@@ -475,7 +502,8 @@ export async function GET(request: NextRequest) {
           // Historical comparison will be added later.
           priceChange: 0,
 
-          source: "Ministry of Agriculture / DAM",
+          source:
+            "Ministry of Agriculture / DAM",
 
           verified: true,
 
@@ -506,6 +534,17 @@ export async function GET(request: NextRequest) {
         "DaamBD first mapped item:",
         JSON.stringify(items[0], null, 2)
       );
+
+      const item608 = items.find(
+        (item) => item.commodityId === 608
+      );
+
+      if (item608) {
+        console.log(
+          "DaamBD MAPPED 608:",
+          JSON.stringify(item608, null, 2)
+        );
+      }
     }
 
     // =========================================================
@@ -532,9 +571,11 @@ export async function GET(request: NextRequest) {
 
       items,
 
-      source: "Official Ministry of Agriculture / DAM",
+      source:
+        "Official Ministry of Agriculture / DAM",
 
-      timestamp: new Date().toISOString(),
+      timestamp:
+        new Date().toISOString(),
     });
   } catch (error: any) {
     console.error(
