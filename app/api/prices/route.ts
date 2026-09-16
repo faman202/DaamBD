@@ -12,20 +12,12 @@ type AnyObject = Record<string, any>;
 
 function getNumber(...values: unknown[]): number {
   for (const value of values) {
-    if (
-      typeof value === "number" &&
-      Number.isFinite(value)
-    ) {
+    if (typeof value === "number" && Number.isFinite(value)) {
       return value;
     }
 
-    if (
-      typeof value === "string" &&
-      value.trim() !== ""
-    ) {
-      const number = Number(
-        value.replace(/,/g, "").trim()
-      );
+    if (typeof value === "string" && value.trim() !== "") {
+      const number = Number(value.replace(/,/g, "").trim());
 
       if (Number.isFinite(number)) {
         return number;
@@ -38,17 +30,11 @@ function getNumber(...values: unknown[]): number {
 
 function getText(...values: unknown[]): string {
   for (const value of values) {
-    if (
-      typeof value === "string" &&
-      value.trim() !== ""
-    ) {
+    if (typeof value === "string" && value.trim() !== "") {
       return value.trim();
     }
 
-    if (
-      typeof value === "number" &&
-      Number.isFinite(value)
-    ) {
+    if (typeof value === "number" && Number.isFinite(value)) {
       return String(value);
     }
   }
@@ -60,13 +46,9 @@ function getPreviousDate(
   dateString: string,
   daysBack: number
 ): string {
-  const [year, month, day] = dateString
-    .split("-")
-    .map(Number);
+  const [year, month, day] = dateString.split("-").map(Number);
 
-  const d = new Date(
-    Date.UTC(year, month - 1, day)
-  );
+  const d = new Date(Date.UTC(year, month - 1, day));
 
   d.setUTCDate(d.getUTCDate() - daysBack);
 
@@ -135,15 +117,22 @@ async function fetchPriceRows(
     return data.data.result;
   }
 
-  if (Array.isArray(data?.items)) {
-    return data.items;
-  }
-
-  if (Array.isArray(data?.data?.items)) {
-    return data.data.items;
+  if (Array.isArray(data?.data?.data)) {
+    return data.data.data;
   }
 
   return [];
+}
+
+function getCommodityId(row: AnyObject): number {
+  return getNumber(
+    row?.commodity_id,
+    row?.commodityId,
+    row?.commodityID,
+    row?.commodity,
+    row?.commodity_id_value,
+    0
+  );
 }
 
 function getRetailAverage(row: AnyObject): number {
@@ -161,18 +150,88 @@ function getRetailAverage(row: AnyObject): number {
     row?.rAveragePrice,
     row?.retail_price_avg,
     row?.retailPriceAvg,
+    row?.avgPrice,
+    row?.averagePrice,
+    row?.price,
     0
   );
 }
 
-function getCommodityId(row: AnyObject): number {
+function getRetailLow(row: AnyObject): number {
   return getNumber(
-    row?.commodity_id,
-    row?.commodityId,
-    row?.commodityID,
-    row?.commodity,
-    row?.commodity_id_value,
-    row?.commodityValue,
+    row?.r_avgPriceMin,
+    row?.retail_low,
+    row?.retailLow,
+    row?.retail_min,
+    row?.retailMin,
+    row?.r_min_price,
+    row?.rMinPrice,
+    row?.retail_price_min,
+    row?.retailPriceMin,
+    0
+  );
+}
+
+function getRetailHigh(row: AnyObject): number {
+  return getNumber(
+    row?.r_avgPriceMax,
+    row?.retail_high,
+    row?.retailHigh,
+    row?.retail_max,
+    row?.retailMax,
+    row?.r_max_price,
+    row?.rMaxPrice,
+    row?.retail_price_max,
+    row?.retailPriceMax,
+    0
+  );
+}
+
+function getWholesaleAverage(row: AnyObject): number {
+  return getNumber(
+    row?.w_avgPriceAvg,
+    row?.wholesale_avg,
+    row?.wholesaleAvg,
+    row?.wholesale_average,
+    row?.wholesaleAverage,
+    row?.wholesale_avg_price,
+    row?.wholesaleAvgPrice,
+    row?.avg_wholesale_price,
+    row?.average_wholesale_price,
+    row?.w_avg_price,
+    row?.wAveragePrice,
+    row?.wholesale_price_avg,
+    row?.wholesalePriceAvg,
+    0
+  );
+}
+
+function getWholesaleLow(row: AnyObject): number {
+  return getNumber(
+    row?.w_avgPriceMin,
+    row?.wholesale_low,
+    row?.wholesaleLow,
+    row?.wholesale_min,
+    row?.wholesaleMin,
+    row?.w_min_price,
+    row?.wMinPrice,
+    row?.wholesale_price_min,
+    row?.wholesalePriceMin,
+    0
+  );
+}
+
+function getWholesaleHigh(row: AnyObject): number {
+  return getNumber(
+    row?.w_avgPriceMax,
+    row?.wholesale_high,
+    row?.wholesaleHigh,
+    row?.wholesale_max,
+    row?.wholesaleMax,
+    row?.w_max_price,
+    row?.wMaxPrice,
+    row?.wholesale_price_max,
+    row?.wholesalePriceMax,
     0
   );
 }
@@ -199,30 +258,21 @@ function getCategory(row: AnyObject): string {
       row?.commodity_name,
       row?.commodityName,
       row?.text_bn,
-      row?.text,
-      row?.name_bn,
-      row?.name,
-      row?.text_en
+      row?.text
     ),
+
     getText(
       row?.commodity_group_name_bn,
       row?.commodityGroupNameBn,
       row?.commodity_group_name,
-      row?.commodityGroupName,
-      row?.group_name_bn,
-      row?.groupNameBn,
-      row?.group_name,
-      row?.groupName
+      row?.commodityGroupName
     ),
+
     getText(
       row?.commodity_sub_group_name_bn,
       row?.commoditySubGroupNameBn,
       row?.commodity_sub_group_name,
-      row?.commoditySubGroupName,
-      row?.sub_group_name_bn,
-      row?.subGroupNameBn,
-      row?.sub_group_name,
-      row?.subGroupName
+      row?.commoditySubGroupName
     ),
   ]
     .join(" ")
@@ -230,9 +280,15 @@ function getCategory(row: AnyObject): string {
 
   if (
     text.includes("চাল") ||
-    text.includes("rice")
+    text.includes("rice") ||
+    text.includes("atta") ||
+    text.includes("আটা") ||
+    text.includes("sugar") ||
+    text.includes("চিনি") ||
+    text.includes("salt") ||
+    text.includes("লবণ")
   ) {
-    return "চাল";
+    return "চাল ও খাদ্যশস্য";
   }
 
   if (
@@ -240,23 +296,28 @@ function getCategory(row: AnyObject): string {
     text.includes("lentil") ||
     text.includes("pulse") ||
     text.includes("gram") ||
-    text.includes("peas")
+    text.includes("peas") ||
+    text.includes("mung") ||
+    text.includes("মুগ") ||
+    text.includes("ছোলা") ||
+    text.includes("মটর") ||
+    text.includes("খেসারি")
   ) {
-    return "ডাল";
+    return "ডাল ও শিম";
   }
 
   if (
     text.includes("তেল") ||
     text.includes("oil")
   ) {
-    return "তেল";
+    return "ভোজ্যতেল";
   }
 
   if (
     text.includes("আলু") ||
     text.includes("potato")
   ) {
-    return "আলু";
+    return "শাকসবজি";
   }
 
   if (
@@ -264,56 +325,61 @@ function getCategory(row: AnyObject): string {
     text.includes("পেঁয়াজ") ||
     text.includes("onion")
   ) {
-    return "পেঁয়াজ";
+    return "মসলা";
   }
 
   if (
     text.includes("রসুন") ||
-    text.includes("garlic")
-  ) {
-    return "রসুন";
-  }
-
-  if (
+    text.includes("garlic") ||
     text.includes("আদা") ||
-    text.includes("ginger")
-  ) {
-    return "আদা";
-  }
-
-  if (
+    text.includes("ginger") ||
     text.includes("মরিচ") ||
     text.includes("chilli") ||
-    text.includes("chili")
+    text.includes("chili") ||
+    text.includes("turmeric") ||
+    text.includes("হলুদ")
   ) {
-    return "মরিচ";
+    return "মসলা";
   }
 
   if (
     text.includes("বেগুন") ||
     text.includes("eggplant") ||
-    text.includes("brinjal")
-  ) {
-    return "সবজি";
-  }
-
-  if (
+    text.includes("brinjal") ||
     text.includes("টমেটো") ||
-    text.includes("tomato")
-  ) {
-    return "সবজি";
-  }
-
-  if (
+    text.includes("tomato") ||
     text.includes("সবজি") ||
-    text.includes("vegetable")
+    text.includes("vegetable") ||
+    text.includes("পটল") ||
+    text.includes("লাউ") ||
+    text.includes("করল্লা") ||
+    text.includes("পেঁপে") ||
+    text.includes("papaya") ||
+    text.includes("কুমড়া") ||
+    text.includes("pumpkin") ||
+    text.includes("শসা") ||
+    text.includes("cucumber") ||
+    text.includes("শিম") ||
+    text.includes("bean") ||
+    text.includes("বরবটি") ||
+    text.includes("spinach") ||
+    text.includes("শাক")
   ) {
-    return "সবজি";
+    return "শাকসবজি";
   }
 
   if (
     text.includes("মাছ") ||
-    text.includes("fish")
+    text.includes("fish") ||
+    text.includes("rui") ||
+    text.includes("ruhi") ||
+    text.includes("katla") ||
+    text.includes("pangash") ||
+    text.includes("pangas") ||
+    text.includes("singhi") ||
+    text.includes("silver carp") ||
+    text.includes("telapia") ||
+    text.includes("tilapia")
   ) {
     return "মাছ";
   }
@@ -322,7 +388,7 @@ function getCategory(row: AnyObject): string {
     text.includes("ডিম") ||
     text.includes("egg")
   ) {
-    return "ডিম";
+    return "মাংস ও ডিম";
   }
 
   if (
@@ -330,12 +396,16 @@ function getCategory(row: AnyObject): string {
     text.includes("meat") ||
     text.includes("beef") ||
     text.includes("mutton") ||
-    text.includes("chicken")
+    text.includes("chicken") ||
+    text.includes("মুরগি") ||
+    text.includes("গরু") ||
+    text.includes("খাসী") ||
+    text.includes("বকরী")
   ) {
-    return "মাংস";
+    return "মাংস ও ডিম";
   }
 
-  return "অন্যান্য";
+  return "নিত্যপণ্য";
 }
 
 function getUnitInfo(
@@ -348,9 +418,7 @@ function getUnitInfo(
         item?.value,
         item?.id,
         item?.unit_id,
-        item?.unitId,
-        item?.measurement_unit_id,
-        item?.measurementUnitId
+        item?.unitId
       ) === unitId
   );
 
@@ -368,7 +436,6 @@ function getUnitInfo(
         unit?.unit_name_bn,
         unit?.unitNameBn,
         unit?.name_bn,
-        unit?.nameBn,
         unit?.text
       ) || "কেজি",
 
@@ -378,28 +445,30 @@ function getUnitInfo(
         unit?.unit_name,
         unit?.unitName,
         unit?.name_en,
-        unit?.nameEn,
-        unit?.name,
-        unit?.text
+        unit?.name
       ) || "kg",
   };
 }
 
 function extractList(
   data: AnyObject,
-  listName: string
+  keys: string[]
 ): AnyObject[] {
-  const possibleLocations = [
-    data?.[listName],
-    data?.data?.[listName],
-    data?.result?.[listName],
-    data?.data?.data?.[listName],
-    data?.data?.result?.[listName],
-  ];
+  for (const key of keys) {
+    if (Array.isArray(data?.[key])) {
+      return data[key];
+    }
 
-  for (const value of possibleLocations) {
-    if (Array.isArray(value)) {
-      return value;
+    if (Array.isArray(data?.data?.[key])) {
+      return data.data[key];
+    }
+
+    if (Array.isArray(data?.result?.[key])) {
+      return data.result[key];
+    }
+
+    if (Array.isArray(data?.data?.data?.[key])) {
+      return data.data.data[key];
     }
   }
 
@@ -410,9 +479,7 @@ export async function GET(
   request: NextRequest
 ) {
   try {
-    const { searchParams } = new URL(
-      request.url
-    );
+    const { searchParams } = new URL(request.url);
 
     const division = getNumber(
       searchParams.get("division"),
@@ -436,13 +503,13 @@ export async function GET(
 
     const date =
       searchParams.get("date") ||
-      new Date()
-        .toISOString()
-        .split("T")[0];
+      new Date().toISOString().split("T")[0];
 
-    /* =====================================================
-       1. OFFICIAL COMMODITY + UNIT DATA
-       ===================================================== */
+    /*
+     * ============================================================
+     * 1. OFFICIAL COMMODITY + UNIT DATA
+     * ============================================================
+     */
 
     const commodityResponse = await fetch(
       COMMODITY_API,
@@ -467,18 +534,28 @@ export async function GET(
     const commodityList =
       extractList(
         commodityData,
-        "commodityNameList"
+        [
+          "commodityNameList",
+          "commodity_name_list",
+          "commodities",
+        ]
       );
 
     const measurementUnitList =
       extractList(
         commodityData,
-        "measurementUnitList"
+        [
+          "measurementUnitList",
+          "measurement_unit_list",
+          "units",
+        ]
       );
 
-    /* =====================================================
-       2. OFFICIAL COMMODITY MAP
-       ===================================================== */
+    /*
+     * ============================================================
+     * 2. OFFICIAL COMMODITY MAP
+     * ============================================================
+     */
 
     const commodityMap =
       new Map<number, AnyObject>();
@@ -488,21 +565,19 @@ export async function GET(
         commodity?.value,
         commodity?.id,
         commodity?.commodity_id,
-        commodity?.commodityId,
-        commodity?.commodityID
+        commodity?.commodityId
       );
 
       if (id > 0) {
-        commodityMap.set(
-          id,
-          commodity
-        );
+        commodityMap.set(id, commodity);
       }
     }
 
-    /* =====================================================
-       3. CURRENT OFFICIAL PRICE DATA
-       ===================================================== */
+    /*
+     * ============================================================
+     * 3. CURRENT OFFICIAL PRICE DATA
+     * ============================================================
+     */
 
     const priceRows =
       await fetchPriceRows(
@@ -513,25 +588,20 @@ export async function GET(
         market
       );
 
-    /* =====================================================
-       4. FETCH 30 CALENDAR DAYS
-       ===================================================== */
+    /*
+     * ============================================================
+     * 4. FETCH 30 CALENDAR DAYS
+     * ============================================================
+     */
 
     const historyRequests: {
       date: string;
       promise: Promise<AnyObject[]>;
     }[] = [];
 
-    for (
-      let index = 0;
-      index < 30;
-      index++
-    ) {
+    for (let index = 0; index < 30; index++) {
       const historyDate =
-        getPreviousDate(
-          date,
-          index
-        );
+        getPreviousDate(date, index);
 
       historyRequests.push({
         date: historyDate,
@@ -578,10 +648,9 @@ export async function GET(
 
                 return {
                   date: historyDate,
-                  rows:
-                    Array.isArray(rows)
-                      ? rows
-                      : [],
+                  rows: Array.isArray(rows)
+                    ? rows
+                    : [],
                 };
               } catch {
                 return {
@@ -601,9 +670,11 @@ export async function GET(
       }
     }
 
-    /* =====================================================
-       5. BUILD COMMODITY-WISE HISTORY
-       ===================================================== */
+    /*
+     * ============================================================
+     * 5. BUILD COMMODITY-WISE HISTORY
+     * ============================================================
+     */
 
     const historyMap =
       new Map<
@@ -617,10 +688,7 @@ export async function GET(
     historyRowsByDate.forEach(
       (rows, historyDate) => {
         const dailyCommodityPrices =
-          new Map<
-            number,
-            number[]
-          >();
+          new Map<number, number[]>();
 
         for (const row of rows) {
           const commodityId =
@@ -650,22 +718,14 @@ export async function GET(
         }
 
         dailyCommodityPrices.forEach(
-          (
-            prices,
-            commodityId
-          ) => {
-            if (
-              prices.length === 0
-            ) {
+          (prices, commodityId) => {
+            if (prices.length === 0) {
               return;
             }
 
             const averagePrice =
               prices.reduce(
-                (
-                  sum,
-                  price
-                ) =>
+                (sum, price) =>
                   sum + price,
                 0
               ) / prices.length;
@@ -677,12 +737,9 @@ export async function GET(
 
             existingHistory.push({
               date: historyDate,
-              avgPrice:
-                Number(
-                  averagePrice.toFixed(
-                    2
-                  )
-                ),
+              avgPrice: Number(
+                averagePrice.toFixed(2)
+              ),
             });
 
             historyMap.set(
@@ -694,15 +751,14 @@ export async function GET(
       }
     );
 
-    /* =====================================================
-       6. SORT + DEDUPE HISTORY
-       ===================================================== */
+    /*
+     * ============================================================
+     * 6. SORT + DEDUPE HISTORY
+     * ============================================================
+     */
 
     historyMap.forEach(
-      (
-        history,
-        commodityId
-      ) => {
+      (history, commodityId) => {
         const uniqueByDate =
           new Map<
             string,
@@ -712,9 +768,7 @@ export async function GET(
             }
           >();
 
-        for (
-          const point of history
-        ) {
+        for (const point of history) {
           uniqueByDate.set(
             point.date,
             point
@@ -725,10 +779,7 @@ export async function GET(
           Array.from(
             uniqueByDate.values()
           ).sort(
-            (
-              a,
-              b
-            ) =>
+            (a, b) =>
               a.date.localeCompare(
                 b.date
               )
@@ -741,9 +792,11 @@ export async function GET(
       }
     );
 
-    /* =====================================================
-       7. FIND PREVIOUS AVAILABLE DATE
-       ===================================================== */
+    /*
+     * ============================================================
+     * 7. FIND PREVIOUS AVAILABLE DATE
+     * ============================================================
+     */
 
     let previousDate:
       | string
@@ -765,9 +818,7 @@ export async function GET(
           candidateDate
         ) || [];
 
-      if (
-        candidateRows.length > 0
-      ) {
+      if (candidateRows.length > 0) {
         previousDate =
           candidateDate;
 
@@ -775,9 +826,11 @@ export async function GET(
       }
     }
 
-    /* =====================================================
-       8. PREVIOUS PRICE MAP
-       ===================================================== */
+    /*
+     * ============================================================
+     * 8. PREVIOUS PRICE MAP
+     * ============================================================
+     */
 
     const previousPriceMap =
       new Map<number, number>();
@@ -789,14 +842,9 @@ export async function GET(
         ) || [];
 
       const groupedPrevious =
-        new Map<
-          number,
-          number[]
-        >();
+        new Map<number, number[]>();
 
-      for (
-        const row of previousRows
-      ) {
+      for (const row of previousRows) {
         const commodityId =
           getCommodityId(row);
 
@@ -815,9 +863,7 @@ export async function GET(
             commodityId
           ) || [];
 
-        values.push(
-          retailAvg
-        );
+        values.push(retailAvg);
 
         groupedPrevious.set(
           commodityId,
@@ -826,22 +872,14 @@ export async function GET(
       }
 
       groupedPrevious.forEach(
-        (
-          values,
-          commodityId
-        ) => {
-          if (
-            values.length === 0
-          ) {
+        (values, commodityId) => {
+          if (values.length === 0) {
             return;
           }
 
           const average =
             values.reduce(
-              (
-                sum,
-                value
-              ) =>
+              (sum, value) =>
                 sum + value,
               0
             ) / values.length;
@@ -849,25 +887,22 @@ export async function GET(
           previousPriceMap.set(
             commodityId,
             Number(
-              average.toFixed(
-                2
-              )
+              average.toFixed(2)
             )
           );
         }
       );
     }
 
-    /* =====================================================
-       9. BUILD CURRENT PRODUCTS
-       ===================================================== */
+    /*
+     * ============================================================
+     * 9. BUILD CURRENT PRODUCTS
+     * ============================================================
+     */
 
-    const products: AnyObject[] =
-      [];
+    const products: AnyObject[] = [];
 
-    for (
-      const row of priceRows
-    ) {
+    for (const row of priceRows) {
       const commodityId =
         getCommodityId(row);
 
@@ -886,9 +921,9 @@ export async function GET(
           commodityId
         );
 
-      /* -----------------------------------------------
-         OFFICIAL COMMODITY NAME
-         ----------------------------------------------- */
+      /*
+       * OFFICIAL COMMODITY NAME
+       */
 
       const commodityNameBn =
         getText(
@@ -901,12 +936,10 @@ export async function GET(
 
           row?.commodity_name_bn,
           row?.commodityNameBn,
-          row?.commodity_name,
+          row?.commodity_name_bn,
           row?.commodityName,
           row?.text_bn,
-          row?.text,
-          row?.name_bn,
-          row?.name
+          row?.text
         ) ||
         `পণ্য ${commodityId}`;
 
@@ -922,24 +955,19 @@ export async function GET(
           row?.commodity_name,
           row?.commodityName,
           row?.text_en,
-          row?.text,
-          row?.name_en,
-          row?.name
+          row?.text
         ) ||
         commodityNameBn;
 
-      /* -----------------------------------------------
-         OFFICIAL RETAIL UNIT
-         ----------------------------------------------- */
+      /*
+       * OFFICIAL RETAIL UNIT
+       */
 
       const officialRetailUnitId =
         getNumber(
           officialCommodity?.unit_retail,
-          officialCommodity?.unitRetail,
           officialCommodity?.retail_unit_id,
-          officialCommodity?.retailUnitId,
-          officialCommodity?.retail_unit,
-          officialCommodity?.retailUnit
+          officialCommodity?.retailUnitId
         );
 
       const rowUnitId =
@@ -956,91 +984,32 @@ export async function GET(
           measurementUnitList
         );
 
-      /* -----------------------------------------------
-         RETAIL LOW / HIGH
-         ----------------------------------------------- */
+      /*
+       * RETAIL LOW / HIGH
+       */
 
       const retailLow =
-        getNumber(
-          row?.r_avgPriceMin,
-          row?.retail_low,
-          row?.retailLow,
-          row?.retail_min,
-          row?.retailMin,
-          row?.r_min_price,
-          row?.rMinPrice,
-          row?.retail_price_min,
-          row?.retailPriceMin,
-          0
-        );
+        getRetailLow(row);
 
       const retailHigh =
-        getNumber(
-          row?.r_avgPriceMax,
-          row?.retail_high,
-          row?.retailHigh,
-          row?.retail_max,
-          row?.retailMax,
-          row?.r_max_price,
-          row?.rMaxPrice,
-          row?.retail_price_max,
-          row?.retailPriceMax,
-          0
-        );
+        getRetailHigh(row);
 
-      /* -----------------------------------------------
-         WHOLESALE
-         ----------------------------------------------- */
+      /*
+       * WHOLESALE
+       */
 
       const wholesaleAvg =
-        getNumber(
-          row?.w_avgPriceAvg,
-          row?.wholesale_avg,
-          row?.wholesaleAvg,
-          row?.wholesale_average,
-          row?.wholesaleAverage,
-          row?.wholesale_avg_price,
-          row?.wholesaleAvgPrice,
-          row?.avg_wholesale_price,
-          row?.average_wholesale_price,
-          row?.w_avg_price,
-          row?.wAveragePrice,
-          row?.wholesale_price_avg,
-          row?.wholesalePriceAvg,
-          0
-        );
+        getWholesaleAverage(row);
 
       const wholesaleLow =
-        getNumber(
-          row?.w_avgPriceMin,
-          row?.wholesale_low,
-          row?.wholesaleLow,
-          row?.wholesale_min,
-          row?.wholesaleMin,
-          row?.w_min_price,
-          row?.wMinPrice,
-          row?.wholesale_price_min,
-          row?.wholesalePriceMin,
-          0
-        );
+        getWholesaleLow(row);
 
       const wholesaleHigh =
-        getNumber(
-          row?.w_avgPriceMax,
-          row?.wholesale_high,
-          row?.wholesaleHigh,
-          row?.wholesale_max,
-          row?.wholesaleMax,
-          row?.w_max_price,
-          row?.wMaxPrice,
-          row?.wholesale_price_max,
-          row?.wholesalePriceMax,
-          0
-        );
+        getWholesaleHigh(row);
 
-      /* -----------------------------------------------
-         PREVIOUS PRICE
-         ----------------------------------------------- */
+      /*
+       * PREVIOUS PRICE
+       */
 
       const previousAvgPrice =
         previousPriceMap.get(
@@ -1048,6 +1017,7 @@ export async function GET(
         ) || 0;
 
       let priceChange = 0;
+
       let priceChangePercent = 0;
 
       let priceChangeType:
@@ -1057,9 +1027,7 @@ export async function GET(
         | "no_data" =
         "no_data";
 
-      if (
-        previousAvgPrice > 0
-      ) {
+      if (previousAvgPrice > 0) {
         priceChange =
           Number(
             (
@@ -1072,24 +1040,18 @@ export async function GET(
           Number(
             (
               (
-                (
-                  retailAvg -
-                  previousAvgPrice
-                ) /
+                (retailAvg -
+                  previousAvgPrice) /
                 previousAvgPrice
               ) *
               100
             ).toFixed(2)
           );
 
-        if (
-          priceChange > 0
-        ) {
+        if (priceChange > 0) {
           priceChangeType =
             "increase";
-        } else if (
-          priceChange < 0
-        ) {
+        } else if (priceChange < 0) {
           priceChangeType =
             "decrease";
         } else {
@@ -1098,18 +1060,18 @@ export async function GET(
         }
       }
 
-      /* -----------------------------------------------
-         30 DAY HISTORY
-         ----------------------------------------------- */
+      /*
+       * 30 DAY HISTORY
+       */
 
       const history30Days =
         historyMap.get(
           commodityId
         ) || [];
 
-      /* -----------------------------------------------
-         PRODUCT
-         ----------------------------------------------- */
+      /*
+       * FINAL PRODUCT
+       */
 
       products.push({
         id: commodityId,
@@ -1118,77 +1080,74 @@ export async function GET(
 
         name: commodityNameBn,
 
-        nameBn:
-          commodityNameBn,
+        nameBn: commodityNameBn,
 
-        nameEn:
-          commodityName,
+        nameEn: commodityName,
 
-        commodityNameBn:
-          commodityNameBn,
+        commodityNameBn,
 
-        commodityName:
-          commodityName,
+        commodityName,
 
-        category:
-          getCategory({
-            ...officialCommodity,
-            ...row,
+        category: getCategory({
+          ...officialCommodity,
+          ...row,
 
-            commodity_name_bn:
-              commodityNameBn,
+          commodity_name_bn:
+            commodityNameBn,
 
-            commodity_name:
-              commodityName,
+          commodity_name:
+            commodityName,
 
-            commodity_group_name_bn:
-              officialCommodity?.commodity_group_name_bn ||
-              officialCommodity?.commodityGroupNameBn ||
-              officialCommodity?.group_name_bn ||
-              officialCommodity?.groupNameBn,
+          commodity_group_name_bn:
+            officialCommodity?.commodity_group_name_bn,
 
-            commodity_group_name:
-              officialCommodity?.commodity_group_name ||
-              officialCommodity?.commodityGroupName ||
-              officialCommodity?.group_name ||
-              officialCommodity?.groupName,
+          commodity_group_name:
+            officialCommodity?.commodity_group_name,
 
-            commodity_sub_group_name_bn:
-              officialCommodity?.commodity_sub_group_name_bn ||
-              officialCommodity?.commoditySubGroupNameBn ||
-              officialCommodity?.sub_group_name_bn ||
-              officialCommodity?.subGroupNameBn,
+          commodity_sub_group_name_bn:
+            officialCommodity?.commodity_sub_group_name_bn,
 
-            commodity_sub_group_name:
-              officialCommodity?.commodity_sub_group_name ||
-              officialCommodity?.commoditySubGroupName ||
-              officialCommodity?.sub_group_name ||
-              officialCommodity?.subGroupName,
-          }),
+          commodity_sub_group_name:
+            officialCommodity?.commodity_sub_group_name,
+        }),
 
-        price:
-          retailAvg,
+        /*
+         * IMPORTANT:
+         * Keep multiple compatible price fields
+         * so existing frontend components can read
+         * the official retail average.
+         */
 
-        retailAvg:
-          retailAvg,
+        price: retailAvg,
 
-        retailLow:
-          retailLow,
+        avgPrice: retailAvg,
 
-        retailHigh:
-          retailHigh,
+        averagePrice: retailAvg,
+
+        retailPrice: retailAvg,
+
+        retailAvg: retailAvg,
+
+        retailLow,
+
+        retailHigh,
 
         wholesaleAvg:
-          wholesaleAvg || null,
+          wholesaleAvg > 0
+            ? wholesaleAvg
+            : null,
 
         wholesaleLow:
-          wholesaleLow || null,
+          wholesaleLow > 0
+            ? wholesaleLow
+            : null,
 
         wholesaleHigh:
-          wholesaleHigh || null,
+          wholesaleHigh > 0
+            ? wholesaleHigh
+            : null,
 
-        unitId:
-          unitId,
+        unitId,
 
         unitBn:
           unitInfo.unitBn,
@@ -1197,47 +1156,40 @@ export async function GET(
           unitInfo.unitEn,
 
         previousAvgPrice:
-          previousAvgPrice || null,
+          previousAvgPrice > 0
+            ? previousAvgPrice
+            : null,
 
         previousPriceDate:
           previousDate,
 
-        priceChange:
-          priceChange,
+        priceChange,
 
-        priceChangePercent:
-          priceChangePercent,
+        priceChangePercent,
 
-        priceChangeType:
-          priceChangeType,
+        priceChangeType,
 
-        history30Days:
-          history30Days,
+        history30Days,
 
         source:
           "Ministry of Agriculture / DAM",
 
-        verified:
-          true,
+        verified: true,
 
-        reportDate:
-          date,
+        reportDate: date,
       });
     }
 
-    /* =====================================================
-       10. REMOVE DUPLICATES
-       ===================================================== */
+    /*
+     * ============================================================
+     * 10. REMOVE DUPLICATES
+     * ============================================================
+     */
 
     const uniqueProducts =
-      new Map<
-        number,
-        AnyObject
-      >();
+      new Map<number, AnyObject>();
 
-    for (
-      const product of products
-    ) {
+    for (const product of products) {
       uniqueProducts.set(
         product.commodityId,
         product
@@ -1249,37 +1201,31 @@ export async function GET(
         uniqueProducts.values()
       );
 
-    /* =====================================================
-       11. CATEGORY COUNTS
-       ===================================================== */
+    /*
+     * ============================================================
+     * 11. CATEGORY COUNTS
+     * ============================================================
+     */
 
-    const categoryCounts:
-      Record<
-        string,
-        number
-      > = {};
+    const categoryCounts: Record<
+      string,
+      number
+    > = {};
 
-    for (
-      const product of
-        finalProducts
-    ) {
+    for (const product of finalProducts) {
       const category =
         product.category ||
-        "অন্যান্য";
+        "নিত্যপণ্য";
 
-      categoryCounts[
-        category
-      ] =
-        (
-          categoryCounts[
-            category
-          ] || 0
-        ) + 1;
+      categoryCounts[category] =
+        (categoryCounts[category] || 0) + 1;
     }
 
-    /* =====================================================
-       12. PRICE CHANGE COUNTS
-       ===================================================== */
+    /*
+     * ============================================================
+     * 12. PRICE CHANGE COUNTS
+     * ============================================================
+     */
 
     const priceChangeCounts: {
       increase: number;
@@ -1293,37 +1239,29 @@ export async function GET(
       no_data: 0,
     };
 
-    for (
-      const product of
-        finalProducts
-    ) {
+    for (const product of finalProducts) {
       const type =
         product.priceChangeType;
 
-      if (
-        type === "increase"
-      ) {
+      if (type === "increase") {
         priceChangeCounts.increase++;
-      } else if (
-        type === "decrease"
-      ) {
+      } else if (type === "decrease") {
         priceChangeCounts.decrease++;
-      } else if (
-        type === "unchanged"
-      ) {
+      } else if (type === "unchanged") {
         priceChangeCounts.unchanged++;
       } else {
         priceChangeCounts.no_data++;
       }
     }
 
-    /* =====================================================
-       13. RESPONSE
-       ===================================================== */
+    /*
+     * ============================================================
+     * 13. RESPONSE
+     * ============================================================
+     */
 
     return NextResponse.json({
-      success:
-        true,
+      success: true,
 
       location: {
         division,
@@ -1349,13 +1287,9 @@ export async function GET(
       items:
         finalProducts,
 
-      categoryCounts:
+      categoryCounts,
 
-        categoryCounts,
-
-      priceChangeCounts:
-
-        priceChangeCounts,
+      priceChangeCounts,
 
       source:
         "Ministry of Agriculture / DAM",
@@ -1371,8 +1305,7 @@ export async function GET(
 
     return NextResponse.json(
       {
-        success:
-          false,
+        success: false,
 
         error:
           error instanceof Error
