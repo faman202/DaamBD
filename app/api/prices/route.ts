@@ -25,36 +25,33 @@ type PriceChangeType =
    BASIC HELPERS
    ========================================================= */
 
-function getNumber(
-  value: unknown,
-  fallback = 0
-): number {
-  if (
-    typeof value === "number" &&
-    Number.isFinite(value)
-  ) {
-    return value;
-  }
+function getNumber(...values: unknown[]): number {
+  for (const value of values) {
+    if (
+      typeof value === "number" &&
+      Number.isFinite(value)
+    ) {
+      return value;
+    }
 
-  if (
-    typeof value === "string" &&
-    value.trim() !== ""
-  ) {
-    const n = Number(
-      value.replace(/,/g, "")
-    );
+    if (
+      typeof value === "string" &&
+      value.trim() !== ""
+    ) {
+      const number = Number(
+        value.replace(/,/g, "").trim()
+      );
 
-    if (Number.isFinite(n)) {
-      return n;
+      if (Number.isFinite(number)) {
+        return number;
+      }
     }
   }
 
-  return fallback;
+  return 0;
 }
 
-function getText(
-  ...values: unknown[]
-): string {
+function getText(...values: unknown[]): string {
   for (const value of values) {
     if (
       value !== undefined &&
@@ -77,9 +74,7 @@ function getPreviousDate(
   daysBack: number
 ): string {
   const [year, month, day] =
-    dateString
-      .split("-")
-      .map(Number);
+    dateString.split("-").map(Number);
 
   const date = new Date(
     Date.UTC(
@@ -115,38 +110,26 @@ async function fetchPriceRows(
       district_id: [district],
       upazila_id: [upazila],
       market_id: [market],
-
       price_type_id: ["Retail"],
-
       price_date: reportDate,
-
       select_type: "Daily",
-
       month_id: 0,
       year_id: 0,
       week_id: 0,
     };
 
-    const response =
-      await fetch(
-        PRICE_API,
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type":
-              "application/json",
-            Accept:
-              "application/json",
-          },
-
-          body: JSON.stringify(
-            payload
-          ),
-
-          cache: "no-store",
-        }
-      );
+    const response = await fetch(
+      PRICE_API,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(payload),
+        cache: "no-store",
+      }
+    );
 
     if (!response.ok) {
       console.error(
@@ -157,56 +140,29 @@ async function fetchPriceRows(
       return [];
     }
 
-    const data =
-      await response.json();
-
-    /*
-     * DAM API may return the array
-     * directly or inside different
-     * wrapper properties.
-     */
+    const data = await response.json();
 
     if (Array.isArray(data)) {
       return data;
     }
 
-    if (
-      Array.isArray(
-        data?.data
-      )
-    ) {
+    if (Array.isArray(data?.data)) {
       return data.data;
     }
 
-    if (
-      Array.isArray(
-        data?.result
-      )
-    ) {
+    if (Array.isArray(data?.result)) {
       return data.result;
     }
 
-    if (
-      Array.isArray(
-        data?.content
-      )
-    ) {
+    if (Array.isArray(data?.content)) {
       return data.content;
     }
 
-    if (
-      Array.isArray(
-        data?.data?.content
-      )
-    ) {
+    if (Array.isArray(data?.data?.content)) {
       return data.data.content;
     }
 
-    if (
-      Array.isArray(
-        data?.data?.result
-      )
-    ) {
+    if (Array.isArray(data?.data?.result)) {
       return data.data.result;
     }
 
@@ -277,13 +233,10 @@ function getCategory(
   en: string;
 } {
   const text =
-    `${nameBn} ${nameEn}`
-      .toLowerCase();
+    `${nameBn} ${nameEn}`.toLowerCase();
 
   if (
-    /rice|চাল|ধান|paddy|boro|aman|aus/.test(
-      text
-    )
+    /rice|চাল|ধান|paddy|boro|aman|aus/.test(text)
   ) {
     return {
       slug: "rice",
@@ -341,9 +294,7 @@ function getCategory(
   }
 
   if (
-    /egg|ডিম|hen egg|chicken egg/.test(
-      text
-    )
+    /egg|ডিম|hen egg|chicken egg/.test(text)
   ) {
     return {
       slug: "eggs",
@@ -412,14 +363,13 @@ function getUnitInfo(
   shortBn: string;
   shortEn: string;
 } {
-  const unit =
-    measurementUnits.find(
-      (item) =>
-        getNumber(
-          item?.value,
-          item?.id
-        ) === unitId
-    );
+  const unit = measurementUnits.find(
+    (item) =>
+      getNumber(
+        item?.value,
+        item?.id
+      ) === unitId
+  );
 
   const bn = getText(
     unit?.text_bn,
@@ -464,11 +414,6 @@ function getUnitInfo(
   ) {
     shortBn = "লিটার";
     shortEn = "L";
-  } else if (
-    /piece|hali|dozen/i.test(en)
-  ) {
-    shortBn = bn;
-    shortEn = en;
   }
 
   return {
@@ -489,81 +434,56 @@ export async function GET(
 ) {
   try {
     const { searchParams } =
-      new URL(
-        request.url
-      );
+      new URL(request.url);
 
-    const division =
-      getNumber(
-        searchParams.get(
-          "division"
-        ),
-        6
-      );
+    const division = getNumber(
+      searchParams.get("division"),
+      6
+    );
 
-    const district =
-      getNumber(
-        searchParams.get(
-          "district"
-        ),
-        46
-      );
+    const district = getNumber(
+      searchParams.get("district"),
+      46
+    );
 
-    const upazila =
-      getNumber(
-        searchParams.get(
-          "upazila"
-        ),
-        360
-      );
+    const upazila = getNumber(
+      searchParams.get("upazila"),
+      360
+    );
 
-    const market =
-      getNumber(
-        searchParams.get(
-          "market"
-        ),
-        109
-      );
+    const market = getNumber(
+      searchParams.get("market"),
+      109
+    );
 
     const date =
-      searchParams.get(
-        "date"
-      ) ||
+      searchParams.get("date") ||
       new Date()
         .toISOString()
         .split("T")[0];
 
-    console.log(
-      "DaamBD API:",
-      {
-        division,
-        district,
-        upazila,
-        market,
-        date,
-      }
-    );
+    console.log("DaamBD API:", {
+      division,
+      district,
+      upazila,
+      market,
+      date,
+    });
 
     /* =====================================================
-       1. FETCH OFFICIAL COMMODITY / UNIT DATA
+       1. OFFICIAL COMMODITY / UNIT DATA
        ===================================================== */
 
     const commodityResponse =
-      await fetch(
-        COMMODITY_API,
-        {
-          method: "GET",
-          headers: {
-            Accept:
-              "application/json",
-          },
-          cache: "no-store",
-        }
-      );
+      await fetch(COMMODITY_API, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+        },
+        cache: "no-store",
+      });
 
-    if (
-      !commodityResponse.ok
-    ) {
+    if (!commodityResponse.ok) {
       throw new Error(
         `Commodity API failed: ${commodityResponse.status}`
       );
@@ -576,32 +496,14 @@ export async function GET(
       Array.isArray(
         commodityData?.commodityNameList
       )
-        ? commodityData
-            .commodityNameList
+        ? commodityData.commodityNameList
         : [];
 
     const measurementUnitList =
       Array.isArray(
         commodityData?.measurementUnitList
       )
-        ? commodityData
-            .measurementUnitList
-        : [];
-
-    const groupList =
-      Array.isArray(
-        commodityData?.commodityGroupList
-      )
-        ? commodityData
-            .commodityGroupList
-        : [];
-
-    const subgroupList =
-      Array.isArray(
-        commodityData?.commoditySubGroupList
-      )
-        ? commodityData
-            .commoditySubGroupList
+        ? commodityData.measurementUnitList
         : [];
 
     /* =====================================================
@@ -609,19 +511,15 @@ export async function GET(
        ===================================================== */
 
     const commodityMap =
-      new Map<
-        number,
-        AnyObject
-      >();
+      new Map<number, AnyObject>();
 
     for (
       const commodity of commodityList
     ) {
-      const id =
-        getNumber(
-          commodity?.value,
-          commodity?.id
-        );
+      const id = getNumber(
+        commodity?.value,
+        commodity?.id
+      );
 
       if (id > 0) {
         commodityMap.set(
@@ -632,57 +530,7 @@ export async function GET(
     }
 
     /* =====================================================
-       3. BUILD GROUP / SUBGROUP MAP
-       ===================================================== */
-
-    const groupMap =
-      new Map<
-        number,
-        AnyObject
-      >();
-
-    for (
-      const group of groupList
-    ) {
-      const id =
-        getNumber(
-          group?.value,
-          group?.id
-        );
-
-      if (id > 0) {
-        groupMap.set(
-          id,
-          group
-        );
-      }
-    }
-
-    const subgroupMap =
-      new Map<
-        number,
-        AnyObject
-      >();
-
-    for (
-      const subgroup of subgroupList
-    ) {
-      const id =
-        getNumber(
-          subgroup?.value,
-          subgroup?.id
-        );
-
-      if (id > 0) {
-        subgroupMap.set(
-          id,
-          subgroup
-        );
-      }
-    }
-
-    /* =====================================================
-       4. FETCH CURRENT OFFICIAL PRICE DATA
+       3. CURRENT OFFICIAL PRICE DATA
        ===================================================== */
 
     const priceRows =
@@ -700,13 +548,7 @@ export async function GET(
     );
 
     /* =====================================================
-       5. FETCH PREVIOUS 30 CALENDAR DAYS
-
-       This is also used for:
-       - previous price comparison
-       - 30-day history
-
-       No fake values are generated.
+       4. FETCH 30 DAYS OFFICIAL HISTORY
        ===================================================== */
 
     const historyRequests =
@@ -737,12 +579,6 @@ export async function GET(
         }
       );
 
-    /*
-     * To avoid sending all 30 requests
-     * simultaneously, process them in
-     * small batches.
-     */
-
     const historyRowsByDate =
       new Map<
         string,
@@ -753,8 +589,7 @@ export async function GET(
 
     for (
       let i = 0;
-      i <
-      historyRequests.length;
+      i < historyRequests.length;
       i += BATCH_SIZE
     ) {
       const batch =
@@ -775,14 +610,12 @@ export async function GET(
                   await promise;
 
                 return {
-                  date:
-                    historyDate,
-                  rows:
-                    Array.isArray(
-                      rows
-                    )
-                      ? rows
-                      : [],
+                  date: historyDate,
+                  rows: Array.isArray(
+                    rows
+                  )
+                    ? rows
+                    : [],
                 };
               } catch (error) {
                 console.error(
@@ -791,8 +624,7 @@ export async function GET(
                 );
 
                 return {
-                  date:
-                    historyDate,
+                  date: historyDate,
                   rows: [],
                 };
               }
@@ -804,8 +636,7 @@ export async function GET(
         const result of results
       ) {
         if (
-          result.rows.length >
-          0
+          result.rows.length > 0
         ) {
           historyRowsByDate.set(
             result.date,
@@ -821,7 +652,7 @@ export async function GET(
     );
 
     /* =====================================================
-       6. BUILD PRODUCT-WISE 30 DAY HISTORY
+       5. BUILD PRODUCT-WISE HISTORY
        ===================================================== */
 
     const historyMap =
@@ -836,11 +667,6 @@ export async function GET(
         rows,
       ] of historyRowsByDate
     ) {
-      /*
-       * Protect against duplicate
-       * commodity rows on same date.
-       */
-
       const dailyCommodityPrices =
         new Map<
           number,
@@ -851,14 +677,10 @@ export async function GET(
         const row of rows
       ) {
         const commodityId =
-          getCommodityId(
-            row
-          );
+          getCommodityId(row);
 
         const avgPrice =
-          getRetailAverage(
-            row
-          );
+          getRetailAverage(row);
 
         if (
           commodityId <= 0 ||
@@ -879,9 +701,7 @@ export async function GET(
         }
 
         dailyCommodityPrices
-          .get(
-            commodityId
-          )!
+          .get(commodityId)!
           .push(avgPrice);
       }
 
@@ -891,25 +711,16 @@ export async function GET(
           prices,
         ] of dailyCommodityPrices
       ) {
-        if (
-          prices.length === 0
-        ) {
+        if (prices.length === 0) {
           continue;
         }
-
-        /*
-         * If DAM returns multiple rows
-         * for the same commodity/date,
-         * use their arithmetic average.
-         */
 
         const avg =
           prices.reduce(
             (sum, value) =>
               sum + value,
             0
-          ) /
-          prices.length;
+          ) / prices.length;
 
         if (
           !historyMap.has(
@@ -923,23 +734,18 @@ export async function GET(
         }
 
         historyMap
-          .get(
-            commodityId
-          )!
+          .get(commodityId)!
           .push({
-            date:
-              historyDate,
-
-            avgPrice:
-              Number(
-                avg.toFixed(2)
-              ),
+            date: historyDate,
+            avgPrice: Number(
+              avg.toFixed(2)
+            ),
           });
       }
     }
 
     /* =====================================================
-       7. SORT HISTORY ASCENDING
+       6. SORT AND DEDUPLICATE HISTORY
        ===================================================== */
 
     for (
@@ -954,10 +760,6 @@ export async function GET(
             b.date
           )
       );
-
-      /*
-       * Remove duplicate dates.
-       */
 
       const uniqueHistory =
         Array.from(
@@ -978,15 +780,12 @@ export async function GET(
     }
 
     /* =====================================================
-       8. FIND PREVIOUS AVAILABLE DATE
-       
-       Keep previous comparison within
-       the previous 7 calendar days,
-       matching the old behaviour.
+       7. FIND PREVIOUS AVAILABLE DATE
        ===================================================== */
 
     let previousDate:
-      string | null = null;
+      | string
+      | null = null;
 
     let previousRows:
       AnyObject[] = [];
@@ -1027,7 +826,7 @@ export async function GET(
     );
 
     /* =====================================================
-       9. BUILD PREVIOUS PRICE MAP
+       8. BUILD PREVIOUS PRICE MAP
        ===================================================== */
 
     const previousPriceMap =
@@ -1035,11 +834,6 @@ export async function GET(
         number,
         number
       >();
-
-    /*
-     * Multiple rows for the same
-     * commodity are averaged.
-     */
 
     const previousTempMap =
       new Map<
@@ -1051,14 +845,10 @@ export async function GET(
       const row of previousRows
     ) {
       const commodityId =
-        getCommodityId(
-          row
-        );
+        getCommodityId(row);
 
       const avgPrice =
-        getRetailAverage(
-          row
-        );
+        getRetailAverage(row);
 
       if (
         commodityId <= 0 ||
@@ -1079,9 +869,7 @@ export async function GET(
       }
 
       previousTempMap
-        .get(
-          commodityId
-        )!
+        .get(commodityId)!
         .push(avgPrice);
     }
 
@@ -1091,6 +879,10 @@ export async function GET(
         prices,
       ] of previousTempMap
     ) {
+      if (prices.length === 0) {
+        continue;
+      }
+
       const avg =
         prices.reduce(
           (sum, value) =>
@@ -1100,313 +892,277 @@ export async function GET(
 
       previousPriceMap.set(
         commodityId,
-        Number(
-          avg.toFixed(2)
-        )
+        Number(avg.toFixed(2))
       );
     }
 
-    console.log(
-      "DaamBD previous price map size:",
-      previousPriceMap.size
-    );
-
     /* =====================================================
-       10. CREATE FINAL PRODUCTS
+       9. CREATE FINAL PRODUCTS
        ===================================================== */
 
     const items =
       priceRows
-        .map(
-          (row) => {
-            const commodityId =
-              getCommodityId(
-                row
+        .map((row) => {
+          const commodityId =
+            getCommodityId(row);
+
+          if (
+            commodityId <= 0
+          ) {
+            return null;
+          }
+
+          const commodity =
+            commodityMap.get(
+              commodityId
+            );
+
+          const nameBn = getText(
+            commodity?.text_bn,
+            commodity?.text,
+            row?.commodity_name_bn,
+            row?.commodityNameBn,
+            row?.commodity_name,
+            row?.commodityName
+          );
+
+          const nameEn = getText(
+            commodity?.text_en,
+            commodity?.text,
+            row?.commodity_name,
+            row?.commodityName,
+            nameBn
+          );
+
+          if (
+            !nameBn &&
+            !nameEn
+          ) {
+            return null;
+          }
+
+          const category =
+            getCategory(
+              nameBn,
+              nameEn
+            );
+
+          /* ---------------------------------------------
+             UNIT
+             --------------------------------------------- */
+
+          const unitId =
+            getUnitId(
+              row,
+              commodity
+            );
+
+          const unit =
+            getUnitInfo(
+              unitId,
+              measurementUnitList
+            );
+
+          /* ---------------------------------------------
+             RETAIL
+             --------------------------------------------- */
+
+          const retailAvg =
+            getRetailAverage(row);
+
+          const retailLow =
+            getNumber(
+              row?.r_avgPriceMin,
+              row?.retail_low,
+              row?.retailLow,
+              row?.retail_min,
+              row?.r_lowPrice,
+              0
+            );
+
+          const retailHigh =
+            getNumber(
+              row?.r_avgPriceMax,
+              row?.retail_high,
+              row?.retailHigh,
+              row?.retail_max,
+              row?.r_highPrice,
+              0
+            );
+
+          /* ---------------------------------------------
+             WHOLESALE
+             --------------------------------------------- */
+
+          const wholesaleAvg =
+            getNumber(
+              row?.w_avgPriceAvg,
+              row?.wholesale_avg,
+              row?.wholesaleAvg,
+              row?.wholesale_average,
+              row?.wholesale_avg_price,
+              row?.wholesaleAvgPrice,
+              row?.w_avg_price,
+              0
+            );
+
+          const wholesaleLow =
+            getNumber(
+              row?.w_avgPriceMin,
+              row?.wholesale_low,
+              row?.wholesaleLow,
+              row?.w_lowPrice,
+              0
+            );
+
+          const wholesaleHigh =
+            getNumber(
+              row?.w_avgPriceMax,
+              row?.wholesale_high,
+              row?.wholesaleHigh,
+              row?.w_highPrice,
+              0
+            );
+
+          /* ---------------------------------------------
+             PREVIOUS PRICE
+             --------------------------------------------- */
+
+          const previousAvgPrice =
+            previousPriceMap.get(
+              commodityId
+            ) || 0;
+
+          let priceChange = 0;
+
+          let priceChangePercent = 0;
+
+          let priceChangeType:
+            PriceChangeType =
+              "no_data";
+
+          if (
+            retailAvg > 0 &&
+            previousAvgPrice > 0
+          ) {
+            priceChange =
+              Number(
+                (
+                  retailAvg -
+                  previousAvgPrice
+                ).toFixed(2)
               );
 
-            if (
-              commodityId <= 0
-            ) {
-              return null;
-            }
-
-            const commodity =
-              commodityMap.get(
-                commodityId
-              );
-
-            /*
-             * Prefer official commodity
-             * dropdown names.
-             */
-
-            const nameBn =
-              getText(
-                commodity?.text_bn,
-                commodity?.text,
-                row?.commodity_name_bn,
-                row?.commodityNameBn,
-                row?.commodity_name,
-                row?.commodityName
-              );
-
-            const nameEn =
-              getText(
-                commodity?.text_en,
-                commodity?.text,
-                row?.commodity_name,
-                row?.commodityName,
-                nameBn
-              );
-
-            /*
-             * Skip rows where we cannot
-             * identify the product.
-             */
-
-            if (
-              !nameBn &&
-              !nameEn
-            ) {
-              return null;
-            }
-
-            const category =
-              getCategory(
-                nameBn,
-                nameEn
-              );
-
-            /* ---------------------------------------------
-               OFFICIAL UNIT
-               --------------------------------------------- */
-
-            const unitId =
-              getUnitId(
-                row,
-                commodity
-              );
-
-            const unit =
-              getUnitInfo(
-                unitId,
-                measurementUnitList
-              );
-
-            /* ---------------------------------------------
-               CURRENT RETAIL PRICE
-               --------------------------------------------- */
-
-            const retailAvg =
-              getRetailAverage(
-                row
-              );
-
-            const retailLow =
-              getNumber(
-                row?.r_avgPriceMin,
-                row?.retail_low,
-                row?.retailLow,
-                row?.retail_min,
-                row?.r_lowPrice,
-                0
-              );
-
-            const retailHigh =
-              getNumber(
-                row?.r_avgPriceMax,
-                row?.retail_high,
-                row?.retailHigh,
-                row?.retail_max,
-                row?.r_highPrice,
-                0
-              );
-
-            /* ---------------------------------------------
-               WHOLESALE
-               --------------------------------------------- */
-
-            const wholesaleAvg =
-              getNumber(
-                row?.w_avgPriceAvg,
-                row?.wholesale_avg,
-                row?.wholesaleAvg,
-                row?.wholesale_average,
-                row?.wholesale_avg_price,
-                row?.wholesaleAvgPrice,
-                row?.w_avg_price,
-                0
-              );
-
-            const wholesaleLow =
-              getNumber(
-                row?.w_avgPriceMin,
-                row?.wholesale_low,
-                row?.wholesaleLow,
-                row?.w_lowPrice,
-                0
-              );
-
-            const wholesaleHigh =
-              getNumber(
-                row?.w_avgPriceMax,
-                row?.wholesale_high,
-                row?.wholesaleHigh,
-                row?.w_highPrice,
-                0
-              );
-
-            /* ---------------------------------------------
-               PREVIOUS PRICE
-               --------------------------------------------- */
-
-            const previousAvgPrice =
-              previousPriceMap.get(
-                commodityId
-              ) || 0;
-
-            let priceChange = 0;
-
-            let priceChangePercent =
-              0;
-
-            let priceChangeType:
-              PriceChangeType =
-                "no_data";
-
-            if (
-              retailAvg > 0 &&
-              previousAvgPrice > 0
-            ) {
-              priceChange =
-                Number(
-                  (
-                    retailAvg -
-                    previousAvgPrice
-                  ).toFixed(2)
-                );
-
-              priceChangePercent =
-                Number(
+            priceChangePercent =
+              Number(
+                (
                   (
                     (
-                      (
-                        retailAvg -
-                        previousAvgPrice
-                      ) /
+                      retailAvg -
                       previousAvgPrice
-                    ) *
-                    100
-                  ).toFixed(2)
-                );
+                    ) /
+                    previousAvgPrice
+                  ) *
+                  100
+                ).toFixed(2)
+              );
 
-              if (
-                priceChange > 0
-              ) {
-                priceChangeType =
-                  "increase";
-              } else if (
-                priceChange < 0
-              ) {
-                priceChangeType =
-                  "decrease";
-              } else {
-                priceChangeType =
-                  "unchanged";
-              }
+            if (
+              priceChange > 0
+            ) {
+              priceChangeType =
+                "increase";
+            } else if (
+              priceChange < 0
+            ) {
+              priceChangeType =
+                "decrease";
+            } else {
+              priceChangeType =
+                "unchanged";
             }
+          }
 
-            /* ---------------------------------------------
-               OFFICIAL 30-DAY HISTORY
-               --------------------------------------------- */
+          /* ---------------------------------------------
+             30 DAY HISTORY
+             --------------------------------------------- */
 
-            const history30Days =
-              historyMap.get(
-                commodityId
-              ) || [];
+          const history30Days =
+            historyMap.get(
+              commodityId
+            ) || [];
 
-            /* ---------------------------------------------
-               RETURN PRODUCT
-               --------------------------------------------- */
+          return {
+            commodityId,
 
-            return {
-              commodityId,
+            nameBn,
+            nameEn,
 
-              nameBn,
-              nameEn,
+            category:
+              category.slug,
 
-              category:
-                category.slug,
+            categorySlug:
+              category.slug,
 
-              categorySlug:
-                category.slug,
+            categoryBn:
+              category.bn,
 
-              categoryBn:
-                category.bn,
+            categoryEn:
+              category.en,
 
-              categoryEn:
-                category.en,
+            unitId,
 
-              unitId,
+            unitBn:
+              unit.shortBn,
 
-              unitBn:
-                unit.shortBn,
+            unitEn:
+              unit.shortEn,
 
-              unitEn:
-                unit.shortEn,
+            unitNameBn:
+              unit.bn,
 
-              unitNameBn:
-                unit.bn,
+            unitNameEn:
+              unit.en,
 
-              unitNameEn:
-                unit.en,
-
-              price:
-                retailAvg,
-
+            price:
               retailAvg,
 
-              retailLow,
+            retailAvg,
 
-              retailHigh,
+            retailLow,
 
-              wholesaleAvg,
+            retailHigh,
 
-              wholesaleLow,
+            wholesaleAvg,
 
-              wholesaleHigh,
+            wholesaleLow,
 
-              previousAvgPrice:
-                previousAvgPrice ||
-                null,
+            wholesaleHigh,
 
-              previousPriceDate:
-                previousDate ||
-                null,
+            previousAvgPrice:
+              previousAvgPrice ||
+              null,
 
-              priceChange,
+            previousPriceDate:
+              previousDate ||
+              null,
 
-              priceChangePercent,
+            priceChange,
 
-              priceChangeType,
+            priceChangePercent,
 
-              /*
-               * IMPORTANT:
-               * This contains ONLY official
-               * DAM daily retail average data.
-               */
+            priceChangeType,
 
-              history30Days,
+            history30Days,
 
-              source:
-                "Ministry of Agriculture / DAM",
+            source:
+              "Ministry of Agriculture / DAM",
 
-              verified: true,
+            verified: true,
 
-              reportDate: date,
-            };
-          }
-        )
+            reportDate: date,
+          };
+        })
         .filter(
           (
             item
@@ -1418,7 +1174,7 @@ export async function GET(
         );
 
     /* =====================================================
-       11. CATEGORY COUNTS
+       10. CATEGORY COUNTS
        ===================================================== */
 
     const categoryCounts:
@@ -1432,12 +1188,11 @@ export async function GET(
         "other";
 
       categoryCounts[key] =
-        (categoryCounts[key] ||
-          0) + 1;
+        (categoryCounts[key] || 0) + 1;
     }
 
     /* =====================================================
-       12. PRICE CHANGE COUNTS
+       11. PRICE CHANGE COUNTS
        ===================================================== */
 
     const priceChangeCounts = {
@@ -1450,19 +1205,19 @@ export async function GET(
     for (
       const item of items
     ) {
-      const type =
-        item.priceChangeType;
-
       if (
-        type === "increase"
+        item.priceChangeType ===
+        "increase"
       ) {
         priceChangeCounts.increase++;
       } else if (
-        type === "decrease"
+        item.priceChangeType ===
+        "decrease"
       ) {
         priceChangeCounts.decrease++;
       } else if (
-        type === "unchanged"
+        item.priceChangeType ===
+        "unchanged"
       ) {
         priceChangeCounts.unchanged++;
       } else {
@@ -1471,7 +1226,7 @@ export async function GET(
     }
 
     /* =====================================================
-       13. RESPONSE
+       12. RESPONSE
        ===================================================== */
 
     return NextResponse.json(
