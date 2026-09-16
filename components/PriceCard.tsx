@@ -41,10 +41,6 @@ export const PriceCard: React.FC<PriceCardProps> = ({
       ? item.retail
       : item.wholesale;
 
-  /*
-   * DAM API বিভিন্ন field name ব্যবহার করতে পারে।
-   * তাই একাধিক possible field থেকে actual price নেওয়া হচ্ছে।
-   */
   const getNumber = (...values: unknown[]): number => {
     for (const value of values) {
       if (
@@ -71,96 +67,57 @@ export const PriceCard: React.FC<PriceCardProps> = ({
     return 0;
   };
 
-  /*
-   * Unit
-   */
+  // Unit
   const unit =
     lang === 'bn'
       ? item.unitBn || 'কেজি'
       : item.unitEn || 'Kilogram';
 
-  /*
-   * Average price
-   *
-   * Priority:
-   * priceData.avgPrice
-   * priceData.averagePrice
-   * priceData.avg
-   * priceData.average
-   * priceData.price
-   * item.retailAvg
-   * item.averagePrice
-   * item.price
-   */
+  // Average price
   const avgPrice = getNumber(
     priceData?.avgPrice,
-    priceData?.averagePrice,
-    priceData?.avg,
-    priceData?.average,
-    priceData?.price,
-    priceType === 'retail' ? item.retailAvg : item.wholesaleAvg,
-    item.averagePrice,
+    priceType === 'retail'
+      ? item.retailAvg
+      : item.wholesaleAvg,
     item.price
   );
 
-  /*
-   * Lowest price
-   */
+  // Lowest price
   const lowestPrice = getNumber(
-    priceData?.lowestPrice,
-    priceData?.lowPrice,
-    priceData?.lowest,
-    priceData?.low,
-    priceData?.minPrice,
-    priceData?.minimumPrice
+    priceData?.lowestPrice
   );
 
-  /*
-   * Highest price
-   */
+  // Highest price
   const highestPrice = getNumber(
-    priceData?.highestPrice,
-    priceData?.highPrice,
-    priceData?.highest,
-    priceData?.high,
-    priceData?.maxPrice,
-    priceData?.maximumPrice
+    priceData?.highestPrice
   );
 
-  /*
-   * যদি low/high API থেকে না আসে,
-   * তাহলে average price দিয়েই fallback করা হবে।
-   */
+  // Fallback if low/high are missing
   const displayLowest =
-    lowestPrice > 0 ? lowestPrice : avgPrice;
+    lowestPrice > 0
+      ? lowestPrice
+      : avgPrice;
 
   const displayHighest =
     highestPrice > 0
       ? highestPrice
       : avgPrice;
 
-  /*
-   * Category
-   */
+  // Category
   const category =
     lang === 'bn'
       ? item.categoryBn || 'পণ্য'
       : item.categoryEn || 'Product';
 
-  /*
-   * Movement
-   */
-  const movement = item.movement ?? 'stable';
+  // Movement
+  const movement =
+    item.movement ?? 'stable';
 
   const priceChange = getNumber(
-    item.priceChange,
-    item.change,
-    item.priceDifference
+    item.priceChange
   );
 
-  /*
-   * Movement badge
-   */
+  // Movement badge
   const renderMovementBadge = () => {
     if (movement === 'down') {
       return (
