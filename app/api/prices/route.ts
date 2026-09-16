@@ -251,163 +251,255 @@ function getUnitId(row: AnyObject): number {
 }
 
 function getCategory(row: AnyObject): string {
-  const text = [
-    getText(
-      row?.commodity_name_bn,
-      row?.commodityNameBn,
-      row?.commodity_name,
-      row?.commodityName,
-      row?.text_bn,
-      row?.text
-    ),
+  const bn = getText(
+    row?.commodity_name_bn,
+    row?.commodityNameBn,
+    row?.text_bn,
+    row?.text,
+    row?.name_bn,
+    row?.nameBn
+  ).toLowerCase();
 
-    getText(
-      row?.commodity_group_name_bn,
-      row?.commodityGroupNameBn,
-      row?.commodity_group_name,
-      row?.commodityGroupName
-    ),
+  const en = getText(
+    row?.commodity_name,
+    row?.commodityName,
+    row?.text_en,
+    row?.name_en,
+    row?.nameEn
+  ).toLowerCase();
 
-    getText(
-      row?.commodity_sub_group_name_bn,
-      row?.commoditySubGroupNameBn,
-      row?.commodity_sub_group_name,
-      row?.commoditySubGroupName
-    ),
-  ]
-    .join(" ")
-    .toLowerCase();
+  const text = `${bn} ${en}`;
+
+  // ============================================================
+  // 1. মাছ
+  // ============================================================
 
   if (
-    text.includes("চাল") ||
-    text.includes("rice") ||
-    text.includes("atta") ||
-    text.includes("আটা") ||
-    text.includes("sugar") ||
-    text.includes("চিনি") ||
-    text.includes("salt") ||
-    text.includes("লবণ")
+    text.includes("রুই") ||
+    text.includes("রোহিত") ||
+    text.includes("কাতল") ||
+    text.includes("পাংগাস") ||
+    text.includes("পাঙ্গাস") ||
+    text.includes("শিং") ||
+    text.includes("মাগুর") ||
+    text.includes("তেলাপিয়া") ||
+    text.includes("তেলাপিয়া") ||
+    text.includes("সিলভার কার্প") ||
+    text.includes("কার্প") ||
+    text.includes("ইলিশ") ||
+    text.includes("বোয়ালি") ||
+    text.includes("বোয়ালি") ||
+    text.includes("চিংড়ি") ||
+    text.includes("চিংড়ি") ||
+    text.includes("কৈ") ||
+    text.includes("তাকি") ||
+    text.includes("বাটা") ||
+    text.includes("fish") ||
+    text.includes("rui") ||
+    text.includes("rohu") ||
+    text.includes("katla") ||
+    text.includes("pangash") ||
+    text.includes("pangas") ||
+    text.includes("tilapia") ||
+    text.includes("silver carp") ||
+    text.includes("shrimp") ||
+    text.includes("hilsa")
   ) {
-    return "চাল ও খাদ্যশস্য";
+    return "মাছ";
   }
 
+  // ============================================================
+  // 2. মাংস ও ডিম
+  // ============================================================
+
   if (
-    text.includes("ডাল") ||
-    text.includes("lentil") ||
-    text.includes("pulse") ||
-    text.includes("gram") ||
-    text.includes("peas") ||
-    text.includes("mung") ||
-    text.includes("মুগ") ||
-    text.includes("ছোলা") ||
-    text.includes("মটর") ||
-    text.includes("খেসারি")
+    text.includes("ডিম") ||
+    text.includes("egg") ||
+    text.includes("মুরগি") ||
+    text.includes("মুরগী") ||
+    text.includes("ব্রয়লার") ||
+    text.includes("ব্রয়লার") ||
+    text.includes("গরুর মাংস") ||
+    text.includes("গরু") ||
+    text.includes("খাসি") ||
+    text.includes("খাসী") ||
+    text.includes("ছাগল") ||
+    text.includes("বকরি") ||
+    text.includes("বকরী") ||
+    text.includes("মাংস") ||
+    text.includes("beef") ||
+    text.includes("mutton") ||
+    text.includes("chicken") ||
+    text.includes("broiler") ||
+    text.includes("meat")
   ) {
-    return "ডাল ও শিম";
+    return "মাংস ও ডিম";
   }
+
+  // ============================================================
+  // 3. ভোজ্যতেল
+  // ============================================================
 
   if (
     text.includes("তেল") ||
+    text.includes("তৈল") ||
+    text.includes("সরিষা") ||
+    text.includes("সয়াবিন") ||
+    text.includes("সয়াবিন") ||
+    text.includes("পাম") ||
+    text.includes("sunflower") ||
+    text.includes("soybean") ||
+    text.includes("mustard oil") ||
     text.includes("oil")
   ) {
     return "ভোজ্যতেল";
   }
 
+  // ============================================================
+  // 4. ডাল ও শিম
+  // ============================================================
+
   if (
-    text.includes("আলু") ||
-    text.includes("potato")
+    text.includes("ডাল") ||
+    text.includes("মশুর") ||
+    text.includes("মসুর") ||
+    text.includes("মুগ") ||
+    text.includes("মাষ") ||
+    text.includes("মাশ") ||
+    text.includes("কালাই") ||
+    text.includes("ছোলা") ||
+    text.includes("বুট") ||
+    text.includes("খেসারি") ||
+    text.includes("মটর") ||
+    text.includes("মটরশুঁটি") ||
+    text.includes("শুঁটি") ||
+    text.includes("lentil") ||
+    text.includes("pulse") ||
+    text.includes("mung") ||
+    text.includes("black gram") ||
+    text.includes("gram") ||
+    text.includes("peas")
   ) {
-    return "শাকসবজি";
+    return "ডাল ও শিম";
   }
+
+  // ============================================================
+  // 5. মসলা
+  // ============================================================
 
   if (
     text.includes("পেঁয়াজ") ||
     text.includes("পেঁয়াজ") ||
-    text.includes("onion")
-  ) {
-    return "মসলা";
-  }
-
-  if (
+    text.includes("onion") ||
     text.includes("রসুন") ||
     text.includes("garlic") ||
     text.includes("আদা") ||
     text.includes("ginger") ||
     text.includes("মরিচ") ||
+    text.includes("লংকা") ||
     text.includes("chilli") ||
     text.includes("chili") ||
+    text.includes("হলুদ") ||
     text.includes("turmeric") ||
-    text.includes("হলুদ")
+    text.includes("জিরা") ||
+    text.includes("cumin") ||
+    text.includes("ধনে") ||
+    text.includes("coriander") ||
+    text.includes("দারুচিনি") ||
+    text.includes("cinnamon") ||
+    text.includes("এলাচ") ||
+    text.includes("cardamom") ||
+    text.includes("লবঙ্গ") ||
+    text.includes("clove")
   ) {
     return "মসলা";
   }
 
+  // ============================================================
+  // 6. শাকসবজি
+  // ============================================================
+
   if (
+    text.includes("আলু") ||
+    text.includes("potato") ||
     text.includes("বেগুন") ||
     text.includes("eggplant") ||
     text.includes("brinjal") ||
     text.includes("টমেটো") ||
     text.includes("tomato") ||
-    text.includes("সবজি") ||
-    text.includes("vegetable") ||
     text.includes("পটল") ||
     text.includes("লাউ") ||
-    text.includes("করল্লা") ||
-    text.includes("পেঁপে") ||
-    text.includes("papaya") ||
+    text.includes("চালকুমড়া") ||
+    text.includes("চালকুমড়া") ||
     text.includes("কুমড়া") ||
+    text.includes("কুমড়া") ||
     text.includes("pumpkin") ||
+    text.includes("করলা") ||
+    text.includes("করল্লা") ||
+    text.includes("bitter gourd") ||
     text.includes("শসা") ||
     text.includes("cucumber") ||
     text.includes("শিম") ||
     text.includes("bean") ||
     text.includes("বরবটি") ||
-    text.includes("spinach") ||
-    text.includes("শাক")
+    text.includes("ঢেঁড়স") ||
+    text.includes("ঢেঁড়স") ||
+    text.includes("okra") ||
+    text.includes("ফুলকপি") ||
+    text.includes("cauliflower") ||
+    text.includes("বাঁধাকপি") ||
+    text.includes("cabbage") ||
+    text.includes("গাজর") ||
+    text.includes("carrot") ||
+    text.includes("মূলা") ||
+    text.includes("মুলা") ||
+    text.includes("radish") ||
+    text.includes("পেঁপে") ||
+    text.includes("papaya") ||
+    text.includes("কাঁচা কলা") ||
+    text.includes("কলাই শাক") ||
+    text.includes("শাক") ||
+    text.includes("সবজি") ||
+    text.includes("vegetable")
   ) {
     return "শাকসবজি";
   }
 
-  if (
-    text.includes("মাছ") ||
-    text.includes("fish") ||
-    text.includes("rui") ||
-    text.includes("ruhi") ||
-    text.includes("katla") ||
-    text.includes("pangash") ||
-    text.includes("pangas") ||
-    text.includes("singhi") ||
-    text.includes("silver carp") ||
-    text.includes("telapia") ||
-    text.includes("tilapia")
-  ) {
-    return "মাছ";
-  }
+  // ============================================================
+  // 7. চাল ও খাদ্যশস্য
+  // ============================================================
 
   if (
-    text.includes("ডিম") ||
-    text.includes("egg")
+    text.includes("চাল") ||
+    text.includes("rice") ||
+    text.includes("ধান") ||
+    text.includes("গম") ||
+    text.includes("wheat") ||
+    text.includes("আটা") ||
+    text.includes("ময়দা") ||
+    text.includes("ময়দা") ||
+    text.includes("flour")
   ) {
-    return "মাংস ও ডিম";
+    return "চাল ও খাদ্যশস্য";
   }
 
+  // ============================================================
+  // 8. নিত্যপণ্য
+  // ============================================================
+
   if (
-    text.includes("মাংস") ||
-    text.includes("meat") ||
-    text.includes("beef") ||
-    text.includes("mutton") ||
-    text.includes("chicken") ||
-    text.includes("মুরগি") ||
-    text.includes("গরু") ||
-    text.includes("খাসী") ||
-    text.includes("বকরী")
+    text.includes("চিনি") ||
+    text.includes("sugar") ||
+    text.includes("লবণ") ||
+    text.includes("salt") ||
+    text.includes("সাবান") ||
+    text.includes("soap")
   ) {
-    return "মাংস ও ডিম";
+    return "নিত্যপণ্য";
   }
 
   return "নিত্যপণ্য";
 }
-
 function getUnitInfo(
   unitId: number,
   measurementUnitList: AnyObject[]
