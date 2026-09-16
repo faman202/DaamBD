@@ -37,14 +37,373 @@ function getText(...values: any[]): string {
   return "";
 }
 
+/* =========================================================
+   CATEGORY MAPPER
+   ========================================================= */
+
+function getCategory(
+  commodity: AnyObject | undefined,
+  nameBn: string,
+  nameEn: string
+) {
+  const bn = `${nameBn || ""}`.toLowerCase();
+  const en = `${nameEn || ""}`.toLowerCase();
+
+  const groupId = Number(
+    commodity?.commodity_group_id || 0
+  );
+
+  const subGroupId = Number(
+    commodity?.commodity_sub_group_id || 0
+  );
+
+  const groupBn = getText(
+    commodity?.commodity_group_name_bn,
+    commodity?.group_name_bn,
+    commodity?.groupBn,
+    commodity?.group_name
+  ).toLowerCase();
+
+  const groupEn = getText(
+    commodity?.commodity_group_name,
+    commodity?.commodity_group_name_en,
+    commodity?.group_name,
+    commodity?.groupEn
+  ).toLowerCase();
+
+  const searchText =
+    `${bn} ${en} ${groupBn} ${groupEn}`.toLowerCase();
+
+  /*
+   * Priority:
+   * 1. Official group/subgroup information
+   * 2. Commodity name keyword fallback
+   *
+   * This prevents products from going into "Other".
+   */
+
+  // =======================================================
+  // FISH
+  // =======================================================
+
+  if (
+    searchText.includes("fish") ||
+    searchText.includes("seafood") ||
+    searchText.includes("মাছ") ||
+    searchText.includes("ইলিশ") ||
+    searchText.includes("রুই") ||
+    searchText.includes("কাতলা") ||
+    searchText.includes("তেলাপিয়া") ||
+    searchText.includes("পাঙ্গাস") ||
+    searchText.includes("চিংড়ি")
+  ) {
+    return {
+      slug: "fish",
+      nameBn: "মাছ",
+      nameEn: "Fish & Seafood",
+    };
+  }
+
+  // =======================================================
+  // MEAT & EGGS
+  // =======================================================
+
+  if (
+    searchText.includes("chicken") ||
+    searchText.includes("beef") ||
+    searchText.includes("mutton") ||
+    searchText.includes("meat") ||
+    searchText.includes("egg") ||
+    searchText.includes("poultry") ||
+    searchText.includes("মুরগি") ||
+    searchText.includes("গরুর মাংস") ||
+    searchText.includes("গরুর") ||
+    searchText.includes("খাসির") ||
+    searchText.includes("মাংস") ||
+    searchText.includes("ডিম") ||
+    searchText.includes("হালি")
+  ) {
+    return {
+      slug: "meat-eggs",
+      nameBn: "মাংস ও ডিম",
+      nameEn: "Meat & Eggs",
+    };
+  }
+
+  // =======================================================
+  // EDIBLE OILS
+  // =======================================================
+
+  if (
+    searchText.includes("oil") ||
+    searchText.includes("soybean") ||
+    searchText.includes("palm") ||
+    searchText.includes("mustard oil") ||
+    searchText.includes("তেল") ||
+    searchText.includes("সয়াবিন") ||
+    searchText.includes("সয়াবিন") ||
+    searchText.includes("সরিষার তেল")
+  ) {
+    return {
+      slug: "oils",
+      nameBn: "ভোজ্যতেল",
+      nameEn: "Edible Oils",
+    };
+  }
+
+  // =======================================================
+  // SPICES
+  // =======================================================
+
+  if (
+    searchText.includes("onion") ||
+    searchText.includes("garlic") ||
+    searchText.includes("ginger") ||
+    searchText.includes("chili") ||
+    searchText.includes("chilli") ||
+    searchText.includes("turmeric") ||
+    searchText.includes("cumin") ||
+    searchText.includes("coriander") ||
+    searchText.includes("pepper") ||
+    searchText.includes("পেঁয়াজ") ||
+    searchText.includes("পেঁয়াজ") ||
+    searchText.includes("রসুন") ||
+    searchText.includes("আদা") ||
+    searchText.includes("মরিচ") ||
+    searchText.includes("হলুদ") ||
+    searchText.includes("জিরা") ||
+    searchText.includes("ধনে")
+  ) {
+    return {
+      slug: "spices",
+      nameBn: "মসলা",
+      nameEn: "Spices",
+    };
+  }
+
+  // =======================================================
+  // VEGETABLES
+  // =======================================================
+
+  if (
+    searchText.includes("vegetable") ||
+    searchText.includes("potato") ||
+    searchText.includes("tomato") ||
+    searchText.includes("eggplant") ||
+    searchText.includes("brinjal") ||
+    searchText.includes("cabbage") ||
+    searchText.includes("cauliflower") ||
+    searchText.includes("okra") ||
+    searchText.includes("bottle gourd") ||
+    searchText.includes("pumpkin") ||
+    searchText.includes("cucumber") ||
+    searchText.includes("beans") ||
+    searchText.includes("carrot") ||
+    searchText.includes("potol") ||
+    searchText.includes("আলু") ||
+    searchText.includes("টমেটো") ||
+    searchText.includes("বেগুন") ||
+    searchText.includes("লাউ") ||
+    searchText.includes("কুমড়া") ||
+    searchText.includes("কুমড়া") ||
+    searchText.includes("ফুলকপি") ||
+    searchText.includes("বাঁধাকপি") ||
+    searchText.includes("ঢেঁড়স") ||
+    searchText.includes("ঢেঁড়স") ||
+    searchText.includes("শসা") ||
+    searchText.includes("শাকসবজি") ||
+    searchText.includes("করলা")
+  ) {
+    return {
+      slug: "vegetables",
+      nameBn: "শাকসবজি",
+      nameEn: "Vegetables",
+    };
+  }
+
+  // =======================================================
+  // PULSES / LENTILS
+  // =======================================================
+
+  if (
+    searchText.includes("lentil") ||
+    searchText.includes("dal") ||
+    searchText.includes("pulse") ||
+    searchText.includes("mung") ||
+    searchText.includes("pea") ||
+    searchText.includes("gram") ||
+    searchText.includes("masur") ||
+    searchText.includes("মসুর") ||
+    searchText.includes("মুগ") ||
+    searchText.includes("ডাল") ||
+    searchText.includes("ছোলা") ||
+    searchText.includes("বুট") ||
+    searchText.includes("শিম")
+  ) {
+    return {
+      slug: "pulses",
+      nameBn: "ডাল ও শিম",
+      nameEn: "Pulses & Lentils",
+    };
+  }
+
+  // =======================================================
+  // GRAINS & CEREALS
+  // =======================================================
+
+  if (
+    searchText.includes("rice") ||
+    searchText.includes("wheat") ||
+    searchText.includes("flour") ||
+    searchText.includes("atta") ||
+    searchText.includes("grain") ||
+    searchText.includes("cereal") ||
+    searchText.includes("চাল") ||
+    searchText.includes("গম") ||
+    searchText.includes("আটা") ||
+    searchText.includes("ময়দা") ||
+    searchText.includes("ময়দা")
+  ) {
+    return {
+      slug: "grains",
+      nameBn: "চাল ও খাদ্যশস্য",
+      nameEn: "Grains & Cereals",
+    };
+  }
+
+  // =======================================================
+  // ESSENTIALS
+  // =======================================================
+
+  if (
+    searchText.includes("sugar") ||
+    searchText.includes("salt") ||
+    searchText.includes("sugar") ||
+    searchText.includes("চিনি") ||
+    searchText.includes("লবণ") ||
+    searchText.includes("লবন")
+  ) {
+    return {
+      slug: "essentials",
+      nameBn: "নিত্যপণ্য",
+      nameEn: "Essentials",
+    };
+  }
+
+  // =======================================================
+  // OFFICIAL GROUP FALLBACK
+  // =======================================================
+
+  if (
+    groupBn.includes("মাছ") ||
+    groupEn.includes("fish")
+  ) {
+    return {
+      slug: "fish",
+      nameBn: "মাছ",
+      nameEn: "Fish & Seafood",
+    };
+  }
+
+  if (
+    groupBn.includes("মাংস") ||
+    groupBn.includes("ডিম") ||
+    groupEn.includes("meat") ||
+    groupEn.includes("egg")
+  ) {
+    return {
+      slug: "meat-eggs",
+      nameBn: "মাংস ও ডিম",
+      nameEn: "Meat & Eggs",
+    };
+  }
+
+  if (
+    groupBn.includes("তেল") ||
+    groupEn.includes("oil")
+  ) {
+    return {
+      slug: "oils",
+      nameBn: "ভোজ্যতেল",
+      nameEn: "Edible Oils",
+    };
+  }
+
+  if (
+    groupBn.includes("মসলা") ||
+    groupEn.includes("spice")
+  ) {
+    return {
+      slug: "spices",
+      nameBn: "মসলা",
+      nameEn: "Spices",
+    };
+  }
+
+  if (
+    groupBn.includes("শস্য") ||
+    groupBn.includes("চাল") ||
+    groupEn.includes("grain") ||
+    groupEn.includes("cereal")
+  ) {
+    return {
+      slug: "grains",
+      nameBn: "চাল ও খাদ্যশস্য",
+      nameEn: "Grains & Cereals",
+    };
+  }
+
+  if (
+    groupBn.includes("ডাল") ||
+    groupBn.includes("শিম") ||
+    groupEn.includes("pulse") ||
+    groupEn.includes("lentil")
+  ) {
+    return {
+      slug: "pulses",
+      nameBn: "ডাল ও শিম",
+      nameEn: "Pulses & Lentils",
+    };
+  }
+
+  if (
+    groupBn.includes("সবজি") ||
+    groupEn.includes("vegetable")
+  ) {
+    return {
+      slug: "vegetables",
+      nameBn: "শাকসবজি",
+      nameEn: "Vegetables",
+    };
+  }
+
+  // Final fallback
+  return {
+    slug: "essentials",
+    nameBn: "নিত্যপণ্য",
+    nameEn: "Essentials",
+  };
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
 
-    const division = Number(searchParams.get("division") || 6);
-    const district = Number(searchParams.get("district") || 46);
-    const upazila = Number(searchParams.get("upazila") || 360);
-    const market = Number(searchParams.get("market") || 109);
+    const division = Number(
+      searchParams.get("division") || 6
+    );
+
+    const district = Number(
+      searchParams.get("district") || 46
+    );
+
+    const upazila = Number(
+      searchParams.get("upazila") || 360
+    );
+
+    const market = Number(
+      searchParams.get("market") || 109
+    );
 
     const date =
       searchParams.get("date") ||
@@ -54,13 +413,16 @@ export async function GET(request: NextRequest) {
     // 1. FETCH OFFICIAL COMMON DROPDOWNS
     // =========================================================
 
-    const commodityResponse = await fetch(COMMODITY_API, {
-      method: "GET",
-      cache: "no-store",
-      headers: {
-        Accept: "application/json",
-      },
-    });
+    const commodityResponse = await fetch(
+      COMMODITY_API,
+      {
+        method: "GET",
+        cache: "no-store",
+        headers: {
+          Accept: "application/json",
+        },
+      }
+    );
 
     if (!commodityResponse.ok) {
       throw new Error(
@@ -68,32 +430,40 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const commodityData = await commodityResponse.json();
+    const commodityData =
+      await commodityResponse.json();
 
     // =========================================================
-    // 2. OFFICIAL COMMODITY + UNIT LIST
-    //
-    // IMPORTANT:
-    // Commodity IDs are in commodityNameList
-    //
-    // Example:
-    // value: 608
-    // text_bn: "চাল -বোরো - হাইব্রিড -সরু"
-    // unit_retail: 2
-    // unit_whole_sale: 1
+    // 2. OFFICIAL LISTS
     // =========================================================
 
-    const commodityList: AnyObject[] = Array.isArray(
-      commodityData?.data?.commodityNameList
-    )
-      ? commodityData.data.commodityNameList
-      : [];
+    const commodityList: AnyObject[] =
+      Array.isArray(
+        commodityData?.data?.commodityNameList
+      )
+        ? commodityData.data.commodityNameList
+        : [];
 
-    const measurementUnitList: AnyObject[] = Array.isArray(
-      commodityData?.data?.measurementUnitList
-    )
-      ? commodityData.data.measurementUnitList
-      : [];
+    const measurementUnitList: AnyObject[] =
+      Array.isArray(
+        commodityData?.data?.measurementUnitList
+      )
+        ? commodityData.data.measurementUnitList
+        : [];
+
+    const commodityGroupList: AnyObject[] =
+      Array.isArray(
+        commodityData?.data?.commodityGroupList
+      )
+        ? commodityData.data.commodityGroupList
+        : [];
+
+    const commoditySubGroupList: AnyObject[] =
+      Array.isArray(
+        commodityData?.data?.commoditySubGroupList
+      )
+        ? commodityData.data.commoditySubGroupList
+        : [];
 
     console.log(
       "DaamBD commodityNameList:",
@@ -105,31 +475,85 @@ export async function GET(request: NextRequest) {
       measurementUnitList.length
     );
 
+    console.log(
+      "DaamBD commodityGroupList:",
+      commodityGroupList.length
+    );
+
+    console.log(
+      "DaamBD commoditySubGroupList:",
+      commoditySubGroupList.length
+    );
+
     // =========================================================
-    // 3. CREATE COMMODITY MAP
+    // 3. COMMODITY MAP
     // =========================================================
 
-    const commodityMap = new Map<number, AnyObject>();
+    const commodityMap =
+      new Map<number, AnyObject>();
 
     for (const item of commodityList) {
       const id = Number(item?.value);
 
-      if (Number.isFinite(id) && id > 0) {
+      if (
+        Number.isFinite(id) &&
+        id > 0
+      ) {
         commodityMap.set(id, item);
       }
     }
 
     // =========================================================
-    // 4. CREATE UNIT MAP
+    // 4. UNIT MAP
     // =========================================================
 
-    const unitMap = new Map<number, AnyObject>();
+    const unitMap =
+      new Map<number, AnyObject>();
 
     for (const item of measurementUnitList) {
       const id = Number(item?.value);
 
-      if (Number.isFinite(id) && id > 0) {
+      if (
+        Number.isFinite(id) &&
+        id > 0
+      ) {
         unitMap.set(id, item);
+      }
+    }
+
+    // =========================================================
+    // 5. GROUP MAP
+    // =========================================================
+
+    const groupMap =
+      new Map<number, AnyObject>();
+
+    for (const item of commodityGroupList) {
+      const id = Number(item?.value);
+
+      if (
+        Number.isFinite(id) &&
+        id > 0
+      ) {
+        groupMap.set(id, item);
+      }
+    }
+
+    // =========================================================
+    // 6. SUBGROUP MAP
+    // =========================================================
+
+    const subGroupMap =
+      new Map<number, AnyObject>();
+
+    for (const item of commoditySubGroupList) {
+      const id = Number(item?.value);
+
+      if (
+        Number.isFinite(id) &&
+        id > 0
+      ) {
+        subGroupMap.set(id, item);
       }
     }
 
@@ -138,56 +562,42 @@ export async function GET(request: NextRequest) {
       commodityMap.size
     );
 
-    console.log(
-      "DaamBD unit map size:",
-      unitMap.size
+    // =========================================================
+    // 7. FETCH OFFICIAL DAILY PRICE
+    // =========================================================
+
+    const priceResponse = await fetch(
+      PRICE_API,
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/json",
+          Accept:
+            "application/json",
+        },
+
+        body: JSON.stringify({
+          division_id: [division],
+          district_id: [district],
+          upazila_id: [upazila],
+          market_id: [market],
+
+          price_type_id: ["Retail"],
+
+          price_date: date,
+
+          select_type: "Daily",
+
+          month_id: 0,
+          year_id: 0,
+          week_id: 0,
+        }),
+
+        cache: "no-store",
+      }
     );
-
-    // Debug specifically for commodity 608
-    const debug608 = commodityMap.get(608);
-
-    if (debug608) {
-      console.log(
-        "DaamBD commodity 608:",
-        JSON.stringify(debug608, null, 2)
-      );
-    } else {
-      console.log(
-        "DaamBD commodity 608 NOT FOUND"
-      );
-    }
-
-    // =========================================================
-    // 5. FETCH OFFICIAL DAILY PRICE
-    // =========================================================
-
-    const priceResponse = await fetch(PRICE_API, {
-      method: "POST",
-
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-
-      body: JSON.stringify({
-        division_id: [division],
-        district_id: [district],
-        upazila_id: [upazila],
-        market_id: [market],
-
-        price_type_id: ["Retail"],
-
-        price_date: date,
-
-        select_type: "Daily",
-
-        month_id: 0,
-        year_id: 0,
-        week_id: 0,
-      }),
-
-      cache: "no-store",
-    });
 
     if (!priceResponse.ok) {
       throw new Error(
@@ -195,10 +605,11 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const priceData = await priceResponse.json();
+    const priceData =
+      await priceResponse.json();
 
     // =========================================================
-    // 6. FIND PRICE ROWS
+    // 8. FIND PRICE ROWS
     // =========================================================
 
     const possibleRows = [
@@ -213,7 +624,10 @@ export async function GET(request: NextRequest) {
     let rows: AnyObject[] = [];
 
     for (const list of possibleRows) {
-      if (Array.isArray(list) && list.length > 0) {
+      if (
+        Array.isArray(list) &&
+        list.length > 0
+      ) {
         rows = list;
         break;
       }
@@ -225,7 +639,7 @@ export async function GET(request: NextRequest) {
     );
 
     // =========================================================
-    // 7. MAP OFFICIAL PRICE DATA
+    // 9. MAP OFFICIAL PRICE DATA
     // =========================================================
 
     const items = rows
@@ -234,236 +648,270 @@ export async function GET(request: NextRequest) {
         // COMMODITY ID
         // -----------------------------------------------------
 
-        const commodityId = getNumber(
-          row?.commodity_id,
-          row?.commodityId,
-          row?.commodityID,
-          row?.product_id,
-          row?.productId
-        );
+        const commodityId =
+          getNumber(
+            row?.commodity_id,
+            row?.commodityId,
+            row?.commodityID,
+            row?.product_id,
+            row?.productId
+          );
 
-        const commodity = commodityMap.get(commodityId);
+        const commodity =
+          commodityMap.get(
+            commodityId
+          );
+
+        // -----------------------------------------------------
+        // OFFICIAL GROUP / SUBGROUP
+        // -----------------------------------------------------
+
+        const groupId =
+          Number(
+            commodity?.commodity_group_id || 0
+          );
+
+        const subGroupId =
+          Number(
+            commodity?.commodity_sub_group_id || 0
+          );
+
+        const group =
+          groupMap.get(groupId);
+
+        const subGroup =
+          subGroupMap.get(
+            subGroupId
+          );
 
         // -----------------------------------------------------
         // OFFICIAL COMMODITY NAME
         // -----------------------------------------------------
 
-        const nameBn = getText(
-          // Direct price API names
-          row?.commodity_name_bn,
-          row?.commodityNameBn,
-          row?.name_bn,
-          row?.text_bn,
+        const nameBn =
+          getText(
+            row?.commodity_name_bn,
+            row?.commodityNameBn,
+            row?.name_bn,
+            row?.text_bn,
 
-          // Official common-dropdown commodity name
-          commodity?.text_bn,
+            commodity?.text_bn,
 
-          // Fallbacks
-          commodity?.commodity_name_bn,
-          commodity?.commodityNameBn,
-          commodity?.name_bn,
+            commodity?.commodity_name_bn,
+            commodity?.commodityNameBn,
+            commodity?.name_bn,
 
-          row?.commodity_name,
-          commodity?.text,
-          commodity?.commodity_name,
+            row?.commodity_name,
+            commodity?.text,
+            commodity?.commodity_name,
 
-          `পণ্য ${commodityId}`
-        );
+            `পণ্য ${commodityId}`
+          );
 
-        const nameEn = getText(
-          // Direct price API names
-          row?.commodity_name,
-          row?.commodityName,
-          row?.name_en,
-          row?.text_en,
+        const nameEn =
+          getText(
+            row?.commodity_name,
+            row?.commodityName,
+            row?.name_en,
+            row?.text_en,
 
-          // Official common-dropdown commodity name
-          commodity?.text_en,
+            commodity?.text_en,
 
-          // Fallbacks
-          commodity?.commodity_name,
-          commodity?.commodityName,
-          commodity?.name_en,
+            commodity?.commodity_name,
+            commodity?.commodityName,
+            commodity?.name_en,
 
-          commodity?.text,
+            commodity?.text,
 
-          `Product ${commodityId}`
-        );
-
-        // -----------------------------------------------------
-        // OFFICIAL UNIT IDs
-        // -----------------------------------------------------
-
-        const retailUnitId = getNumber(
-          commodity?.unit_retail,
-
-          row?.unit_retail,
-          row?.retail_unit,
-          row?.retailUnitId,
-          row?.retail_unit_id
-        );
-
-        const wholesaleUnitId = getNumber(
-          commodity?.unit_whole_sale,
-
-          row?.unit_whole_sale,
-          row?.unit_wholesale,
-          row?.wholesale_unit,
-          row?.wholesaleUnitId,
-          row?.wholesale_unit_id
-        );
-
-        const retailUnit = unitMap.get(
-          retailUnitId
-        );
-
-        const wholesaleUnit = unitMap.get(
-          wholesaleUnitId
-        );
-
-        // -----------------------------------------------------
-        // RETAIL UNIT
-        // -----------------------------------------------------
-
-        const unitBn = getText(
-          // Price API unit object
-          row?.rUnitObj?.text_bn,
-          row?.rUnitObj?.unit_name_bn,
-          row?.rUnitObj?.text,
-
-          row?.retailUnitObj?.text_bn,
-          row?.retailUnitObj?.unit_name_bn,
-          row?.retailUnitObj?.text,
-
-          // Official measurementUnitList
-          retailUnit?.text_bn,
-          retailUnit?.text,
-
-          row?.unit_name_bn,
-          row?.unitBn,
-
-          "কিলোগ্রাম"
-        );
-
-        const unitEn = getText(
-          // Price API unit object
-          row?.rUnitObj?.text_en,
-          row?.rUnitObj?.unit_name,
-          row?.rUnitObj?.text,
-
-          row?.retailUnitObj?.text_en,
-          row?.retailUnitObj?.unit_name,
-          row?.retailUnitObj?.text,
-
-          // Official measurementUnitList
-          retailUnit?.text_en,
-          retailUnit?.text,
-
-          row?.unit_name,
-          row?.unitEn,
-
-          "Kilogram"
-        );
-
-        // -----------------------------------------------------
-        // RETAIL PRICE
-        // -----------------------------------------------------
-
-        const retailAvg = getNumber(
-          row?.r_avgPriceAvg,
-          row?.retail_avg,
-          row?.retailAvg,
-          row?.retail?.avg,
-          row?.r_avg_price,
-          row?.rAvgPrice,
-          row?.retail_average_price,
-          row?.retailAveragePrice
-        );
-
-        const retailLow = getNumber(
-          row?.r_lowestPrice,
-          row?.retail_low,
-          row?.retailLow,
-          row?.retail?.low,
-          row?.r_low_price,
-          row?.rLowestPrice,
-          row?.retail_lowest_price,
-          row?.retailLowestPrice
-        );
-
-        const retailHigh = getNumber(
-          row?.r_highestPrice,
-          row?.retail_high,
-          row?.retailHigh,
-          row?.retail?.high,
-          row?.r_high_price,
-          row?.rHighestPrice,
-          row?.retail_highest_price,
-          row?.retailHighestPrice
-        );
-
-        // -----------------------------------------------------
-        // WHOLESALE PRICE
-        // -----------------------------------------------------
-
-        const wholesaleAvg = getNumber(
-          row?.w_avgPriceAvg,
-          row?.wholesale_avg,
-          row?.wholesaleAvg,
-          row?.wholesale?.avg,
-          row?.w_avg_price,
-          row?.wAvgPrice,
-          row?.wholesale_average_price,
-          row?.wholesaleAveragePrice
-        );
-
-        const wholesaleLow = getNumber(
-          row?.w_lowestPrice,
-          row?.wholesale_low,
-          row?.wholesaleLow,
-          row?.wholesale?.low,
-          row?.w_low_price,
-          row?.wLowestPrice,
-          row?.wholesale_lowest_price,
-          row?.wholesaleLowestPrice
-        );
-
-        const wholesaleHigh = getNumber(
-          row?.w_highestPrice,
-          row?.wholesale_high,
-          row?.wholesaleHigh,
-          row?.wholesale?.high,
-          row?.w_high_price,
-          row?.wHighestPrice,
-          row?.wholesale_highest_price,
-          row?.wholesaleHighestPrice
-        );
+            `Product ${commodityId}`
+          );
 
         // -----------------------------------------------------
         // CATEGORY
         // -----------------------------------------------------
 
-        const categoryBn = getText(
-          row?.commodity_group_name_bn,
-          row?.commodityGroupNameBn,
-          row?.group_name_bn,
+        const category =
+          getCategory(
+            {
+              ...commodity,
+              commodity_group_name_bn:
+                group?.text_bn ||
+                group?.name_bn ||
+                group?.commodity_group_name_bn,
 
-          commodity?.commodity_group_name_bn,
-          commodity?.group_name_bn,
+              commodity_group_name:
+                group?.text_en ||
+                group?.name_en ||
+                group?.commodity_group_name,
 
-          ""
-        );
+              commodity_sub_group_name_bn:
+                subGroup?.text_bn ||
+                subGroup?.name_bn,
 
-        const categoryEn = getText(
-          row?.commodity_group_name,
-          row?.commodityGroupName,
-          row?.group_name,
+              commodity_sub_group_name:
+                subGroup?.text_en ||
+                subGroup?.name_en,
+            },
+            nameBn,
+            nameEn
+          );
 
-          commodity?.commodity_group_name,
-          commodity?.group_name,
+        // -----------------------------------------------------
+        // OFFICIAL UNIT IDs
+        // -----------------------------------------------------
 
-          ""
-        );
+        const retailUnitId =
+          getNumber(
+            commodity?.unit_retail,
+
+            row?.unit_retail,
+            row?.retail_unit,
+            row?.retailUnitId,
+            row?.retail_unit_id
+          );
+
+        const wholesaleUnitId =
+          getNumber(
+            commodity?.unit_whole_sale,
+
+            row?.unit_whole_sale,
+            row?.unit_wholesale,
+            row?.wholesale_unit,
+            row?.wholesaleUnitId,
+            row?.wholesale_unit_id
+          );
+
+        const retailUnit =
+          unitMap.get(
+            retailUnitId
+          );
+
+        const wholesaleUnit =
+          unitMap.get(
+            wholesaleUnitId
+          );
+
+        // -----------------------------------------------------
+        // RETAIL UNIT
+        // -----------------------------------------------------
+
+        const unitBn =
+          getText(
+            row?.rUnitObj?.text_bn,
+            row?.rUnitObj?.unit_name_bn,
+            row?.rUnitObj?.text,
+
+            row?.retailUnitObj?.text_bn,
+            row?.retailUnitObj?.unit_name_bn,
+            row?.retailUnitObj?.text,
+
+            retailUnit?.text_bn,
+            retailUnit?.text,
+
+            row?.unit_name_bn,
+            row?.unitBn,
+
+            "কিলোগ্রাম"
+          );
+
+        const unitEn =
+          getText(
+            row?.rUnitObj?.text_en,
+            row?.rUnitObj?.unit_name,
+            row?.rUnitObj?.text,
+
+            row?.retailUnitObj?.text_en,
+            row?.retailUnitObj?.unit_name,
+            row?.retailUnitObj?.text,
+
+            retailUnit?.text_en,
+            retailUnit?.text,
+
+            row?.unit_name,
+            row?.unitEn,
+
+            "Kilogram"
+          );
+
+        // -----------------------------------------------------
+        // RETAIL PRICE
+        // -----------------------------------------------------
+
+        const retailAvg =
+          getNumber(
+            row?.r_avgPriceAvg,
+            row?.retail_avg,
+            row?.retailAvg,
+            row?.retail?.avg,
+            row?.r_avg_price,
+            row?.rAvgPrice,
+            row?.retail_average_price,
+            row?.retailAveragePrice
+          );
+
+        const retailLow =
+          getNumber(
+            row?.r_lowestPrice,
+            row?.retail_low,
+            row?.retailLow,
+            row?.retail?.low,
+            row?.r_low_price,
+            row?.rLowestPrice,
+            row?.retail_lowest_price,
+            row?.retailLowestPrice
+          );
+
+        const retailHigh =
+          getNumber(
+            row?.r_highestPrice,
+            row?.retail_high,
+            row?.retailHigh,
+            row?.retail?.high,
+            row?.r_high_price,
+            row?.rHighestPrice,
+            row?.retail_highest_price,
+            row?.retailHighestPrice
+          );
+
+        // -----------------------------------------------------
+        // WHOLESALE PRICE
+        // -----------------------------------------------------
+
+        const wholesaleAvg =
+          getNumber(
+            row?.w_avgPriceAvg,
+            row?.wholesale_avg,
+            row?.wholesaleAvg,
+            row?.wholesale?.avg,
+            row?.w_avg_price,
+            row?.wAvgPrice,
+            row?.wholesale_average_price,
+            row?.wholesaleAveragePrice
+          );
+
+        const wholesaleLow =
+          getNumber(
+            row?.w_lowestPrice,
+            row?.wholesale_low,
+            row?.wholesaleLow,
+            row?.wholesale?.low,
+            row?.w_low_price,
+            row?.wLowestPrice,
+            row?.wholesale_lowest_price,
+            row?.wholesaleLowestPrice
+          );
+
+        const wholesaleHigh =
+          getNumber(
+            row?.w_highestPrice,
+            row?.wholesale_high,
+            row?.wholesaleHigh,
+            row?.wholesale?.high,
+            row?.w_high_price,
+            row?.wHighestPrice,
+            row?.wholesale_highest_price,
+            row?.wholesaleHighestPrice
+          );
 
         // -----------------------------------------------------
         // FINAL ITEM
@@ -475,8 +923,16 @@ export async function GET(request: NextRequest) {
           nameBn,
           nameEn,
 
-          categoryBn,
-          categoryEn,
+          // IMPORTANT:
+          // Frontend category filter uses categorySlug.
+          categorySlug:
+            category.slug,
+
+          categoryBn:
+            category.nameBn,
+
+          categoryEn:
+            category.nameEn,
 
           unitBn,
           unitEn,
@@ -488,15 +944,25 @@ export async function GET(request: NextRequest) {
             wholesaleUnitId || null,
 
           retail: {
-            avgPrice: retailAvg,
-            lowestPrice: retailLow,
-            highestPrice: retailHigh,
+            avgPrice:
+              retailAvg,
+
+            lowestPrice:
+              retailLow,
+
+            highestPrice:
+              retailHigh,
           },
 
           wholesale: {
-            avgPrice: wholesaleAvg,
-            lowestPrice: wholesaleLow,
-            highestPrice: wholesaleHigh,
+            avgPrice:
+              wholesaleAvg,
+
+            lowestPrice:
+              wholesaleLow,
+
+            highestPrice:
+              wholesaleHigh,
           },
 
           // Historical comparison will be added later.
@@ -515,40 +981,76 @@ export async function GET(request: NextRequest) {
       // REMOVE INVALID ITEMS
       // -------------------------------------------------------
 
-      .filter((item: AnyObject) => {
-        return (
+      .filter(
+        (item: AnyObject) =>
           item.commodityId > 0 &&
           (
             item.retail.avgPrice > 0 ||
             item.wholesale.avgPrice > 0
           )
-        );
-      });
+      );
 
     // =========================================================
-    // 8. DEBUG
+    // 10. CATEGORY DEBUG
+    // =========================================================
+
+    const categoryCounts =
+      items.reduce(
+        (
+          acc: Record<string, number>,
+          item: AnyObject
+        ) => {
+          acc[item.categorySlug] =
+            (acc[item.categorySlug] || 0) + 1;
+
+          return acc;
+        },
+        {}
+      );
+
+    console.log(
+      "DaamBD category counts:",
+      JSON.stringify(
+        categoryCounts,
+        null,
+        2
+      )
+    );
+
+    // =========================================================
+    // 11. DEBUG FIRST ITEM
     // =========================================================
 
     if (items.length > 0) {
       console.log(
         "DaamBD first mapped item:",
-        JSON.stringify(items[0], null, 2)
+        JSON.stringify(
+          items[0],
+          null,
+          2
+        )
       );
 
-      const item608 = items.find(
-        (item) => item.commodityId === 608
-      );
+      const item608 =
+        items.find(
+          (item) =>
+            item.commodityId === 608
+        );
 
       if (item608) {
         console.log(
           "DaamBD MAPPED 608:",
-          JSON.stringify(item608, null, 2)
+          JSON.stringify(
+            item608,
+            null,
+            2
+          )
         );
       }
     }
 
     // =========================================================
-    // 9. RESPONSE
+    // 12. RESPONSE
     // =========================================================
 
     return NextResponse.json({
@@ -567,9 +1069,12 @@ export async function GET(request: NextRequest) {
 
       date,
 
-      total: items.length,
+      total:
+        items.length,
 
       items,
+
+      categoryCounts,
 
       source:
         "Official Ministry of Agriculture / DAM",
