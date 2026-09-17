@@ -1,16 +1,25 @@
-export type Language = 'bn' | 'en';
+export type Language = "bn" | "en";
 
-export type PriceType = 'retail' | 'wholesale';
+export type PriceType = "retail" | "wholesale";
 
-export type AnomalyStatus = 'normal' | 'warning' | 'critical';
+export type AnomalyStatus =
+  | "normal"
+  | "warning"
+  | "critical";
 
-export type PriceMovement = 'up' | 'down' | 'stable';
+export type PriceMovement =
+  | "up"
+  | "down"
+  | "stable";
 
 export interface PriceSource {
   code: string;
   nameBn: string;
   nameEn: string;
-  trustLevel: 'official_gov' | 'verified_field' | 'crowdsourced';
+  trustLevel:
+    | "official_gov"
+    | "verified_field"
+    | "crowdsourced";
   sourceUrl?: string;
   verified: boolean;
 }
@@ -19,86 +28,104 @@ export interface PriceRecord {
   minPrice: number;
   maxPrice: number;
   avgPrice: number;
-
-  // Unit information used by PriceConverter
   unitBn: string;
   unitEn: string;
-
-  // API-compatible aliases
   lowestPrice?: number;
   highestPrice?: number;
 }
 
 export interface DailyPriceItem {
-  id: string;
-
+  id: string | number;
   commodityId: number;
 
   nameBn: string;
   nameEn: string;
 
-  slug: string;
+  slug?: string;
 
-  categoryBn: string;
-  categoryEn: string;
-  categorySlug: string;
+  commodityNameBn?: string;
+  commodityName?: string;
 
-  districtBn: string;
-  districtEn: string;
+  category?: string;
 
-  // Main commodity unit
+  categoryBn?: string;
+  categoryEn?: string;
+  categorySlug?: string;
+
+  districtBn?: string;
+  districtEn?: string;
+
+  unitId?: number;
   unitBn: string;
   unitEn: string;
 
-  // Official unit IDs
   unitRetailId?: number | null;
   unitWholesaleId?: number | null;
 
-  retail: PriceRecord;
-  wholesale: PriceRecord;
+  price: number;
+  avgPrice: number;
+  averagePrice: number;
 
-  anomalyStatus: AnomalyStatus;
-  anomalyReasons?: string[];
+  retailPrice: number;
+  retailAvg: number;
+  retailLow: number;
+  retailHigh: number;
+
+  wholesaleAvg?: number | null;
+  wholesaleLow?: number | null;
+  wholesaleHigh?: number | null;
+
+  previousAvgPrice?: number | null;
+  previousPriceDate?: string | null;
 
   priceChange: number;
-  movement: PriceMovement;
-  pctChange: number;
+  priceChangePercent: number;
 
-  source: PriceSource;
+  priceChangeType:
+    | "increase"
+    | "decrease"
+    | "unchanged"
+    | "no_data";
+
+  retail?: PriceRecord;
+  wholesale?: PriceRecord;
+
+  anomalyStatus?: AnomalyStatus;
+  anomalyReasons?: string[];
+
+  movement?: PriceMovement;
+  pctChange?: number;
+
+  source: string | PriceSource;
 
   reportDate: string;
-  collectedAt: string;
+  collectedAt?: string;
 
   imageUrl?: string;
 
   history30Days: Array<{
     date: string;
     avgPrice: number;
-    minPrice: number;
-    maxPrice: number;
+    minPrice?: number;
+    maxPrice?: number;
   }>;
 }
 
 export interface DistrictComparisonItem {
   districtEn: string;
   districtBn: string;
-
   divisionEn: string;
-
   minPrice: number;
   maxPrice: number;
   avgPrice: number;
-
   unitBn: string;
   unitEn: string;
-
   isLowest?: boolean;
   diffFromLowest?: number;
 }
 
 export interface MarketSummaryStats {
   totalItems: number;
-
   increasedCount: number;
   decreasedCount: number;
   stableCount: number;
