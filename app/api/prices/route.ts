@@ -107,7 +107,7 @@ function resolveDistrictInfo(param: string | null): { districtId: number; divisi
 function getCategory(name: string): string {
   const n = String(name || "").toLowerCase();
   if (/চাল|ধান|গম|আটা|ময়দা|ময়দা|rice|wheat|flour|grain/.test(n)) return "চাল ও খাদ্যশস্য";
-  if (/মাংস|ডিম|মুরগি|মুরগী|গরু|খাসি|হাঁস|মোরগ|কোয়েল|meat|beef|mutton|chicken|egg|broiler/.test(n)) return "মাংস ও ডিম";
+  if (/মাংস|ডিম|মুরগি|মুরগী|গরু|খাসি|হাঁস|মোরগ|কোয়েল|meat|beef|mutton|chicken|egg|broiler/.test(n) && !n.includes("চামড়া") && !n.includes("চামড়া")) return "মাংস ও ডিম";
   if (/মাছ|ইলিশ|রুই|কাতলা|মৃগেল|পাঙ্গাস|তেলাপিয়া|তেলাপিয়া|কৈ|শিং|মাগুর|মগুর|চিংড়ি|মাাছ|fish|carp|prawn|shrimp/.test(n)) return "মাছ";
   if (/তেল|তৈল|ওয়েল|ওয়েল|সোয়াবিন|সয়াবিন|সরিষা|পাম|\boil\b|\boils\b|soyabean|soyabin|soybean|mustard|sunflower/.test(n) && !n.includes("তেলাপিয়া") && !n.includes("তেলাপিয়া")) return "ভোজ্যতেল";
   if (/ডাল|শিম|মশুরি|মুগ|ছোলা|মটর|lenti|pulse|gram|\bbean\b|\bbeans\b/.test(n)) return "ডাল ও শিম";
