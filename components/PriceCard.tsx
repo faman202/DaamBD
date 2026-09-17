@@ -1,13 +1,19 @@
 'use client';
 
 import React from 'react';
-import { DailyPriceItem, Language, PriceType } from '@/lib/types';
+import {
+  DailyPriceItem,
+  Language,
+  PriceType,
+} from '@/lib/types';
+
 import {
   translations,
   formatPriceRange,
   formatPrice,
   toBanglaNumber,
 } from '@/lib/i18n';
+
 import {
   TrendingUp,
   TrendingDown,
@@ -29,17 +35,30 @@ interface PriceCardProps {
 
 type UnknownObject = Record<string, unknown>;
 
-const isObject = (value: unknown): value is UnknownObject => {
-  return typeof value === 'object' && value !== null;
+const isObject = (
+  value: unknown
+): value is UnknownObject => {
+  return (
+    typeof value === 'object' &&
+    value !== null
+  );
 };
 
-const getNumber = (...values: unknown[]): number => {
+const getNumber = (
+  ...values: unknown[]
+): number => {
   for (const value of values) {
-    if (typeof value === 'number' && Number.isFinite(value)) {
+    if (
+      typeof value === 'number' &&
+      Number.isFinite(value)
+    ) {
       return value;
     }
 
-    if (typeof value === 'string' && value.trim() !== '') {
+    if (
+      typeof value === 'string' &&
+      value.trim() !== ''
+    ) {
       const cleaned = value
         .replace(/৳/g, '')
         .replace(/টাকা/g, '')
@@ -66,7 +85,10 @@ const getValue = (
   }
 
   for (const key of keys) {
-    if (object[key] !== undefined && object[key] !== null) {
+    if (
+      object[key] !== undefined &&
+      object[key] !== null
+    ) {
       return object[key];
     }
   }
@@ -117,7 +139,9 @@ const getNestedNumber = (
   return 0;
 };
 
-export const PriceCard: React.FC<PriceCardProps> = ({
+export const PriceCard: React.FC<
+  PriceCardProps
+> = ({
   item,
   lang,
   priceType,
@@ -126,13 +150,18 @@ export const PriceCard: React.FC<PriceCardProps> = ({
 }) => {
   const t = translations[lang];
 
-  const rawItem = item as unknown as UnknownObject;
+  const rawItem =
+    item as unknown as UnknownObject;
 
-  const rawRetail = isObject(rawItem.retail)
+  const rawRetail = isObject(
+    rawItem.retail
+  )
     ? rawItem.retail
     : null;
 
-  const rawWholesale = isObject(rawItem.wholesale)
+  const rawWholesale = isObject(
+    rawItem.wholesale
+  )
     ? rawItem.wholesale
     : null;
 
@@ -141,22 +170,10 @@ export const PriceCard: React.FC<PriceCardProps> = ({
       ? rawRetail
       : rawWholesale;
 
-  /*
-   * DAM price field mapping
-   *
-   * Supports:
-   * avgPrice
-   * averagePrice
-   * avg
-   * average
-   * retailAvg
-   * wholesaleAvg
-   * price
-   * retail_price
-   * wholesale_price
-   * retailAverage
-   * wholesaleAverage
-   */
+  /* =========================
+     Average Price
+  ========================== */
+
   const averageKeys =
     priceType === 'retail'
       ? [
@@ -185,6 +202,30 @@ export const PriceCard: React.FC<PriceCardProps> = ({
           'wholesale_price',
           'price',
         ];
+
+  let avgPrice = getNestedNumber(
+    priceData,
+    averageKeys
+  );
+
+  if (avgPrice <= 0) {
+    avgPrice = getNestedNumber(
+      rawItem,
+      averageKeys
+    );
+  }
+
+  if (avgPrice <= 0) {
+    avgPrice = getNumber(
+      priceType === 'retail'
+        ? rawItem.retailAvg
+        : rawItem.wholesaleAvg
+    );
+  }
+
+  /* =========================
+     Lowest / Highest
+  ========================== */
 
   const lowestKeys = [
     'lowestPrice',
@@ -216,35 +257,6 @@ export const PriceCard: React.FC<PriceCardProps> = ({
     'wholesale_high',
   ];
 
-  /*
-   * Average price
-   */
-  let avgPrice = getNestedNumber(
-    priceData,
-    averageKeys
-  );
-
-  if (avgPrice <= 0) {
-    avgPrice = getNestedNumber(
-      rawItem,
-      averageKeys
-    );
-  }
-
-  /*
-   * Direct known DailyPriceItem fields
-   */
-  if (avgPrice <= 0) {
-    avgPrice = getNumber(
-      priceType === 'retail'
-        ? rawItem.retailAvg
-        : rawItem.wholesaleAvg
-    );
-  }
-
-  /*
-   * Lowest price
-   */
   let lowestPrice = getNestedNumber(
     priceData,
     lowestKeys
@@ -257,9 +269,6 @@ export const PriceCard: React.FC<PriceCardProps> = ({
     );
   }
 
-  /*
-   * Highest price
-   */
   let highestPrice = getNestedNumber(
     priceData,
     highestKeys
@@ -272,10 +281,6 @@ export const PriceCard: React.FC<PriceCardProps> = ({
     );
   }
 
-  /*
-   * If DAM gives only average price,
-   * use average as the displayed price.
-   */
   const displayLowest =
     lowestPrice > 0
       ? lowestPrice
@@ -286,9 +291,10 @@ export const PriceCard: React.FC<PriceCardProps> = ({
       ? highestPrice
       : avgPrice;
 
-  /*
-   * Unit
-   */
+  /* =========================
+     Unit
+  ========================== */
+
   const unit =
     lang === 'bn'
       ? String(
@@ -310,9 +316,10 @@ export const PriceCard: React.FC<PriceCardProps> = ({
           ]) || 'Kilogram'
         );
 
-  /*
-   * Product names
-   */
+  /* =========================
+     Product Names
+  ========================== */
+
   const nameBn = String(
     getValue(rawItem, [
       'nameBn',
@@ -335,9 +342,10 @@ export const PriceCard: React.FC<PriceCardProps> = ({
     ]) || 'Product'
   );
 
-  /*
-   * Category
-   */
+  /* =========================
+     Category
+  ========================== */
+
   const categoryBn = String(
     getValue(rawItem, [
       'categoryBn',
@@ -363,25 +371,35 @@ export const PriceCard: React.FC<PriceCardProps> = ({
       ? categoryBn
       : categoryEn;
 
-  /*
-   * Movement
-   */
-  const movementValue = getValue(rawItem, [
-    'movement',
-    'priceMovement',
-    'price_movement',
-  ]);
+  /* =========================
+     Movement
+     Supports:
+     up / down
+     spike / drop
+     stable
+  ========================== */
+
+  const movementValue = String(
+    getValue(rawItem, [
+      'movement',
+      'priceMovement',
+      'price_movement',
+    ]) || ''
+  ).toLowerCase();
 
   const movement =
     movementValue === 'up' ||
-    movementValue === 'down' ||
-    movementValue === 'stable'
-      ? movementValue
+    movementValue === 'spike'
+      ? 'spike'
+      : movementValue === 'down' ||
+        movementValue === 'drop'
+      ? 'drop'
       : 'stable';
 
-  /*
-   * Price change
-   */
+  /* =========================
+     Price Change
+  ========================== */
+
   const priceChange = getNumber(
     getValue(rawItem, [
       'priceChange',
@@ -393,13 +411,17 @@ export const PriceCard: React.FC<PriceCardProps> = ({
     ])
   );
 
-  const renderMovementBadge = () => {
-    if (movement === 'down') {
-      return (
-        <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-bold bg-[#ECFDF5] text-[#16A34A] border border-[#16A34A]/30">
-          <TrendingDown className="w-3.5 h-3.5" />
+  /* =========================
+     Movement Badge
+  ========================== */
 
-          <span>
+  const renderMovementBadge = () => {
+    if (movement === 'drop') {
+      return (
+        <span className="inline-flex max-w-full items-center gap-1 px-2 py-1 rounded-full text-[10px] sm:text-xs font-bold bg-[#ECFDF5] text-[#16A34A] border border-[#16A34A]/30 whitespace-nowrap">
+          <TrendingDown className="w-3.5 h-3.5 shrink-0" />
+
+          <span className="truncate">
             {lang === 'bn'
               ? `↓ ${toBanglaNumber(
                   Math.abs(priceChange)
@@ -412,12 +434,12 @@ export const PriceCard: React.FC<PriceCardProps> = ({
       );
     }
 
-    if (movement === 'up') {
+    if (movement === 'spike') {
       return (
-        <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-bold bg-[#FEF2F2] text-[#DC2626] border border-[#DC2626]/30">
-          <TrendingUp className="w-3.5 h-3.5" />
+        <span className="inline-flex max-w-full items-center gap-1 px-2 py-1 rounded-full text-[10px] sm:text-xs font-bold bg-[#FEF2F2] text-[#DC2626] border border-[#DC2626]/30 whitespace-nowrap">
+          <TrendingUp className="w-3.5 h-3.5 shrink-0" />
 
-          <span>
+          <span className="truncate">
             {lang === 'bn'
               ? `↑ ${toBanglaNumber(
                   Math.abs(priceChange)
@@ -431,8 +453,8 @@ export const PriceCard: React.FC<PriceCardProps> = ({
     }
 
     return (
-      <span className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700 border border-gray-200">
-        <Minus className="w-3.5 h-3.5" />
+      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] sm:text-xs font-semibold bg-gray-100 text-gray-700 border border-gray-200 whitespace-nowrap">
+        <Minus className="w-3.5 h-3.5 shrink-0" />
 
         <span>
           {lang === 'bn'
@@ -444,49 +466,78 @@ export const PriceCard: React.FC<PriceCardProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-2xl p-4 sm:p-5 border border-surface-border shadow-card-subtle hover:shadow-card-hover transition-all duration-200 flex flex-col justify-between group relative overflow-hidden">
-      <div>
-        <div className="flex items-center justify-between gap-2 mb-2.5">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-brand-700 bg-brand-50 px-2.5 py-0.5 rounded-md border border-brand-200">
+    <article className="w-full min-w-0 bg-white rounded-2xl p-3.5 sm:p-4 lg:p-5 border border-surface-border shadow-card-subtle hover:shadow-card-hover transition-all duration-200 flex flex-col justify-between group relative overflow-hidden">
+
+      <div className="min-w-0">
+
+        {/* =========================
+            Category + Movement
+        ========================== */}
+
+        <div className="flex items-start justify-between gap-2 mb-2.5">
+
+          <span className="min-w-0 max-w-[48%] text-[10px] sm:text-[11px] font-bold uppercase tracking-wide text-brand-700 bg-brand-50 px-2 sm:px-2.5 py-1 rounded-md border border-brand-200 truncate">
             {category}
           </span>
 
-          {renderMovementBadge()}
+          <div className="min-w-0 max-w-[52%]">
+            {renderMovementBadge()}
+          </div>
+
         </div>
 
-        <div className="mb-3">
-          <h4 className="text-base sm:text-lg font-bold text-content-main group-hover:text-brand-700 transition-colors leading-snug">
+        {/* =========================
+            Product Name
+        ========================== */}
+
+        <div className="mb-3 min-w-0">
+
+          <h4 className="text-[15px] sm:text-base lg:text-lg font-bold text-content-main group-hover:text-brand-700 transition-colors leading-snug break-words">
             {lang === 'bn'
               ? nameBn
               : nameEn}
           </h4>
 
-          <p className="text-xs text-content-muted font-medium mt-0.5">
+          <p className="text-[10px] sm:text-xs text-content-muted font-medium mt-1 break-words">
             {lang === 'bn'
               ? nameEn
               : nameBn}
           </p>
+
         </div>
 
-        {rawItem.anomalyStatus === 'warning' && (
-          <div className="mb-3 bg-amber-50 border border-amber-300 text-amber-900 rounded-xl p-2 text-xs flex items-center space-x-1.5">
-            <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+        {/* =========================
+            Anomaly Warning
+        ========================== */}
 
-            <span className="font-semibold">
+        {rawItem.anomalyStatus ===
+          'warning' && (
+          <div className="mb-3 bg-amber-50 border border-amber-300 text-amber-900 rounded-xl p-2.5 text-[10px] sm:text-xs flex items-start gap-1.5">
+
+            <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+
+            <span className="font-semibold leading-relaxed">
               {t.anomalyAlert}
             </span>
+
           </div>
         )}
 
-        <div className="bg-surface-bg rounded-xl p-3.5 border border-surface-borderLight mb-3">
-          <div className="flex items-baseline justify-between">
-            <span className="text-xs text-content-muted font-medium">
+        {/* =========================
+            Price Box
+        ========================== */}
+
+        <div className="bg-surface-bg rounded-xl p-3 sm:p-3.5 border border-surface-borderLight mb-3">
+
+          <div className="flex items-center justify-between gap-2">
+
+            <span className="text-[10px] sm:text-xs text-content-muted font-medium whitespace-nowrap">
               {priceType === 'retail'
                 ? t.retailTab
                 : t.wholesaleTab}
             </span>
 
-            <span className="text-[11px] text-content-light">
+            <span className="text-[10px] sm:text-[11px] text-content-light text-right truncate">
               {t.averagePrice}:{' '}
 
               <strong className="text-content-main font-bold">
@@ -496,10 +547,12 @@ export const PriceCard: React.FC<PriceCardProps> = ({
                 )}
               </strong>
             </span>
+
           </div>
 
-          <div className="mt-1 flex items-baseline space-x-1">
-            <span className="text-xl sm:text-2xl font-black text-brand-900 tracking-tight">
+          <div className="mt-1.5 min-w-0">
+
+            <span className="block text-lg sm:text-xl lg:text-2xl font-black text-brand-900 tracking-tight leading-tight break-words">
               {formatPriceRange(
                 displayLowest,
                 displayHighest,
@@ -507,28 +560,38 @@ export const PriceCard: React.FC<PriceCardProps> = ({
                 lang
               )}
             </span>
+
           </div>
+
         </div>
 
-        <div className="flex items-center justify-between text-[11px] text-content-muted pt-1 pb-3 border-b border-surface-borderLight">
+        {/* =========================
+            Source + Date
+        ========================== */}
+
+        <div className="flex items-center justify-between gap-2 text-[10px] sm:text-[11px] text-content-muted pt-1 pb-3 border-b border-surface-borderLight">
+
           <div
-            className="flex items-center space-x-1 text-emerald-800 font-semibold"
+            className="min-w-0 flex items-center gap-1 text-emerald-800 font-semibold"
             title={
               lang === 'bn'
                 ? 'কৃষি বিপণন অধিদপ্তর (DAM)'
                 : 'Department of Agricultural Marketing (DAM)'
             }
           >
+
             <ShieldCheck className="w-3.5 h-3.5 text-brand-600 shrink-0" />
 
-            <span className="truncate max-w-[130px] sm:max-w-[150px]">
+            <span className="truncate">
               {lang === 'bn'
                 ? 'কৃষি বিপণন অধিদপ্তর (DAM)'
-                : 'DAM Official Data'}
+                : 'DAM Data'}
             </span>
+
           </div>
 
-          <div className="flex items-center space-x-1 text-gray-500">
+          <div className="shrink-0 flex items-center gap-1 text-gray-500">
+
             <Clock className="w-3 h-3 text-gray-400 shrink-0" />
 
             <span>
@@ -536,39 +599,55 @@ export const PriceCard: React.FC<PriceCardProps> = ({
                 ? 'আজকের তথ্য'
                 : 'Today'}
             </span>
+
           </div>
+
         </div>
+
       </div>
 
+      {/* =========================
+          Action Buttons
+      ========================== */}
+
       <div className="grid grid-cols-2 gap-2 mt-3 pt-1">
+
         <button
+          type="button"
           onClick={() =>
             onOpenCalculator(item)
           }
-          className="flex items-center justify-center space-x-1.5 py-2 px-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300/70 text-xs font-bold transition-all shadow-sm active:scale-95"
+          className="min-w-0 flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300/70 text-[10px] sm:text-xs font-bold transition-all shadow-sm active:scale-95"
           title={t.calculatorSubtitle}
         >
-          <Calculator className="w-3.5 h-3.5 text-amber-700" />
 
-          <span>
+          <Calculator className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+
+          <span className="truncate">
             {t.calculatorBtn}
           </span>
+
         </button>
 
         <button
+          type="button"
           onClick={() =>
             onOpenTrend(item)
           }
-          className="flex items-center justify-center space-x-1.5 py-2 px-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300/70 text-xs font-bold transition-all shadow-sm active:scale-95"
+          className="min-w-0 flex items-center justify-center gap-1.5 py-2.5 px-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-300/70 text-[10px] sm:text-xs font-bold transition-all shadow-sm active:scale-95"
           title={t.trendSubtitle}
         >
-          <LineChart className="w-3.5 h-3.5 text-brand-700" />
 
-          <span>
+          <LineChart className="w-3.5 h-3.5 text-brand-700 shrink-0" />
+
+          <span className="truncate">
             {t.trendBtn}
           </span>
+
         </button>
+
       </div>
-    </div>
+
+    </article>
   );
 };

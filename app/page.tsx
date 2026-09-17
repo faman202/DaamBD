@@ -33,12 +33,32 @@ function getText(...values: unknown[]): string {
       return value.trim();
     }
 
-    if (typeof value === 'number') {
+    if (typeof value === 'number' && Number.isFinite(value)) {
       return String(value);
     }
   }
 
   return '';
+}
+
+function getNumber(...values: unknown[]): number {
+  for (const value of values) {
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return value;
+    }
+
+    if (typeof value === 'string' && value.trim() !== '') {
+      const number = Number(
+        value.replace(/,/g, '').trim()
+      );
+
+      if (Number.isFinite(number)) {
+        return number;
+      }
+    }
+  }
+
+  return 0;
 }
 
 function getPrice(
@@ -49,11 +69,11 @@ function getPrice(
 
   const selected =
     priceType === 'retail'
-      ? object?.retail
-      : object?.wholesale;
+      ? object.retail
+      : object.wholesale;
 
   if (isObject(selected)) {
-    const values = [
+    const number = getNumber(
       selected.avgPrice,
       selected.averagePrice,
       selected.avg,
@@ -66,54 +86,34 @@ function getPrice(
       selected.wholesale_price,
       selected.retailPrice,
       selected.wholesalePrice,
-      selected.price,
-    ];
+      selected.price
+    );
 
-    for (const value of values) {
-      const number = Number(value);
-
-      if (
-        Number.isFinite(number) &&
-        number > 0
-      ) {
-        return number;
-      }
-    }
-  }
-
-  const fallbackValues =
-    priceType === 'retail'
-      ? [
-          object?.retailAvg,
-          object?.retailAverage,
-          object?.retailPrice,
-          object?.retail_price,
-          object?.price,
-          object?.avgPrice,
-          object?.averagePrice,
-        ]
-      : [
-          object?.wholesaleAvg,
-          object?.wholesaleAverage,
-          object?.wholesalePrice,
-          object?.wholesale_price,
-          object?.wholesale,
-          object?.avgPrice,
-          object?.averagePrice,
-        ];
-
-  for (const value of fallbackValues) {
-    const number = Number(value);
-
-    if (
-      Number.isFinite(number) &&
-      number > 0
-    ) {
+    if (number > 0) {
       return number;
     }
   }
 
-  return 0;
+  if (priceType === 'retail') {
+    return getNumber(
+      object.retailAvg,
+      object.retailAverage,
+      object.retailPrice,
+      object.retail_price,
+      object.price,
+      object.avgPrice,
+      object.averagePrice
+    );
+  }
+
+  return getNumber(
+    object.wholesaleAvg,
+    object.wholesaleAverage,
+    object.wholesalePrice,
+    object.wholesale_price,
+    object.avgPrice,
+    object.averagePrice
+  );
 }
 
 function normalizeCategory(value: unknown): string {
@@ -142,59 +142,31 @@ function categoryMatches(
   );
 
   const possibleCategories = [
-    object?.categorySlug,
-    object?.category,
-    object?.categoryBn,
-    object?.categoryEn,
-    object?.categoryName,
-    object?.category_name,
-    object?.category_name_bn,
-    object?.category_name_en,
+    object.categorySlug,
+    object.category,
+    object.categoryBn,
+    object.categoryEn,
+    object.categoryName,
+    object.category_name,
+    object.category_name_bn,
+    object.category_name_en,
   ]
     .map(normalizeCategory)
     .filter(Boolean);
 
-  if (
-    possibleCategories.includes(selected)
-  ) {
+  if (possibleCategories.includes(selected)) {
     return true;
   }
 
   const aliases: Record<string, string[]> = {
-    'চাল ও খাদ্যশস্য': [
-      'চাল ও খাদ্যশস্য',
-      'rice',
-      'rice and grains',
-      'grains',
-      'food grains',
-      'চাল',
-      'খাদ্যশস্য',
-      'rice grains',
-    ],
-
-    rice: [
-      'চাল ও খাদ্যশস্য',
-      'rice',
-      'rice and grains',
-      'grains',
-      'food grains',
-    ],
-
     grains: [
       'চাল ও খাদ্যশস্য',
+      'চাল',
+      'খাদ্যশস্য',
       'rice',
       'rice and grains',
       'grains',
-    ],
-
-    'ডাল ও শিম': [
-      'ডাল ও শিম',
-      'ডাল',
-      'শিম',
-      'pulses',
-      'pulse',
-      'lentil',
-      'legumes',
+      'food grains',
     ],
 
     pulses: [
@@ -207,14 +179,6 @@ function categoryMatches(
       'legumes',
     ],
 
-    'শাকসবজি': [
-      'শাকসবজি',
-      'সবজি',
-      'vegetables',
-      'vegetable',
-      'veggies',
-    ],
-
     vegetables: [
       'শাকসবজি',
       'সবজি',
@@ -223,7 +187,7 @@ function categoryMatches(
       'veggies',
     ],
 
-    'মাংস ও ডিম': [
+    'meat-eggs': [
       'মাংস ও ডিম',
       'মাংস',
       'ডিম',
@@ -232,44 +196,12 @@ function categoryMatches(
       'eggs',
       'egg',
       'poultry',
-    ],
-
-    meat: [
-      'মাংস ও ডিম',
-      'মাংস',
-      'ডিম',
-      'meat and eggs',
-      'meat',
-      'eggs',
-      'egg',
-      'poultry',
-    ],
-
-    eggs: [
-      'মাংস ও ডিম',
-      'ডিম',
-      'egg',
-      'eggs',
-      'meat and eggs',
-    ],
-
-    মাছ: [
-      'মাছ',
-      'fish',
-      'fishes',
     ],
 
     fish: [
       'মাছ',
       'fish',
       'fishes',
-    ],
-
-    মসলা: [
-      'মসলা',
-      'মশলা',
-      'spices',
-      'spice',
     ],
 
     spices: [
@@ -279,27 +211,12 @@ function categoryMatches(
       'spice',
     ],
 
-    ভোজ্যতেল: [
+    oils: [
       'ভোজ্যতেল',
       'তেল',
       'edible oil',
       'cooking oil',
       'oil',
-    ],
-
-    oil: [
-      'ভোজ্যতেল',
-      'তেল',
-      'edible oil',
-      'cooking oil',
-      'oil',
-    ],
-
-    নিত্যপণ্য: [
-      'নিত্যপণ্য',
-      'essential',
-      'essentials',
-      'daily essentials',
     ],
 
     essentials: [
@@ -310,25 +227,57 @@ function categoryMatches(
     ],
   };
 
-  const allowed =
-    aliases[selected] || [selected];
+  const allowed = aliases[selected] || [selected];
 
-  return possibleCategories.some(
-    (category) =>
-      allowed.includes(category) ||
-      allowed.some(
-        (alias) =>
-          category.includes(alias) ||
-          alias.includes(category)
-      )
+  return possibleCategories.some((category) =>
+    allowed.some(
+      (alias) =>
+        category === alias ||
+        category.includes(alias) ||
+        alias.includes(category)
+    )
   );
 }
 
-export default function Home() {
-  // =========================
-  // Global State
-  // =========================
+function getSearchableText(
+  item: DailyPriceItem
+): string {
+  const object = item as unknown as AnyObject;
 
+  return [
+    object.nameBn,
+    object.nameEn,
+
+    object.commodityNameBn,
+    object.commodityNameEn,
+    object.commodityName,
+
+    object.commodity_name_bn,
+    object.commodity_name_en,
+    object.commodity_name,
+
+    object.textBn,
+    object.textEn,
+    object.text_bn,
+    object.text_en,
+
+    object.categoryBn,
+    object.categoryEn,
+    object.category,
+
+    object.categoryName,
+    object.category_name,
+    object.category_name_bn,
+    object.category_name_en,
+  ]
+    .map((value) =>
+      getText(value).toLowerCase()
+    )
+    .filter(Boolean)
+    .join(' ');
+}
+
+export default function Home() {
   const [lang, setLang] =
     useState<Language>('bn');
 
@@ -350,10 +299,6 @@ export default function Home() {
   const [sortBy, setSortBy] =
     useState<string>('default');
 
-  // =========================
-  // Modal State
-  // =========================
-
   const [calculatorItem, setCalculatorItem] =
     useState<DailyPriceItem | null>(null);
 
@@ -369,10 +314,6 @@ export default function Home() {
   const [isTransparencyOpen, setIsTransparencyOpen] =
     useState<boolean>(false);
 
-  // =========================
-  // API Data State
-  // =========================
-
   const [allDistrictItems, setAllDistrictItems] =
     useState<DailyPriceItem[]>([]);
 
@@ -385,17 +326,16 @@ export default function Home() {
   const [lastUpdated, setLastUpdated] =
     useState<string | null>(null);
 
-  // =========================
-  // District ID Mapping
-  // =========================
-
+  /*
+   * IMPORTANT:
+   * Only add a district here when its official DAM ID
+   * has been confirmed from the DAM dropdown API.
+   *
+   * Dhaka = 46 is confirmed.
+   */
   const districtIds: Record<string, number> = {
     Dhaka: 46,
   };
-
-  // =========================
-  // Load Official Market Prices
-  // =========================
 
   useEffect(() => {
     let cancelled = false;
@@ -406,7 +346,19 @@ export default function Home() {
         setError(null);
 
         const districtId =
-          districtIds[selectedDistrict] || 46;
+          districtIds[selectedDistrict];
+
+        /*
+         * Never silently use Dhaka for another district.
+         * That was a serious data-integrity problem.
+         */
+        if (!districtId) {
+          throw new Error(
+            lang === 'bn'
+              ? `${selectedDistrict} জেলার সরকারি DAM ID এখনো সংযুক্ত করা হয়নি।`
+              : `The official DAM ID for ${selectedDistrict} has not been connected yet.`
+          );
+        }
 
         const response = await fetch(
           `/api/prices?district=${districtId}`,
@@ -426,7 +378,8 @@ export default function Home() {
 
         if (!data?.success) {
           throw new Error(
-            data?.error || 'Price API failed'
+            data?.error ||
+              'Price API failed'
           );
         }
 
@@ -440,14 +393,11 @@ export default function Home() {
 
         setAllDistrictItems(items);
 
-        // API timestamp থাকলে সেটি ব্যবহার করবে,
-        // না থাকলে fetch-এর সময় ব্যবহার করবে।
-        const apiTimestamp =
-          getText(
-            data?.timestamp,
-            data?.updatedAt,
-            data?.lastUpdated
-          );
+        const apiTimestamp = getText(
+          data?.timestamp,
+          data?.updatedAt,
+          data?.lastUpdated
+        );
 
         setLastUpdated(
           apiTimestamp ||
@@ -463,8 +413,18 @@ export default function Home() {
           err
         );
 
+        const message =
+          err instanceof Error
+            ? err.message
+            : '';
+
         setError(
-          'বাজারদরের তথ্য লোড করা যাচ্ছে না।'
+          message ||
+            (
+              lang === 'bn'
+                ? 'বাজারদরের তথ্য লোড করা যাচ্ছে না।'
+                : 'Unable to load market prices.'
+            )
         );
 
         setAllDistrictItems([]);
@@ -481,11 +441,7 @@ export default function Home() {
     return () => {
       cancelled = true;
     };
-  }, [selectedDistrict]);
-
-  // =========================
-  // Summary Statistics
-  // =========================
+  }, [selectedDistrict, lang]);
 
   const summaryStats = useMemo(() => {
     const totalItems =
@@ -529,6 +485,16 @@ export default function Home() {
     const topDrop =
       sortedByDrop[0];
 
+    const spikeChange =
+      Number(
+        topSpike?.priceChange || 0
+      );
+
+    const dropChange =
+      Number(
+        topDrop?.priceChange || 0
+      );
+
     return {
       totalItems,
 
@@ -539,33 +505,23 @@ export default function Home() {
       stableCount,
 
       topSpikeItem:
-        topSpike &&
-        Number(topSpike.priceChange || 0) > 0
+        topSpike && spikeChange > 0
           ? {
               nameBn: topSpike.nameBn,
               nameEn: topSpike.nameEn,
-              change: Number(
-                topSpike.priceChange || 0
-              ),
-              pctChange: Number(
-                topSpike.priceChange || 0
-              ),
+              change: spikeChange,
+              pctChange: spikeChange,
             }
           : null,
 
       topDropItem:
-        topDrop &&
-        Number(topDrop.priceChange || 0) < 0
+        topDrop && dropChange < 0
           ? {
               nameBn: topDrop.nameBn,
               nameEn: topDrop.nameEn,
-              change: Number(
-                topDrop.priceChange || 0
-              ),
+              change: dropChange,
               pctChange: Math.abs(
-                Number(
-                  topDrop.priceChange || 0
-                )
+                dropChange
               ),
             }
           : null,
@@ -579,18 +535,13 @@ export default function Home() {
     lastUpdated,
   ]);
 
-  // =========================
-  // Filtered & Sorted Items
-  // =========================
-
   const filteredItems = useMemo(() => {
     let result =
       [...allDistrictItems];
 
-    // =========================
-    // Category Filter
-    // =========================
-
+    /*
+     * Category
+     */
     if (
       selectedCategory !== 'all'
     ) {
@@ -603,100 +554,74 @@ export default function Home() {
         );
     }
 
-    // =========================
-    // Search Filter
-    // =========================
-
+    /*
+     * Search
+     */
     if (
       searchQuery.trim() !== ''
     ) {
-      const q =
+      const query =
         searchQuery
           .toLowerCase()
           .trim();
 
       result =
         result.filter(
-          (item: DailyPriceItem) => {
-            const object =
-              item as unknown as AnyObject;
-
-            const searchableText =
-              [
-                object?.nameBn,
-                object?.nameEn,
-                object?.commodityNameBn,
-                object?.commodity_name_bn,
-                object?.commodityName,
-                object?.commodity_name,
-                object?.textBn,
-                object?.text_bn,
-                object?.textEn,
-                object?.text_en,
-                object?.categoryBn,
-                object?.categoryEn,
-                object?.category,
-              ]
-                .map((value) =>
-                  getText(value)
-                    .toLowerCase()
-                )
-                .filter(Boolean)
-                .join(' ');
-
-            return searchableText.includes(q);
-          }
+          (item) =>
+            getSearchableText(
+              item
+            ).includes(query)
         );
     }
 
-    // =========================
-    // Price Movement Filter
-    // =========================
-
+    /*
+     * Movement
+     */
     if (
       movementFilter !== 'all'
     ) {
       result =
         result.filter(
-          (item: DailyPriceItem) => {
+          (item) => {
             const change =
               Number(
                 item.priceChange || 0
               );
 
             if (
-              movementFilter ===
-              'up'
+              movementFilter === 'up'
             ) {
               return change > 0;
             }
 
             if (
-              movementFilter ===
-              'down'
+              movementFilter === 'down'
             ) {
               return change < 0;
             }
 
             if (
-              movementFilter ===
-              'stable'
+              movementFilter === 'stable'
             ) {
               return change === 0;
             }
 
+            const object =
+              item as unknown as AnyObject;
+
             return (
-              item as unknown as AnyObject
-            )?.movement ===
-              movementFilter;
+              getText(
+                object.movement
+              ) ===
+              movementFilter
+            );
           }
         );
     }
 
-    // =========================
-    // Sorting
-    // =========================
-
+    /*
+     * Sort
+     */
     if (
       sortBy === 'price-low'
     ) {
@@ -760,10 +685,6 @@ export default function Home() {
   const t =
     translations[lang];
 
-  // =========================
-  // Modal Handlers
-  // =========================
-
   const handleOpenCalculator = (
     item: DailyPriceItem
   ) => {
@@ -778,20 +699,12 @@ export default function Home() {
     setIsTrendOpen(true);
   };
 
-  // =========================
-  // District Display Name
-  // =========================
-
   const districtDisplayName =
     lang === 'bn'
       ? selectedDistrict === 'Dhaka'
         ? 'ঢাকা'
         : selectedDistrict
       : selectedDistrict;
-
-  // =========================
-  // Format Update Time
-  // =========================
 
   const formattedUpdatedTime =
     useMemo(() => {
@@ -830,10 +743,6 @@ export default function Home() {
       lang,
     ]);
 
-  // =========================
-  // Reset Filters
-  // =========================
-
   const resetFilters = () => {
     setSearchQuery('');
     setSelectedCategory('all');
@@ -841,17 +750,10 @@ export default function Home() {
     setSortBy('default');
   };
 
-  // =========================
-  // UI
-  // =========================
-
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8FAF8]">
+    <div className="min-h-screen flex flex-col bg-[#F8FAF8] overflow-x-hidden">
 
-      {/* =========================
-          1. Header
-      ========================== */}
-
+      {/* Header */}
       <Header
         lang={lang}
         onLanguageChange={
@@ -870,10 +772,7 @@ export default function Home() {
         }
       />
 
-      {/* =========================
-          2. Hero & Search
-      ========================== */}
-
+      {/* Hero / Search */}
       <HeroSearch
         lang={lang}
         searchQuery={
@@ -909,10 +808,7 @@ export default function Home() {
         }
       />
 
-      {/* =========================
-          3. Market Stats
-      ========================== */}
-
+      {/* Statistics */}
       <MarketStats
         lang={lang}
         stats={
@@ -920,60 +816,42 @@ export default function Home() {
         }
       />
 
-      {/* =========================
-          4. Main Content
-      ========================== */}
+      {/* Main */}
+      <main className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1 w-full space-y-6 sm:space-y-8">
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-8">
-
-        {/* Section Heading */}
-
-        <div className="flex items-center justify-between">
-          <div>
-
-            <h3 className="text-xl sm:text-2xl font-black text-content-main tracking-tight flex items-center gap-2">
-
-              <span>
-                {lang === 'bn'
-                  ? `আজকের বাজারদর (${districtDisplayName})`
-                  : `Today's Market Rates (${selectedDistrict})`}
-              </span>
-
-            </h3>
-
-            <p className="text-xs text-content-muted mt-0.5 font-semibold">
+        {/* Section heading */}
+        <div className="min-w-0">
+          <h3 className="text-xl sm:text-2xl font-black text-content-main tracking-tight flex items-center gap-2">
+            <span className="truncate">
               {lang === 'bn'
-                ? 'সরকারি DAM-এর দৈনিক বাজারদর'
-                : 'Daily market prices sourced from DAM'}
+                ? `আজকের বাজারদর (${districtDisplayName})`
+                : `Today's Market Rates (${selectedDistrict})`}
+            </span>
+          </h3>
+
+          <p className="text-xs text-content-muted mt-1 font-semibold">
+            {lang === 'bn'
+              ? 'সরকারি DAM-এর দৈনিক বাজারদর'
+              : 'Daily market prices sourced from DAM'}
+          </p>
+
+          {formattedUpdatedTime && (
+            <p className="text-[11px] text-content-muted mt-1 break-words">
+              {lang === 'bn'
+                ? `সর্বশেষ আপডেট: ${formattedUpdatedTime}`
+                : `Last updated: ${formattedUpdatedTime}`}
             </p>
-
-            {formattedUpdatedTime && (
-              <p className="text-[11px] text-content-muted mt-1">
-                {lang === 'bn'
-                  ? `সর্বশেষ আপডেট: ${formattedUpdatedTime}`
-                  : `Last updated: ${formattedUpdatedTime}`}
-              </p>
-            )}
-
-          </div>
+          )}
         </div>
 
-        {/* =========================
-            Loading State
-        ========================== */}
-
+        {/* Loading */}
         {loading ? (
-
-          <div className="bg-white rounded-3xl p-10 text-center border border-surface-border shadow-card-subtle max-w-md mx-auto my-8 space-y-4">
-
+          <div className="bg-white rounded-3xl p-8 sm:p-10 text-center border border-surface-border shadow-card-subtle max-w-md mx-auto my-8 space-y-4">
             <div className="w-16 h-16 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center mx-auto text-brand-700">
-
               <RefreshCw className="w-8 h-8 animate-spin" />
-
             </div>
 
             <div>
-
               <h4 className="text-lg font-bold text-content-main">
                 {lang === 'bn'
                   ? 'বাজারদর লোড হচ্ছে...'
@@ -982,40 +860,28 @@ export default function Home() {
 
               <p className="text-xs text-content-muted mt-1">
                 {lang === 'bn'
-                  ? 'সরকারি DAM উৎস থেকে সর্বশেষ তথ্য আনা হচ্ছে।'
-                  : 'Fetching the latest data from the official DAM source.'}
+                  ? 'সরকারি DAM উৎস থেকে তথ্য আনা হচ্ছে।'
+                  : 'Fetching market data from DAM.'}
               </p>
-
             </div>
-
           </div>
-
         ) : error ? (
-
-          /* =========================
-             API Error State
-          ========================== */
-
-          <div className="bg-white rounded-3xl p-10 text-center border border-red-200 shadow-card-subtle max-w-md mx-auto my-8 space-y-4">
-
+          /* Error */
+          <div className="bg-white rounded-3xl p-8 sm:p-10 text-center border border-red-200 shadow-card-subtle max-w-md mx-auto my-8 space-y-4">
             <div className="w-16 h-16 rounded-full bg-red-50 border border-red-200 flex items-center justify-center mx-auto text-red-600">
-
               <SearchX className="w-8 h-8" />
-
             </div>
 
             <div>
-
               <h4 className="text-lg font-bold text-content-main">
                 {lang === 'bn'
                   ? 'তথ্য পাওয়া যাচ্ছে না'
                   : 'Unable to load prices'}
               </h4>
 
-              <p className="text-xs text-content-muted mt-1">
+              <p className="text-xs text-content-muted mt-2 leading-relaxed">
                 {error}
               </p>
-
             </div>
 
             <button
@@ -1028,63 +894,55 @@ export default function Home() {
                 ? 'আবার চেষ্টা করুন'
                 : 'Try Again'}
             </button>
-
           </div>
-
         ) : filteredItems.length > 0 ? (
-
-          /* =========================
-             Price Cards Grid
-          ========================== */
-
+          /* Price cards */
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
-
             {filteredItems.map(
               (
                 item: DailyPriceItem
-              ) => (
-                <PriceCard
-                  key={
-                    String(
-                      (item as any).id ??
-                      (item as any).commodityId ??
-                      (item as any).commodity_id ??
-                      item.nameBn
-                    )
-                  }
-                  item={item}
-                  lang={lang}
-                  priceType={
-                    priceType
-                  }
-                  onOpenCalculator={
-                    handleOpenCalculator
-                  }
-                  onOpenTrend={
-                    handleOpenTrend
-                  }
-                />
-              )
+              ) => {
+                const object =
+                  item as unknown as AnyObject;
+
+                const itemId =
+                  getText(
+                    object.id,
+                    object.commodityId,
+                    object.commodity_id,
+                    object.productId,
+                    object.product_id,
+                    item.nameBn,
+                    item.nameEn
+                  );
+
+                return (
+                  <PriceCard
+                    key={itemId}
+                    item={item}
+                    lang={lang}
+                    priceType={
+                      priceType
+                    }
+                    onOpenCalculator={
+                      handleOpenCalculator
+                    }
+                    onOpenTrend={
+                      handleOpenTrend
+                    }
+                  />
+                );
+              }
             )}
-
           </div>
-
         ) : (
-
-          /* =========================
-             No Items State
-          ========================== */
-
-          <div className="bg-white rounded-3xl p-10 text-center border border-surface-border shadow-card-subtle max-w-md mx-auto my-8 space-y-4">
-
+          /* No results */
+          <div className="bg-white rounded-3xl p-8 sm:p-10 text-center border border-surface-border shadow-card-subtle max-w-md mx-auto my-8 space-y-4">
             <div className="w-16 h-16 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center mx-auto text-brand-700">
-
               <SearchX className="w-8 h-8" />
-
             </div>
 
             <div>
-
               <h4 className="text-lg font-bold text-content-main">
                 {allDistrictItems.length > 0
                   ? lang === 'bn'
@@ -1093,7 +951,7 @@ export default function Home() {
                   : t.noItemsFound}
               </h4>
 
-              <p className="text-xs text-content-muted mt-1">
+              <p className="text-xs text-content-muted mt-1 leading-relaxed">
                 {allDistrictItems.length > 0
                   ? lang === 'bn'
                     ? 'ক্যাটাগরি, অনুসন্ধান বা দামের ফিল্টার পরিবর্তন করে দেখুন।'
@@ -1102,7 +960,6 @@ export default function Home() {
                     ? 'বর্তমানে এই এলাকার জন্য কোনো বাজারদরের তথ্য পাওয়া যায়নি।'
                     : 'No market price data is currently available for this area.'}
               </p>
-
             </div>
 
             <button
@@ -1115,24 +972,16 @@ export default function Home() {
                 ? 'ফিল্টার রিসেট করুন'
                 : 'Reset All Filters'}
             </button>
-
           </div>
         )}
 
-        {/* =========================
-            5. District Comparison
-        ========================== */}
-
+        {/* District comparison */}
         <DistrictCompare
           lang={lang}
         />
-
       </main>
 
-      {/* =========================
-          6. Calculator Modal
-      ========================== */}
-
+      {/* Calculator */}
       <PriceConverter
         item={
           calculatorItem
@@ -1151,10 +1000,7 @@ export default function Home() {
         }
       />
 
-      {/* =========================
-          7. Price Trend Modal
-      ========================== */}
-
+      {/* Trend */}
       <PriceTrendModal
         item={
           trendItem
@@ -1173,10 +1019,7 @@ export default function Home() {
         }
       />
 
-      {/* =========================
-          8. Transparency Modal
-      ========================== */}
-
+      {/* Transparency */}
       <TransparencyModal
         lang={lang}
         isOpen={
@@ -1189,50 +1032,34 @@ export default function Home() {
         }
       />
 
-      {/* =========================
-          9. Footer
-      ========================== */}
-
-      <footer className="bg-[#14532D] text-white border-t border-emerald-900 mt-12 py-10">
-
+      {/* Footer */}
+      <footer className="bg-[#14532D] text-white border-t border-emerald-900 mt-12 py-8 sm:py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
 
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4 pb-6 border-b border-emerald-800/60">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-5 pb-6 border-b border-emerald-800/60">
 
             {/* Brand */}
-
-            <div className="flex items-center space-x-3">
-
-              <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white font-black text-xl">
-
+            <div className="flex items-center space-x-3 min-w-0">
+              <div className="w-10 h-10 shrink-0 rounded-xl bg-emerald-600 flex items-center justify-center text-white font-black text-xl">
                 <Activity className="w-6 h-6" />
-
               </div>
 
-              <div>
-
+              <div className="min-w-0">
                 <h4 className="text-xl font-black tracking-tight text-white">
-
                   DaamBD{' '}
-
                   <span className="text-emerald-300 text-xs font-semibold">
                     | আজকের বাজারদর
                   </span>
-
                 </h4>
 
                 <p className="text-xs text-emerald-200/80">
                   {t.brandTagline}
                 </p>
-
               </div>
-
             </div>
 
-            {/* Footer Links */}
-
-            <div className="flex items-center space-x-4 text-xs font-semibold text-emerald-200">
-
+            {/* Links */}
+            <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs font-semibold text-emerald-200">
               <button
                 onClick={() =>
                   setIsTransparencyOpen(
@@ -1244,7 +1071,9 @@ export default function Home() {
                 {t.transparencyBtn}
               </button>
 
-              <span>•</span>
+              <span className="hidden sm:inline">
+                •
+              </span>
 
               <a
                 href="https://moa-services.com/agri-service/"
@@ -1252,44 +1081,34 @@ export default function Home() {
                 rel="noreferrer"
                 className="hover:text-white transition-colors flex items-center gap-1"
               >
-
                 <span>
                   DAM Portal
                 </span>
 
                 <ExternalLink className="w-3 h-3" />
-
               </a>
-
             </div>
-
           </div>
 
           {/* Copyright */}
-
-          <div className="flex flex-col sm:flex-row items-center justify-between text-xs text-emerald-200/70 gap-2 text-center sm:text-left">
+          <div className="flex flex-col sm:flex-row items-center justify-between text-xs text-emerald-200/70 gap-3 text-center sm:text-left">
 
             <p>
               © {new Date().getFullYear()} DaamBD Intelligence Platform.
               Data sourced from Ministry of Agriculture (MOA / DAM).
             </p>
 
-            <p className="flex items-center justify-center space-x-1">
-
+            <p className="flex items-center justify-center space-x-1 shrink-0">
               <span>
                 Made for Bangladesh with
               </span>
 
               <Heart className="w-3.5 h-3.5 text-red-400 fill-red-400" />
-
             </p>
 
           </div>
-
         </div>
-
       </footer>
-
     </div>
   );
 }
