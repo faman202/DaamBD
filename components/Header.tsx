@@ -3,16 +3,8 @@
 import React, { useMemo } from 'react';
 import { Language } from '@/lib/types';
 import { translations } from '@/lib/i18n';
-import {
-  MapPin,
-  HelpCircle,
-  Activity,
-} from 'lucide-react';
-
-import {
-  DIVISIONS,
-  DISTRICTS,
-} from '@/lib/mockData';
+import { MapPin, HelpCircle, Activity } from 'lucide-react';
+import { DIVISIONS, DISTRICTS } from '@/lib/mockData';
 
 interface HeaderLocation {
   id: number;
@@ -46,10 +38,6 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const t = translations[lang];
 
-  /*
-   * Location list comes from the existing DaamBD location data.
-   * No /api/locations call and no fake office/administration data.
-   */
   const divisions = useMemo<HeaderDivision[]>(
     () =>
       DIVISIONS.map((division, index) => ({
@@ -64,18 +52,14 @@ export const Header: React.FC<HeaderProps> = ({
     () =>
       DISTRICTS.map((district, index) => {
         const divisionIndex = DIVISIONS.findIndex(
-          (division) =>
-            division.en === district.divisionEn
+          division => division.en === district.divisionEn
         );
 
         return {
           id: index + 1,
           en: district.en,
           bn: district.bn,
-          divisionId:
-            divisionIndex >= 0
-              ? divisionIndex + 1
-              : 0,
+          divisionId: divisionIndex >= 0 ? divisionIndex + 1 : 0,
           divisionEn: district.divisionEn,
           divisionBn: district.divisionBn,
         };
@@ -85,11 +69,10 @@ export const Header: React.FC<HeaderProps> = ({
 
   const groupedDistricts = useMemo(
     () =>
-      divisions.map((division) => ({
+      divisions.map(division => ({
         division,
         districts: districts.filter(
-          (district) =>
-            district.divisionId === division.id
+          district => district.divisionId === division.id
         ),
       })),
     [divisions, districts]
@@ -100,11 +83,7 @@ export const Header: React.FC<HeaderProps> = ({
       ? groupedDistricts
       : [
           {
-            division: {
-              id: 0,
-              en: '',
-              bn: '',
-            },
+            division: { id: 0, en: '', bn: '' },
             districts,
           },
         ];
@@ -119,9 +98,10 @@ export const Header: React.FC<HeaderProps> = ({
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
               </span>
-
               <span className="font-medium text-[10px] sm:text-xs tracking-wide truncate">
-                {t.officialVerified}
+                {lang === 'bn'
+                  ? 'সরকারি DAM-এর তথ্যসূত্রে'
+                  : 'Sourced from official DAM data'}
               </span>
             </div>
 
@@ -130,10 +110,7 @@ export const Header: React.FC<HeaderProps> = ({
               className="shrink-0 flex items-center gap-1 text-emerald-200 hover:text-white transition-colors text-[10px] sm:text-xs underline-offset-2 hover:underline cursor-pointer"
             >
               <HelpCircle className="w-3.5 h-3.5" />
-
-              <span>
-                {t.transparencyBtn}
-              </span>
+              <span>{t.transparencyBtn}</span>
             </button>
           </div>
         </div>
@@ -151,11 +128,8 @@ export const Header: React.FC<HeaderProps> = ({
                 <h1 className="text-lg sm:text-2xl font-black tracking-tight text-white leading-none whitespace-nowrap">
                   DaamBD
                 </h1>
-
                 <span className="text-emerald-300 text-[10px] sm:text-sm font-semibold tracking-normal px-1.5 sm:px-2 py-0.5 rounded bg-emerald-900/60 border border-emerald-600/40 whitespace-nowrap">
-                  {lang === 'bn'
-                    ? 'দামবিডি'
-                    : 'Live'}
+                  {lang === 'bn' ? 'দামবিডি' : 'Live'}
                 </span>
               </div>
 
@@ -171,72 +145,50 @@ export const Header: React.FC<HeaderProps> = ({
 
               <select
                 value={selectedDistrict}
-                onChange={(e) =>
-                  onDistrictChange(e.target.value)
-                }
+                onChange={e => onDistrictChange(e.target.value)}
                 disabled={districts.length === 0}
                 className="w-full sm:w-auto min-w-0 bg-transparent text-white text-[11px] sm:text-sm font-semibold focus:outline-none cursor-pointer pr-1 truncate disabled:opacity-60"
                 aria-label={t.districtSelect}
               >
                 {districts.length === 0 ? (
-                  <option
-                    value=""
-                    className="bg-[#14532D] text-white"
-                  >
+                  <option value="" className="bg-[#14532D] text-white">
                     {lang === 'bn'
-                      ? 'কোনো জেলা পাওয়া যায়নি'
-                      : 'No districts found'}
+                      ? 'কোনো এলাকা পাওয়া যায়নি'
+                      : 'No locations found'}
                   </option>
                 ) : (
-                  fallbackGroups.map(
-                    ({
-                      division,
-                      districts: divisionDistricts,
-                    }) => (
-                      <optgroup
-                        key={
-                          division.id ||
-                          division.en ||
-                          'locations'
-                        }
-                        label={
-                          division.id
-                            ? lang === 'bn'
-                              ? division.bn
-                              : `${division.en} Division`
-                            : lang === 'bn'
-                              ? 'জেলা'
-                              : 'Districts'
-                        }
-                        className="bg-[#052e16] text-emerald-300 font-bold"
-                      >
-                        {divisionDistricts.map(
-                          (district) => (
-                            <option
-                              key={district.id}
-                              value={String(
-                                district.id
-                              )}
-                              className="bg-[#14532D] text-white font-medium"
-                            >
-                              {lang === 'bn'
-                                ? district.bn
-                                : district.en}
-                            </option>
-                          )
-                        )}
-                      </optgroup>
-                    )
-                  )
+                  fallbackGroups.map(({ division, districts: divisionDistricts }) => (
+                    <optgroup
+                      key={division.id || division.en || 'locations'}
+                      label={
+                        division.id
+                          ? lang === 'bn'
+                            ? division.bn
+                            : `${division.en} Division`
+                          : lang === 'bn'
+                            ? 'এলাকা'
+                            : 'Locations'
+                      }
+                      className="bg-[#052e16] text-emerald-300 font-bold"
+                    >
+                      {divisionDistricts.map(district => (
+                        <option
+                          key={district.en}
+                          value={district.en}
+                          className="bg-[#14532D] text-white font-medium"
+                        >
+                          {lang === 'bn' ? district.bn : district.en}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ))
                 )}
               </select>
             </div>
 
             <div className="shrink-0 flex items-center bg-black/30 p-1 rounded-lg border border-emerald-600/40">
               <button
-                onClick={() =>
-                  onLanguageChange('bn')
-                }
+                onClick={() => onLanguageChange('bn')}
                 className={`px-2 sm:px-2.5 py-1 rounded-md text-[10px] sm:text-xs font-bold transition-all ${
                   lang === 'bn'
                     ? 'bg-white text-[#14532D] shadow-md'
@@ -247,9 +199,7 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
 
               <button
-                onClick={() =>
-                  onLanguageChange('en')
-                }
+                onClick={() => onLanguageChange('en')}
                 className={`px-2 sm:px-2.5 py-1 rounded-md text-[10px] sm:text-xs font-bold transition-all ${
                   lang === 'en'
                     ? 'bg-white text-[#14532D] shadow-md'
