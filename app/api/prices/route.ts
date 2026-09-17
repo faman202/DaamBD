@@ -107,12 +107,12 @@ function resolveDistrictInfo(param: string | null): { districtId: number; divisi
 function getCategory(name: string): string {
   const n = String(name || "").toLowerCase();
   if (/চাল|ধান|গম|আটা|ময়দা|ময়দা|rice|wheat|flour|grain/.test(n)) return "চাল ও খাদ্যশস্য";
-  if (/ডাল|শিম|মশুরি|মুগ|ছোলা|মটর|lenti|pulse|gram|bean/.test(n)) return "ডাল ও শিম";
+  if (/মাংস|ডিম|মুরগি|মুরগী|গরু|খাসি|হাঁস|মোরগ|কোয়েল|meat|beef|mutton|chicken|egg|broiler/.test(n)) return "মাংস ও ডিম";
+  if (/মাছ|ইলিশ|রুই|কাতলা|মৃগেল|পাঙ্গাস|তেলাপিয়া|তেলাপিয়া|কৈ|শিং|মাগুর|মগুর|চিংড়ি|মাাছ|fish|carp|prawn|shrimp/.test(n)) return "মাছ";
+  if (/তেল|তৈল|ওয়েল|ওয়েল|সোয়াবিন|সয়াবিন|সরিষা|পাম|\boil\b|\boils\b|soyabean|soyabin|soybean|mustard|sunflower/.test(n) && !n.includes("তেলাপিয়া") && !n.includes("তেলাপিয়া")) return "ভোজ্যতেল";
+  if (/ডাল|শিম|মশুরি|মুগ|ছোলা|মটর|lenti|pulse|gram|\bbean\b|\bbeans\b/.test(n)) return "ডাল ও শিম";
   if (/শাক|সবজি|টমেটো|আলু|পটল|বেগুন|পেঁপে|কাঁচামরিচ|কাঁচা মরিচ|কচু|ফুলকপি|বাঁধাকপি|লাউ|কঁাকরোল|ঝিঙ্গা|চিচিংগা|উচ্ছে|করলা|গাজর|শসা|গাাজর|ভেণ্ডি|ঢেঁড়শ|ঢেঁড়স|vege|cabbage|cauliflower|tomato|potato|brinjal|gourd/.test(n)) return "শাকসবজি";
-  if (/মাংস|ডিম|মুরগি|গরু|খাসি|হাঁস|মোরগ|কোয়েল|meat|beef|mutton|chicken|egg/.test(n)) return "মাংস ও ডিম";
-  if (/মাছ|ইলিশ|রুই|কাতলা|মৃগেল|পাঙ্গাস|তেলাপিয়া|কৈ|শিং|মাগুর|মগুর|চিংড়ি|মাাছ|fish|carp|prawn|shrimp/.test(n)) return "মাছ";
-  if (/মসলা|মশলা|পিঁয়াজ|পেঁয়াজ|রসুন|আদা|হলুদ|مরিচ|জিরা|এলাচ|দারুচিনি|লবঙ্গ|ধনিয়া|ধনিয়া|তেজপাতা|spice|onion|garlic|ginger|turmeric|chilli|coriander/.test(n)) return "মসলা";
-  if (/তেল|সোয়াবিন|সরিষা|পাম|oil|soyabean|mustard/.test(n)) return "ভোজ্যতেল";
+  if (/মসলা|মশলা|পিঁয়াজ|পেঁয়াজ|রসুন|আদা|হলুদ|মরিচ|জিরা|এলাচ|দারুচিনি|লবঙ্গ|ধনিয়া|ধনিয়া|তেজপাতা|spice|onion|garlic|ginger|turmeric|chilli|coriander/.test(n)) return "মসলা";
   return "নিত্যপণ্য";
 }
 

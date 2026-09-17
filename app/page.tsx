@@ -233,6 +233,19 @@ function categoryMatches(
       'eggs',
       'egg',
       'poultry',
+      'meat-eggs',
+    ],
+
+    'meat-eggs': [
+      'মাংস ও ডিম',
+      'মাংস',
+      'ডিম',
+      'meat and eggs',
+      'meat',
+      'eggs',
+      'egg',
+      'poultry',
+      'meat-eggs',
     ],
 
     meat: [
@@ -283,17 +296,31 @@ function categoryMatches(
     ভোজ্যতেল: [
       'ভোজ্যতেল',
       'তেল',
+      'তৈল',
       'edible oil',
       'cooking oil',
       'oil',
+      'oils',
+    ],
+
+    oils: [
+      'ভোজ্যতেল',
+      'তেল',
+      'তৈল',
+      'edible oil',
+      'cooking oil',
+      'oil',
+      'oils',
     ],
 
     oil: [
       'ভোজ্যতেল',
       'তেল',
+      'তৈল',
       'edible oil',
       'cooking oil',
       'oil',
+      'oils',
     ],
 
     নিত্যপণ্য: [
