@@ -10,37 +10,47 @@ const COMMON_DROPDOWN_API =
 
 type AnyObject = Record<string, any>;
 
+type PriceChangeType =
+  | "increase"
+  | "decrease"
+  | "unchanged"
+  | "no_data";
+
 /* =========================================================
    BASIC HELPERS
 ========================================================= */
 
-function getNumber(...values: unknown[]): number {
+function toNumber(value: any): number {
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value : 0;
+  }
+
+  if (typeof value === "string") {
+    const parsed = Number(
+      value.replace(/,/g, "").trim()
+    );
+
+    return Number.isFinite(parsed)
+      ? parsed
+      : 0;
+  }
+
+  return 0;
+}
+
+function firstNumber(...values: any[]): number {
   for (const value of values) {
-    if (
-      typeof value === "number" &&
-      Number.isFinite(value)
-    ) {
-      return value;
-    }
+    const number = toNumber(value);
 
-    if (
-      typeof value === "string" &&
-      value.trim() !== ""
-    ) {
-      const number = Number(
-        value.replace(/,/g, "").trim()
-      );
-
-      if (Number.isFinite(number)) {
-        return number;
-      }
+    if (number !== 0) {
+      return number;
     }
   }
 
   return 0;
 }
 
-function getText(...values: unknown[]): string {
+function firstText(...values: any[]): string {
   for (const value of values) {
     if (
       typeof value === "string" &&
@@ -49,10 +59,7 @@ function getText(...values: unknown[]): string {
       return value.trim();
     }
 
-    if (
-      typeof value === "number" &&
-      Number.isFinite(value)
-    ) {
+    if (typeof value === "number") {
       return String(value);
     }
   }
@@ -61,71 +68,78 @@ function getText(...values: unknown[]): string {
 }
 
 function getPreviousDate(
-  dateString: string,
+  date: string,
   daysBack: number
 ): string {
-  const [year, month, day] =
-    dateString.split("-").map(Number);
+  const parts = date.split("-").map(Number);
 
-  const date = new Date(
-    Date.UTC(year, month - 1, day)
+  const year = parts[0];
+  const month = parts[1];
+  const day = parts[2];
+
+  const result = new Date(
+    Date.UTC(
+      year,
+      month - 1,
+      day
+    )
   );
 
-  date.setUTCDate(
-    date.getUTCDate() - daysBack
+  result.setUTCDate(
+    result.getUTCDate() - daysBack
   );
 
-  return date.toISOString().split("T")[0];
+  return result
+    .toISOString()
+    .slice(0, 10);
 }
 
+/* =========================================================
+   COMMON DROPDOWN EXTRACTION
+========================================================= */
+
 function extractList(
-  data: AnyObject,
-  keys: string[]
+  data: any,
+  names: string[]
 ): AnyObject[] {
-  for (const key of keys) {
-    if (Array.isArray(data?.[key])) {
-      return data[key];
-    }
+  for (const name of names) {
+    const possibilities = [
+      data?.[name],
+      data?.data?.[name],
+      data?.result?.[name],
+      data?.data?.data?.[name],
+      data?.data?.result?.[name],
+    ];
 
-    if (Array.isArray(data?.data?.[key])) {
-      return data.data[key];
-    }
-
-    if (Array.isArray(data?.result?.[key])) {
-      return data.result[key];
-    }
-
-    if (
-      Array.isArray(
-        data?.data?.data?.[key]
-      )
-    ) {
-      return data.data.data[key];
+    for (const value of possibilities) {
+      if (Array.isArray(value)) {
+        return value;
+      }
     }
   }
 
   return [];
 }
 
-/* =========================================================
-   COMMON DROPDOWNS
-========================================================= */
-
-async function fetchCommonDropdowns(): Promise<AnyObject> {
+async function getCommonDropdowns(): Promise<any> {
   const response = await fetch(
     COMMON_DROPDOWN_API,
     {
       method: "GET",
+
       headers: {
-        Accept: "application/json",
+        Accept:
+          "application/json",
       },
-      cache: "no-store",
+
+      cache:
+        "no-store",
     }
   );
 
   if (!response.ok) {
     throw new Error(
-      `DAM common dropdown API returned ${response.status}`
+      `Common dropdown API failed: ${response.status}`
     );
   }
 
@@ -133,212 +147,164 @@ async function fetchCommonDropdowns(): Promise<AnyObject> {
 }
 
 /* =========================================================
-   MARKET / HAT HELPERS
+   MARKET HELPERS
 ========================================================= */
 
-function getMarketId(
+function marketId(
   item: AnyObject
 ): number {
-  return getNumber(
+  return firstNumber(
     item?.value,
     item?.id,
     item?.market_id,
-    item?.marketId
+    item?.marketId,
+    item?.marketID
   );
 }
 
-function getMarketDivisionId(
+function marketDivisionId(
   item: AnyObject
 ): number {
-  return getNumber(
+  return firstNumber(
     item?.division_id,
-    item?.divisionId
+    item?.divisionId,
+    item?.divisionID,
+    item?.division
   );
 }
 
-function getMarketDistrictId(
+function marketDistrictId(
   item: AnyObject
 ): number {
-  return getNumber(
+  return firstNumber(
     item?.district_id,
-    item?.districtId
+    item?.districtId,
+    item?.districtID,
+    item?.district
   );
 }
 
-function getMarketUpazilaId(
+function marketUpazilaId(
   item: AnyObject
 ): number {
-  return getNumber(
-    item?.upazilla_id,
+  return firstNumber(
     item?.upazila_id,
+    item?.upazilla_id,
+    item?.upazilaId,
     item?.upazillaId,
-    item?.upazilaId
+    item?.upazilaID,
+    item?.upazillaID,
+    item?.upazila,
+    item?.upazilla
   );
 }
 
-function getMarketName(
+function marketName(
   item: AnyObject
 ): string {
-  return getText(
+  return firstText(
     item?.text_bn,
     item?.market_name_bn,
     item?.marketNameBn,
-    item?.text,
     item?.name_bn,
     item?.nameBn,
+
+    item?.text,
+
     item?.text_en,
     item?.market_name,
     item?.marketName,
     item?.name_en,
+    item?.nameEn,
     item?.name
   );
 }
 
 /* =========================================================
-   RESOLVE OFFICIAL MARKET
+   EXACT MARKET
 ========================================================= */
 
-function resolveMarket(
-  marketList: AnyObject[],
+function findExactMarket(
+  markets: AnyObject[],
   division: number,
   district: number,
   requestedUpazila: number,
   requestedMarket: number
-) {
-  const validMarkets =
-    marketList.filter((item) => {
-      return (
-        getMarketDivisionId(item) === division &&
-        getMarketDistrictId(item) === district
-      );
-    });
-
-  if (validMarkets.length === 0) {
-    return {
-      upazila: 0,
-      market: 0,
-      marketName: "",
-      error:
-        `No official DAM market found for division ${division}, district ${district}.`,
-    };
+): AnyObject | null {
+  if (
+    requestedMarket <= 0
+  ) {
+    return null;
   }
 
-  /* Explicit market */
+  const exact =
+    markets.find(
+      (item) =>
+        marketId(item) ===
+        requestedMarket
+    );
 
-  if (requestedMarket > 0) {
-    const selectedMarket =
-      validMarkets.find(
-        (item) =>
-          getMarketId(item) === requestedMarket
-      );
+  if (!exact) {
+    console.log(
+      `DaamBD: market ${requestedMarket} not found in official marketList`
+    );
 
-    if (!selectedMarket) {
-      return {
-        upazila: 0,
-        market: 0,
-        marketName: "",
-        error:
-          `The selected DAM market ${requestedMarket} does not belong to district ${district}.`,
-      };
-    }
-
-    const marketUpazila =
-      getMarketUpazilaId(
-        selectedMarket
-      );
-
-    if (
-      requestedUpazila > 0 &&
-      marketUpazila > 0 &&
-      marketUpazila !== requestedUpazila
-    ) {
-      return {
-        upazila: 0,
-        market: 0,
-        marketName: "",
-        error:
-          `The selected DAM market ${requestedMarket} does not belong to upazila ${requestedUpazila}.`,
-      };
-    }
-
-    return {
-      upazila:
-        requestedUpazila > 0
-          ? requestedUpazila
-          : marketUpazila,
-
-      market:
-        requestedMarket,
-
-      marketName:
-        getMarketName(
-          selectedMarket
-        ),
-
-      error: null,
-    };
+    return null;
   }
 
-  /* Explicit upazila */
+  const officialDivision =
+    marketDivisionId(exact);
 
-  if (requestedUpazila > 0) {
-    const upazilaMarkets =
-      validMarkets.filter(
-        (item) =>
-          getMarketUpazilaId(item) ===
-          requestedUpazila
-      );
+  const officialDistrict =
+    marketDistrictId(exact);
 
-    if (upazilaMarkets.length === 0) {
-      return {
-        upazila: 0,
-        market: 0,
-        marketName: "",
-        error:
-          `No official DAM market found for upazila ${requestedUpazila}.`,
-      };
-    }
+  const officialUpazila =
+    marketUpazilaId(exact);
 
-    const selected =
-      upazilaMarkets[0];
+  /*
+   * IMPORTANT:
+   *
+   * If official marketList gives location IDs,
+   * validate them.
+   *
+   * Never allow another district.
+   */
 
-    return {
-      upazila:
-        requestedUpazila,
+  if (
+    officialDivision > 0 &&
+    officialDivision !== division
+  ) {
+    console.log(
+      `DaamBD: division mismatch market=${requestedMarket}`
+    );
 
-      market:
-        getMarketId(selected),
-
-      marketName:
-        getMarketName(selected),
-
-      error: null,
-    };
+    return null;
   }
 
-  /* No market/upazila supplied */
+  if (
+    officialDistrict > 0 &&
+    officialDistrict !== district
+  ) {
+    console.log(
+      `DaamBD: district mismatch market=${requestedMarket}`
+    );
 
-  const firstMarket =
-    validMarkets[0];
+    return null;
+  }
 
-  return {
-    upazila:
-      getMarketUpazilaId(
-        firstMarket
-      ),
+  if (
+    requestedUpazila > 0 &&
+    officialUpazila > 0 &&
+    officialUpazila !== requestedUpazila
+  ) {
+    console.log(
+      `DaamBD: upazila mismatch market=${requestedMarket}`
+    );
 
-    market:
-      getMarketId(
-        firstMarket
-      ),
+    return null;
+  }
 
-    marketName:
-      getMarketName(
-        firstMarket
-      ),
-
-    error: null,
-  };
+  return exact;
 }
 
 /* =========================================================
@@ -346,79 +312,66 @@ function resolveMarket(
 ========================================================= */
 
 function extractPriceRows(
-  data: AnyObject
+  data: any
 ): AnyObject[] {
   if (Array.isArray(data)) {
     return data;
   }
 
-  if (Array.isArray(data?.data)) {
-    return data.data;
-  }
+  const possibleArrays = [
+    data?.data,
+    data?.result,
+    data?.content,
+    data?.rows,
+    data?.items,
 
-  if (Array.isArray(data?.result)) {
-    return data.result;
-  }
+    data?.data?.data,
+    data?.data?.result,
+    data?.data?.content,
+    data?.data?.rows,
+    data?.data?.items,
 
-  if (Array.isArray(data?.content)) {
-    return data.content;
-  }
+    data?.result?.data,
+    data?.result?.result,
+    data?.result?.content,
+    data?.result?.rows,
+    data?.result?.items,
+  ];
 
-  if (
-    Array.isArray(
-      data?.data?.content
-    )
+  for (
+    const value of
+      possibleArrays
   ) {
-    return data.data.content;
-  }
-
-  if (
-    Array.isArray(
-      data?.data?.result
-    )
-  ) {
-    return data.data.result;
-  }
-
-  if (
-    Array.isArray(
-      data?.data?.data
-    )
-  ) {
-    return data.data.data;
+    if (Array.isArray(value)) {
+      return value;
+    }
   }
 
   return [];
 }
 
 /* =========================================================
-   WEEK ID
+   WEEK
 ========================================================= */
 
-/*
-  DAM endpoint-এর week_id সবসময় simple calendar-week
-  হিসেবে কাজ নাও করতে পারে।
+function getWeekIds(
+  date: string
+): number[] {
+  const parts =
+    date.split("-").map(Number);
 
-  তাই প্রথমে calculated week পাঠানো হবে।
-  কোনো official row না এলে 1-5 পর্যন্ত অন্য week ID
-  দিয়ে একই official date পুনরায় check করা হবে।
-*/
+  const year = parts[0];
+  const month = parts[1];
+  const day = parts[2];
 
-function getInitialWeekId(
-  reportDate: string
-): number {
-  const [year, month, day] =
-    reportDate
-      .split("-")
-      .map(Number);
-
-  const date = new Date(
-    Date.UTC(
-      year,
-      month - 1,
-      day
-    )
-  );
+  const current =
+    new Date(
+      Date.UTC(
+        year,
+        month - 1,
+        day
+      )
+    );
 
   const firstDay =
     new Date(
@@ -429,35 +382,64 @@ function getInitialWeekId(
       )
     );
 
-  return (
+  const calculatedWeek =
     Math.floor(
       (
-        date.getUTCDate() +
+        current.getUTCDate() +
         firstDay.getUTCDay() -
         1
       ) / 7
-    ) + 1
+    ) + 1;
+
+  /*
+   * DAM may return data under different
+   * week IDs depending on the date.
+   */
+
+  const weeks = [
+    calculatedWeek,
+    1,
+    2,
+    3,
+    4,
+    5,
+  ];
+
+  return weeks.filter(
+    (value, index) =>
+      value >= 1 &&
+      value <= 5 &&
+      weeks.indexOf(value) ===
+        index
   );
 }
 
 /* =========================================================
-   OFFICIAL PRICE API
+   DAM PRICE REQUEST
 ========================================================= */
 
-async function requestPriceRows(
-  reportDate: string,
+async function requestDAM(
+  date: string,
   division: number,
   district: number,
   upazila: number,
   market: number,
   weekId: number
 ): Promise<AnyObject[]> {
-  const [
-    yearId,
-    monthId,
-  ] = reportDate
-    .split("-")
-    .map(Number);
+  if (
+    division <= 0 ||
+    district <= 0 ||
+    upazila <= 0 ||
+    market <= 0
+  ) {
+    return [];
+  }
+
+  const parts =
+    date.split("-").map(Number);
+
+  const year = parts[0];
+  const month = parts[1];
 
   const payload = {
     division_id: [division],
@@ -472,24 +454,23 @@ async function requestPriceRows(
       "Retail",
     ],
 
-    price_date:
-      reportDate,
+    price_date: date,
 
     select_type:
       "Daily",
 
     month_id:
-      monthId,
+      month,
 
     year_id:
-      yearId,
+      year,
 
     week_id:
       weekId,
   };
 
   console.log(
-    "DaamBD DAM request:",
+    "DaamBD DAM PAYLOAD:",
     JSON.stringify(payload)
   );
 
@@ -497,7 +478,8 @@ async function requestPriceRows(
     await fetch(
       PRICE_API,
       {
-        method: "POST",
+        method:
+          "POST",
 
         headers: {
           "Content-Type":
@@ -505,86 +487,125 @@ async function requestPriceRows(
 
           Accept:
             "application/json",
+
+          Origin:
+            "https://moa-services.com",
+
+          Referer:
+            "https://moa-services.com/",
         },
 
         body:
-          JSON.stringify(
-            payload
-          ),
+          JSON.stringify(payload),
 
         cache:
           "no-store",
       }
     );
 
+  const raw =
+    await response.text();
+
+  console.log(
+    `DAM ${date} week=${weekId} market=${market} status=${response.status}`
+  );
+
   if (!response.ok) {
-    throw new Error(
-      `DAM price API returned ${response.status}`
+    console.error(
+      "DAM ERROR:",
+      raw
+    );
+
+    return [];
+  }
+
+  if (
+    !raw.trim()
+  ) {
+    return [];
+  }
+
+  let json: any;
+
+  try {
+    json =
+      JSON.parse(raw);
+  } catch {
+    console.error(
+      "DAM JSON parse failed:",
+      raw.slice(0, 500)
+    );
+
+    return [];
+  }
+
+  /*
+   * DAM explicitly says:
+   *
+   * success=false
+   * message="Not found!"
+   *
+   * In that case return empty.
+   */
+
+  if (
+    json?.success === false
+  ) {
+    return [];
+  }
+
+  const rows =
+    extractPriceRows(json);
+
+  console.log(
+    `DAM rows ${date} week=${weekId} market=${market}: ${rows.length}`
+  );
+
+  if (
+    rows.length > 0
+  ) {
+    console.log(
+      "DAM FIRST ROW:",
+      JSON.stringify(
+        rows[0]
+      )
     );
   }
 
-  const data =
-    await response.json();
-
-  return extractPriceRows(
-    data
-  );
+  return rows;
 }
 
-async function fetchPriceRows(
-  reportDate: string,
+/* =========================================================
+   FETCH PRICE FOR EXACT MARKET
+========================================================= */
+
+async function fetchDAMPrice(
+  date: string,
   division: number,
   district: number,
   upazila: number,
   market: number
 ): Promise<AnyObject[]> {
-  const initialWeek =
-    getInitialWeekId(
-      reportDate
-    );
-
-  /* First try calculated week */
-
-  const firstRows =
-    await requestPriceRows(
-      reportDate,
-      division,
-      district,
-      upazila,
-      market,
-      initialWeek
-    );
-
   if (
-    firstRows.length > 0
+    division <= 0 ||
+    district <= 0 ||
+    upazila <= 0 ||
+    market <= 0
   ) {
-    return firstRows;
+    return [];
   }
 
-  /*
-    If DAM returns no rows, try remaining official
-    week IDs. This does NOT create data; every result
-    still comes directly from DAM.
-  */
-
-  const weekIds = [
-    1,
-    2,
-    3,
-    4,
-    5,
-  ].filter(
-    (week) =>
-      week !== initialWeek
-  );
+  const weekIds =
+    getWeekIds(date);
 
   for (
-    const weekId of weekIds
+    const weekId of
+      weekIds
   ) {
     try {
       const rows =
-        await requestPriceRows(
-          reportDate,
+        await requestDAM(
+          date,
           division,
           district,
           upazila,
@@ -595,14 +616,13 @@ async function fetchPriceRows(
       if (
         rows.length > 0
       ) {
-        console.log(
-          `DAM data found using week_id=${weekId} for ${reportDate}`
-        );
-
         return rows;
       }
-    } catch {
-      /* Try next official week ID */
+    } catch (error) {
+      console.error(
+        "DAM request error:",
+        error
+      );
     }
   }
 
@@ -610,29 +630,340 @@ async function fetchPriceRows(
 }
 
 /* =========================================================
-   COMMODITY
+   FIND MARKET WITH DATA
 ========================================================= */
 
-function getCommodityId(
-  row: AnyObject
-): number {
-  return getNumber(
-    row?.commodity_id,
-    row?.commodityId,
-    row?.commodityID,
-    row?.commodity,
-    row?.commodity_id_value
+async function findMarketWithData(
+  markets: AnyObject[],
+  division: number,
+  district: number,
+  requestedUpazila: number,
+  requestedMarket: number,
+  requestedDate: string
+): Promise<{
+  market: number;
+  upazila: number;
+  marketName: string;
+  rows: AnyObject[];
+  actualDataDate: string | null;
+}> {
+  /*
+   * -------------------------------------------------------
+   * EXACT MARKET
+   * -------------------------------------------------------
+   */
+
+  const exactMarket =
+    findExactMarket(
+      markets,
+      division,
+      district,
+      requestedUpazila,
+      requestedMarket
+    );
+
+  /*
+   * -------------------------------------------------------
+   * BUILD SAFE CANDIDATES
+   *
+   * Priority:
+   *
+   * 1. selected market
+   * 2. same upazila
+   * 3. same district
+   *
+   * NEVER another district.
+   * -------------------------------------------------------
+   */
+
+  const candidates:
+    AnyObject[] = [];
+
+  const addCandidate = (
+    item: AnyObject
+  ) => {
+    const id =
+      marketId(item);
+
+    if (
+      id <= 0
+    ) {
+      return;
+    }
+
+    if (
+      candidates.some(
+        (existing) =>
+          marketId(existing) ===
+          id
+      )
+    ) {
+      return;
+    }
+
+    candidates.push(
+      item
+    );
+  };
+
+  /*
+   * 1. Selected market.
+   */
+
+  if (exactMarket) {
+    addCandidate(
+      exactMarket
+    );
+  }
+
+  /*
+   * 2. Same upazila.
+   *
+   * Only when official marketList
+   * actually provides the upazila.
+   */
+
+  if (
+    requestedUpazila > 0
+  ) {
+    for (
+      const item of markets
+    ) {
+      const mDivision =
+        marketDivisionId(item);
+
+      const mDistrict =
+        marketDistrictId(item);
+
+      const mUpazila =
+        marketUpazilaId(item);
+
+      /*
+       * Division safety.
+       */
+
+      if (
+        mDivision > 0 &&
+        mDivision !== division
+      ) {
+        continue;
+      }
+
+      /*
+       * District safety.
+       */
+
+      if (
+        mDistrict > 0 &&
+        mDistrict !== district
+      ) {
+        continue;
+      }
+
+      if (
+        mUpazila > 0 &&
+        mUpazila ===
+          requestedUpazila
+      ) {
+        addCandidate(
+          item
+        );
+      }
+    }
+  }
+
+  /*
+   * 3. Same district.
+   *
+   * Only official marketList markets
+   * belonging to this district.
+   */
+
+  for (
+    const item of markets
+  ) {
+    const mDivision =
+      marketDivisionId(item);
+
+    const mDistrict =
+      marketDistrictId(item);
+
+    /*
+     * If official data contains
+     * division ID, enforce it.
+     */
+
+    if (
+      mDivision > 0 &&
+      mDivision !== division
+    ) {
+      continue;
+    }
+
+    /*
+     * CRITICAL:
+     *
+     * If market has an official district ID,
+     * it MUST equal selected district.
+     */
+
+    if (
+      mDistrict > 0 &&
+      mDistrict !== district
+    ) {
+      continue;
+    }
+
+    /*
+     * If district information is missing
+     * completely, do NOT add it as a
+     * district fallback.
+     *
+     * This prevents accidental
+     * cross-district data.
+     */
+
+    if (
+      mDistrict <= 0
+    ) {
+      continue;
+    }
+
+    addCandidate(
+      item
+    );
+  }
+
+  console.log(
+    `DaamBD SAFE market candidates=${candidates.length}`
   );
+
+  /*
+   * -------------------------------------------------------
+   * SEARCH DATA
+   *
+   * Today → previous 7 days
+   * -------------------------------------------------------
+   */
+
+  for (
+    const candidate of
+      candidates
+  ) {
+    const candidateMarket =
+      marketId(candidate);
+
+    const candidateUpazila =
+      marketUpazilaId(candidate) ||
+      requestedUpazila;
+
+    const candidateName =
+      marketName(candidate);
+
+    if (
+      candidateMarket <= 0 ||
+      candidateUpazila <= 0
+    ) {
+      continue;
+    }
+
+    console.log(
+      `DaamBD checking market=${candidateMarket}, upazila=${candidateUpazila}, name=${candidateName}`
+    );
+
+    for (
+      let daysBack = 0;
+      daysBack <= 7;
+      daysBack++
+    ) {
+      const checkDate =
+        getPreviousDate(
+          requestedDate,
+          daysBack
+        );
+
+      const rows =
+        await fetchDAMPrice(
+          checkDate,
+          division,
+          district,
+          candidateUpazila,
+          candidateMarket
+        );
+
+      if (
+        rows.length > 0
+      ) {
+        console.log(
+          `DaamBD FOUND OFFICIAL DATA market=${candidateMarket} upazila=${candidateUpazila} date=${checkDate} rows=${rows.length}`
+        );
+
+        return {
+          market:
+            candidateMarket,
+
+          upazila:
+            candidateUpazila,
+
+          marketName:
+            candidateName,
+
+          rows,
+
+          actualDataDate:
+            checkDate,
+        };
+      }
+    }
+  }
+
+  /*
+   * -------------------------------------------------------
+   * NOTHING FOUND
+   * -------------------------------------------------------
+   */
+
+  return {
+    market:
+      exactMarket
+        ? marketId(exactMarket)
+        : requestedMarket,
+
+    upazila:
+      requestedUpazila,
+
+    marketName:
+      exactMarket
+        ? marketName(
+            exactMarket
+          )
+        : "",
+
+    rows: [],
+
+    actualDataDate:
+      null,
+  };
 }
 
 /* =========================================================
-   RETAIL PRICE
+   PRICE FIELDS
 ========================================================= */
 
-function getRetailAverage(
+function commodityId(
   row: AnyObject
 ): number {
-  return getNumber(
+  return firstNumber(
+    row?.commodity_id,
+    row?.commodityId,
+    row?.commodityID
+  );
+}
+
+function retailAverage(
+  row: AnyObject
+): number {
+  return firstNumber(
     row?.r_avgPriceAvg,
 
     row?.retail_avg,
@@ -643,9 +974,6 @@ function getRetailAverage(
 
     row?.retail_avg_price,
     row?.retailAvgPrice,
-
-    row?.avg_retail_price,
-    row?.average_retail_price,
 
     row?.r_avg_price,
     row?.rAveragePrice,
@@ -660,10 +988,11 @@ function getRetailAverage(
   );
 }
 
-function getRetailLow(
+function retailLow(
   row: AnyObject
 ): number {
-  return getNumber(
+  return firstNumber(
+    row?.r_lowestPrice,
     row?.r_avgPriceMin,
 
     row?.retail_low,
@@ -673,17 +1002,15 @@ function getRetailLow(
     row?.retailMin,
 
     row?.r_min_price,
-    row?.rMinPrice,
-
-    row?.retail_price_min,
-    row?.retailPriceMin
+    row?.rMinPrice
   );
 }
 
-function getRetailHigh(
+function retailHigh(
   row: AnyObject
 ): number {
-  return getNumber(
+  return firstNumber(
+    row?.r_highestPrice,
     row?.r_avgPriceMax,
 
     row?.retail_high,
@@ -693,21 +1020,14 @@ function getRetailHigh(
     row?.retailMax,
 
     row?.r_max_price,
-    row?.rMaxPrice,
-
-    row?.retail_price_max,
-    row?.retailPriceMax
+    row?.rMaxPrice
   );
 }
 
-/* =========================================================
-   WHOLESALE
-========================================================= */
-
-function getWholesaleAverage(
+function wholesaleAverage(
   row: AnyObject
 ): number {
-  return getNumber(
+  return firstNumber(
     row?.w_avgPriceAvg,
 
     row?.wholesale_avg,
@@ -716,24 +1036,16 @@ function getWholesaleAverage(
     row?.wholesale_average,
     row?.wholesaleAverage,
 
-    row?.wholesale_avg_price,
-    row?.wholesaleAvgPrice,
-
-    row?.avg_wholesale_price,
-    row?.average_wholesale_price,
-
     row?.w_avg_price,
-    row?.wAveragePrice,
-
-    row?.wholesale_price_avg,
-    row?.wholesalePriceAvg
+    row?.wAveragePrice
   );
 }
 
-function getWholesaleLow(
+function wholesaleLow(
   row: AnyObject
 ): number {
-  return getNumber(
+  return firstNumber(
+    row?.w_lowestPrice,
     row?.w_avgPriceMin,
 
     row?.wholesale_low,
@@ -743,17 +1055,15 @@ function getWholesaleLow(
     row?.wholesaleMin,
 
     row?.w_min_price,
-    row?.wMinPrice,
-
-    row?.wholesale_price_min,
-    row?.wholesalePriceMin
+    row?.wMinPrice
   );
 }
 
-function getWholesaleHigh(
+function wholesaleHigh(
   row: AnyObject
 ): number {
-  return getNumber(
+  return firstNumber(
+    row?.w_highestPrice,
     row?.w_avgPriceMax,
 
     row?.wholesale_high,
@@ -763,10 +1073,65 @@ function getWholesaleHigh(
     row?.wholesaleMax,
 
     row?.w_max_price,
-    row?.wMaxPrice,
+    row?.wMaxPrice
+  );
+}
 
-    row?.wholesale_price_max,
-    row?.wholesalePriceMax
+function unitId(
+  row: AnyObject
+): number {
+  return firstNumber(
+    row?.unit_retail,
+    row?.unit_id,
+    row?.unitId,
+    row?.measurement_unit_id,
+    row?.measurementUnitId,
+    row?.retail_unit_id,
+    row?.retailUnitId,
+    row?.r_unit_id,
+    row?.rUnitId
+  );
+}
+
+/* =========================================================
+   COMMODITY NAMES
+========================================================= */
+
+function commodityBanglaName(
+  commodity:
+    AnyObject | undefined,
+  row: AnyObject
+): string {
+  return firstText(
+    commodity?.text_bn,
+    commodity?.commodity_name_bn,
+    commodity?.commodityNameBn,
+    commodity?.name_bn,
+    commodity?.nameBn,
+
+    row?.commodity_name_bn,
+    row?.commodityNameBn,
+    row?.name_bn,
+    row?.nameBn
+  );
+}
+
+function commodityEnglishName(
+  commodity:
+    AnyObject | undefined,
+  row: AnyObject
+): string {
+  return firstText(
+    commodity?.text_en,
+    commodity?.commodity_name,
+    commodity?.commodityName,
+    commodity?.name_en,
+    commodity?.nameEn,
+
+    row?.commodity_name,
+    row?.commodityName,
+    row?.name_en,
+    row?.nameEn
   );
 }
 
@@ -774,64 +1139,53 @@ function getWholesaleHigh(
    UNIT
 ========================================================= */
 
-function getUnitId(
-  row: AnyObject
-): number {
-  return getNumber(
-    row?.unit_id,
-    row?.unitId,
-
-    row?.measurement_unit_id,
-    row?.measurementUnitId,
-
-    row?.retail_unit_id,
-    row?.retailUnitId,
-
-    row?.r_unit_id,
-    row?.rUnitId
-  );
-}
-
 function getUnitInfo(
-  unitId: number,
-  measurementUnitList: AnyObject[]
-) {
-  const unit =
-    measurementUnitList.find(
+  id: number,
+  units: AnyObject[]
+): {
+  bn: string;
+  en: string;
+} {
+  const found =
+    units.find(
       (item) =>
-        getNumber(
+        firstNumber(
           item?.value,
           item?.id,
           item?.unit_id,
           item?.unitId
-        ) === unitId
+        ) === id
     );
 
-  if (!unit) {
+  if (!found) {
     return {
-      unitBn: "কেজি",
-      unitEn: "kg",
+      bn: "কেজি",
+      en: "kg",
     };
   }
 
   return {
-    unitBn:
-      getText(
-        unit?.text_bn,
-        unit?.unit_name_bn,
-        unit?.unitNameBn,
-        unit?.name_bn,
-        unit?.text
-      ) || "কেজি",
+    bn:
+      firstText(
+        found?.text_bn,
+        found?.unit_name_bn,
+        found?.unitNameBn,
+        found?.name_bn,
+        found?.nameBn,
+        found?.text
+      ) ||
+      "কেজি",
 
-    unitEn:
-      getText(
-        unit?.text_en,
-        unit?.unit_name,
-        unit?.unitName,
-        unit?.name_en,
-        unit?.name
-      ) || "kg",
+    en:
+      firstText(
+        found?.text_en,
+        found?.unit_name,
+        found?.unitName,
+        found?.name_en,
+        found?.nameEn,
+        found?.name
+      ) ||
+      "kg",
   };
 }
 
@@ -840,218 +1194,63 @@ function getUnitInfo(
 ========================================================= */
 
 function getCategory(
-  row: AnyObject
+  name: string
 ): string {
-  const bn =
-    getText(
-      row?.commodity_name_bn,
-      row?.commodityNameBn,
-      row?.text_bn,
-      row?.text,
-      row?.name_bn,
-      row?.nameBn
-    ).toLowerCase();
-
-  const en =
-    getText(
-      row?.commodity_name,
-      row?.commodityName,
-      row?.text_en,
-      row?.name_en,
-      row?.nameEn
-    ).toLowerCase();
-
-  const text =
-    `${bn} ${en}`;
-
-  /* Fish */
+  const value =
+    name.toLowerCase();
 
   if (
-    text.includes("রুই") ||
-    text.includes("রোহিত") ||
-    text.includes("কাতল") ||
-    text.includes("পাংগাস") ||
-    text.includes("পাঙ্গাস") ||
-    text.includes("শিং") ||
-    text.includes("মাগুর") ||
-    text.includes("তেলাপিয়া") ||
-    text.includes("তেলাপিয়া") ||
-    text.includes("কার্প") ||
-    text.includes("ইলিশ") ||
-    text.includes("চিংড়ি") ||
-    text.includes("চিংড়ি") ||
-    text.includes("fish") ||
-    text.includes("rui") ||
-    text.includes("rohu") ||
-    text.includes("katla") ||
-    text.includes("pangash") ||
-    text.includes("pangas") ||
-    text.includes("tilapia") ||
-    text.includes("silver carp") ||
-    text.includes("shrimp") ||
-    text.includes("hilsa")
+    /মাছ|ইলিশ|রুই|কাতল|পাঙ্গাস|পাংগাস|তেলাপিয়া|তেলাপিয়া|চিংড়ি|চিংড়ি|fish|hilsa|rohu|rui|katla|pangash|tilapia|shrimp/.test(
+      value
+    )
   ) {
     return "মাছ";
   }
 
-  /* Meat & Eggs */
-
   if (
-    text.includes("ডিম") ||
-    text.includes("egg") ||
-    text.includes("মুরগি") ||
-    text.includes("মুরগী") ||
-    text.includes("ব্রয়লার") ||
-    text.includes("ব্রয়লার") ||
-    text.includes("গরুর মাংস") ||
-    text.includes("গরু") ||
-    text.includes("খাসি") ||
-    text.includes("খাসী") ||
-    text.includes("ছাগল") ||
-    text.includes("বকরি") ||
-    text.includes("বকরী") ||
-    text.includes("মাংস") ||
-    text.includes("beef") ||
-    text.includes("mutton") ||
-    text.includes("chicken") ||
-    text.includes("broiler") ||
-    text.includes("meat")
+    /ডিম|মুরগ|ব্রয়লার|ব্রয়লার|গরু|মাংস|খাসি|ছাগল|egg|chicken|broiler|beef|mutton|meat/.test(
+      value
+    )
   ) {
     return "মাংস ও ডিম";
   }
 
-  /* Edible Oil */
-
   if (
-    text.includes("তেল") ||
-    text.includes("তৈল") ||
-    text.includes("সরিষা") ||
-    text.includes("সয়াবিন") ||
-    text.includes("সয়াবিন") ||
-    text.includes("পাম") ||
-    text.includes("sunflower") ||
-    text.includes("soybean") ||
-    text.includes("mustard oil") ||
-    text.includes("oil")
+    /তেল|সয়াবিন|সয়াবিন|সরিষা|পাম|oil|soybean|mustard|sunflower/.test(
+      value
+    )
   ) {
     return "ভোজ্যতেল";
   }
 
-  /* Pulses */
-
   if (
-    text.includes("ডাল") ||
-    text.includes("মশুর") ||
-    text.includes("মসুর") ||
-    text.includes("মুগ") ||
-    text.includes("মাষ") ||
-    text.includes("মাশ") ||
-    text.includes("কালাই") ||
-    text.includes("ছোলা") ||
-    text.includes("বুট") ||
-    text.includes("খেসারি") ||
-    text.includes("মটর") ||
-    text.includes("মটরশুঁটি") ||
-    text.includes("শুঁটি") ||
-    text.includes("lentil") ||
-    text.includes("pulse") ||
-    text.includes("mung") ||
-    text.includes("black gram") ||
-    text.includes("gram") ||
-    text.includes("peas")
+    /ডাল|মসুর|মশুর|মুগ|মাষ|কালাই|ছোলা|বুট|খেসারি|মটর|lentil|pulse|mung|gram|peas/.test(
+      value
+    )
   ) {
     return "ডাল ও শিম";
   }
 
-  /* Spices */
-
   if (
-    text.includes("পেঁয়াজ") ||
-    text.includes("পেঁয়াজ") ||
-    text.includes("onion") ||
-    text.includes("রসুন") ||
-    text.includes("garlic") ||
-    text.includes("আদা") ||
-    text.includes("ginger") ||
-    text.includes("মরিচ") ||
-    text.includes("লংকা") ||
-    text.includes("chilli") ||
-    text.includes("chili") ||
-    text.includes("হলুদ") ||
-    text.includes("turmeric") ||
-    text.includes("জিরা") ||
-    text.includes("cumin") ||
-    text.includes("ধনে") ||
-    text.includes("coriander") ||
-    text.includes("দারুচিনি") ||
-    text.includes("cinnamon") ||
-    text.includes("এলাচ") ||
-    text.includes("cardamom") ||
-    text.includes("লবঙ্গ") ||
-    text.includes("clove")
+    /পেঁয়াজ|পেঁয়াজ|রসুন|আদা|মরিচ|লংকা|হলুদ|জিরা|ধনে|দারুচিনি|এলাচ|লবঙ্গ|onion|garlic|ginger|chilli|chili|turmeric|cumin|coriander|cinnamon|cardamom|clove/.test(
+      value
+    )
   ) {
     return "মসলা";
   }
 
-  /* Vegetables */
-
   if (
-    text.includes("আলু") ||
-    text.includes("potato") ||
-    text.includes("বেগুন") ||
-    text.includes("eggplant") ||
-    text.includes("brinjal") ||
-    text.includes("টমেটো") ||
-    text.includes("tomato") ||
-    text.includes("পটল") ||
-    text.includes("লাউ") ||
-    text.includes("চালকুমড়া") ||
-    text.includes("চালকুমড়া") ||
-    text.includes("কুমড়া") ||
-    text.includes("কুমড়া") ||
-    text.includes("pumpkin") ||
-    text.includes("করলা") ||
-    text.includes("করল্লা") ||
-    text.includes("bitter gourd") ||
-    text.includes("শসা") ||
-    text.includes("cucumber") ||
-    text.includes("শিম") ||
-    text.includes("bean") ||
-    text.includes("বরবটি") ||
-    text.includes("ঢেঁড়স") ||
-    text.includes("ঢেঁড়স") ||
-    text.includes("okra") ||
-    text.includes("ফুলকপি") ||
-    text.includes("cauliflower") ||
-    text.includes("বাঁধাকপি") ||
-    text.includes("cabbage") ||
-    text.includes("গাজর") ||
-    text.includes("carrot") ||
-    text.includes("মূলা") ||
-    text.includes("মুলা") ||
-    text.includes("radish") ||
-    text.includes("পেঁপে") ||
-    text.includes("papaya") ||
-    text.includes("কাঁচা কলা") ||
-    text.includes("শাক") ||
-    text.includes("সবজি") ||
-    text.includes("vegetable")
+    /আলু|বেগুন|টমেটো|পটল|লাউ|কুমড়া|কুমড়া|করলা|শসা|শিম|বরবটি|ঢেঁড়স|ঢেঁড়স|ফুলকপি|বাঁধাকপি|গাজর|মূলা|মুলা|পেঁপে|শাক|সবজি|potato|eggplant|brinjal|tomato|pumpkin|cucumber|bean|okra|cauliflower|cabbage|carrot|radish|papaya|vegetable/.test(
+      value
+    )
   ) {
     return "শাকসবজি";
   }
 
-  /* Grains */
-
   if (
-    text.includes("চাল") ||
-    text.includes("rice") ||
-    text.includes("ধান") ||
-    text.includes("গম") ||
-    text.includes("wheat") ||
-    text.includes("আটা") ||
-    text.includes("ময়দা") ||
-    text.includes("ময়দা") ||
-    text.includes("flour")
+    /চাল|ধান|গম|আটা|ময়দা|ময়দা|rice|wheat|flour/.test(
+      value
+    )
   ) {
     return "চাল ও খাদ্যশস্য";
   }
@@ -1067,49 +1266,49 @@ export async function GET(
   request: NextRequest
 ) {
   try {
-    const {
-      searchParams,
-    } = new URL(
-      request.url
-    );
+    const url =
+      new URL(request.url);
+
+    const params =
+      url.searchParams;
 
     const division =
-      getNumber(
-        searchParams.get(
+      toNumber(
+        params.get(
           "division"
         )
       );
 
     const district =
-      getNumber(
-        searchParams.get(
+      toNumber(
+        params.get(
           "district"
         )
       );
 
     const requestedUpazila =
-      getNumber(
-        searchParams.get(
+      toNumber(
+        params.get(
           "upazila"
         )
       );
 
     const requestedMarket =
-      getNumber(
-        searchParams.get(
+      toNumber(
+        params.get(
           "market"
         )
       );
 
-    const date =
-      searchParams.get(
-        "date"
-      ) ||
+    const requestedDate =
+      params.get("date") ||
       new Date()
         .toISOString()
-        .split("T")[0];
+        .slice(0, 10);
 
-    /* Validate */
+    /* =====================================================
+       VALIDATION
+    ===================================================== */
 
     if (
       division <= 0 ||
@@ -1120,7 +1319,7 @@ export async function GET(
           success: false,
 
           error:
-            "Valid official DAM division and district IDs are required.",
+            "Valid DAM division and district are required.",
 
           source:
             "Ministry of Agriculture / DAM",
@@ -1131,34 +1330,104 @@ export async function GET(
       );
     }
 
-    /* Official dropdowns */
+    if (
+      requestedUpazila <= 0 ||
+      requestedMarket <= 0
+    ) {
+      return NextResponse.json({
+        success: true,
 
-    const commonDropdownData =
-      await fetchCommonDropdowns();
+        location: {
+          division,
 
-    /* Official markets only */
+          district,
 
-    const marketList =
+          upazila:
+            requestedUpazila,
+
+          market:
+            requestedMarket,
+
+          marketName: "",
+        },
+
+        district,
+
+        upazila:
+          requestedUpazila,
+
+        market:
+          requestedMarket,
+
+        marketName: "",
+
+        date:
+          requestedDate,
+
+        actualDataDate:
+          null,
+
+        total: 0,
+
+        items: [],
+
+        categoryCounts: {},
+
+        priceChangeCounts: {
+          increase: 0,
+          decrease: 0,
+          unchanged: 0,
+          no_data: 0,
+        },
+
+        source:
+          "Ministry of Agriculture / DAM",
+
+        message:
+          "A valid official DAM upazila and market are required.",
+      });
+    }
+
+    /* =====================================================
+       OFFICIAL DROPDOWNS
+    ===================================================== */
+
+    const dropdowns =
+      await getCommonDropdowns();
+
+    const markets =
       extractList(
-        commonDropdownData,
+        dropdowns,
         [
-          "hatsList",
-          "hatList",
           "marketList",
-          "market_list",
-          "markets",
+        ]
+      );
+
+    const commodities =
+      extractList(
+        dropdowns,
+        [
+          "commodityNameList",
+        ]
+      );
+
+    const units =
+      extractList(
+        dropdowns,
+        [
+          "measurementUnitList",
         ]
       );
 
     if (
-      marketList.length === 0
+      markets.length === 0
     ) {
       return NextResponse.json(
         {
           success: false,
 
           error:
-            "Official DAM market list is empty.",
+            "Official DAM marketList was empty.",
 
           source:
             "Ministry of Agriculture / DAM",
@@ -1169,82 +1438,118 @@ export async function GET(
       );
     }
 
-    /* Resolve market */
+    console.log(
+      `DaamBD official marketList count=${markets.length}`
+    );
+
+    /* =====================================================
+       FIND OFFICIAL DATA
+    ===================================================== */
 
     const resolved =
-      resolveMarket(
-        marketList,
+      await findMarketWithData(
+        markets,
+
         division,
+
         district,
+
         requestedUpazila,
-        requestedMarket
+
+        requestedMarket,
+
+        requestedDate
       );
+
+    const upazila: number =
+      Number(
+        resolved.upazila ||
+          0
+      );
+
+    const market: number =
+      Number(
+        resolved.market ||
+          0
+      );
+
+    /* =====================================================
+       NO DATA
+    ===================================================== */
 
     if (
-      resolved.error
+      resolved.rows.length ===
+        0 ||
+      !resolved.actualDataDate ||
+      market <= 0
     ) {
-      return NextResponse.json(
-        {
-          success: false,
+      return NextResponse.json({
+        success: true,
 
-          error:
-            resolved.error,
+        location: {
+          division,
 
-          location: {
-            division,
-            district,
+          district,
 
-            upazila:
-              requestedUpazila,
+          upazila:
+            requestedUpazila,
 
-            market:
-              requestedMarket,
-          },
+          market:
+            requestedMarket,
 
-          source:
-            "Ministry of Agriculture / DAM",
+          marketName:
+            resolved.marketName ||
+            "",
         },
-        {
-          status: 400,
-        }
-      );
+
+        district,
+
+        upazila:
+          requestedUpazila,
+
+        market:
+          requestedMarket,
+
+        marketName:
+          resolved.marketName ||
+          "",
+
+        date:
+          requestedDate,
+
+        actualDataDate:
+          null,
+
+        total: 0,
+
+        items: [],
+
+        categoryCounts: {},
+
+        priceChangeCounts: {
+          increase: 0,
+          decrease: 0,
+          unchanged: 0,
+          no_data: 0,
+        },
+
+        source:
+          "Ministry of Agriculture / DAM",
+
+        message:
+          "এই এলাকার জন্য বর্তমানে সরকারি DAM-এর মূল্যতথ্য পাওয়া যায়নি।",
+      });
     }
 
-    const upazila =
-      resolved.upazila;
+    const rows =
+      resolved.rows;
 
-    const market =
-      resolved.market;
+    const actualDataDate =
+      resolved.actualDataDate;
 
-    /* Commodity list */
-
-    const commodityList =
-      extractList(
-        commonDropdownData,
-        [
-          "commodityNameList",
-          "commodity_name_list",
-          "commodities",
-          "commodityList",
-        ]
-      );
-
-    /*
-      IMPORTANT:
-      Do NOT use unitList.
-    */
-
-    const measurementUnitList =
-      extractList(
-        commonDropdownData,
-        [
-          "measurementUnitList",
-          "measurement_unit_list",
-          "measurementUnits",
-        ]
-      );
-
-    /* Commodity map */
+    /* =====================================================
+       COMMODITY MAP
+    ===================================================== */
 
     const commodityMap =
       new Map<
@@ -1253,15 +1558,15 @@ export async function GET(
       >();
 
     for (
-      const commodity of
-        commodityList
+      const item of
+        commodities
     ) {
       const id =
-        getNumber(
-          commodity?.value,
-          commodity?.id,
-          commodity?.commodity_id,
-          commodity?.commodityId
+        firstNumber(
+          item?.value,
+          item?.id,
+          item?.commodity_id,
+          item?.commodityId
         );
 
       if (
@@ -1269,309 +1574,62 @@ export async function GET(
       ) {
         commodityMap.set(
           id,
-          commodity
-        );
-      }
-    }
-
-    /* Today's official data */
-
-    const priceRows =
-      await fetchPriceRows(
-        date,
-        division,
-        district,
-        upazila,
-        market
-      );
-
-    /* =====================================================
-       30 DAY HISTORY
-    ===================================================== */
-
-    const historyRequests: {
-      date: string;
-      promise: Promise<AnyObject[]>;
-    }[] = [];
-
-    for (
-      let index = 0;
-      index < 30;
-      index++
-    ) {
-      const historyDate =
-        getPreviousDate(
-          date,
-          index
-        );
-
-      historyRequests.push({
-        date:
-          historyDate,
-
-        promise:
-          index === 0
-            ? Promise.resolve(
-                priceRows
-              )
-            : fetchPriceRows(
-                historyDate,
-                division,
-                district,
-                upazila,
-                market
-              ),
-      });
-    }
-
-    const historyRowsByDate =
-      new Map<
-        string,
-        AnyObject[]
-      >();
-
-    const BATCH_SIZE = 5;
-
-    for (
-      let i = 0;
-      i <
-      historyRequests.length;
-      i += BATCH_SIZE
-    ) {
-      const batch =
-        historyRequests.slice(
-          i,
-          i + BATCH_SIZE
-        );
-
-      const results =
-        await Promise.all(
-          batch.map(
-            async ({
-              date:
-                historyDate,
-              promise,
-            }) => {
-              try {
-                const rows =
-                  await promise;
-
-                return {
-                  date:
-                    historyDate,
-
-                  rows:
-                    Array.isArray(
-                      rows
-                    )
-                      ? rows
-                      : [],
-                };
-              } catch {
-                return {
-                  date:
-                    historyDate,
-
-                  rows: [],
-                };
-              }
-            }
-          )
-        );
-
-      for (
-        const result of
-          results
-      ) {
-        historyRowsByDate.set(
-          result.date,
-          result.rows
+          item
         );
       }
     }
 
     /* =====================================================
-       HISTORY MAP
+       PREVIOUS DATA
     ===================================================== */
 
-    const historyMap =
-      new Map<
-        number,
-        {
-          date: string;
-          avgPrice: number;
-        }[]
-      >();
+    let previousRows:
+      AnyObject[] = [];
 
-    historyRowsByDate.forEach(
-      (
-        rows,
-        historyDate
-      ) => {
-        const dailyCommodityPrices =
-          new Map<
-            number,
-            number[]
-          >();
-
-        for (
-          const row of rows
-        ) {
-          const commodityId =
-            getCommodityId(
-              row
-            );
-
-          const retailAvg =
-            getRetailAverage(
-              row
-            );
-
-          if (
-            commodityId <= 0 ||
-            retailAvg <= 0
-          ) {
-            continue;
-          }
-
-          const existing =
-            dailyCommodityPrices.get(
-              commodityId
-            ) || [];
-
-          existing.push(
-            retailAvg
-          );
-
-          dailyCommodityPrices.set(
-            commodityId,
-            existing
-          );
-        }
-
-        dailyCommodityPrices.forEach(
-          (
-            prices,
-            commodityId
-          ) => {
-            const averagePrice =
-              prices.reduce(
-                (
-                  sum,
-                  price
-                ) =>
-                  sum + price,
-                0
-              ) /
-              prices.length;
-
-            const existingHistory =
-              historyMap.get(
-                commodityId
-              ) || [];
-
-            existingHistory.push({
-              date:
-                historyDate,
-
-              avgPrice:
-                Number(
-                  averagePrice.toFixed(
-                    2
-                  )
-                ),
-            });
-
-            historyMap.set(
-              commodityId,
-              existingHistory
-            );
-          }
-        );
-      }
-    );
-
-    /* Sort history */
-
-    historyMap.forEach(
-      (
-        history,
-        commodityId
-      ) => {
-        const uniqueByDate =
-          new Map<
-            string,
-            {
-              date: string;
-              avgPrice: number;
-            }
-          >();
-
-        for (
-          const point of
-            history
-        ) {
-          uniqueByDate.set(
-            point.date,
-            point
-          );
-        }
-
-        const sorted =
-          Array.from(
-            uniqueByDate.values()
-          ).sort(
-            (
-              a,
-              b
-            ) =>
-              a.date.localeCompare(
-                b.date
-              )
-          );
-
-        historyMap.set(
-          commodityId,
-          sorted
-        );
-      }
-    );
-
-    /* =====================================================
-       PREVIOUS AVAILABLE DATE
-    ===================================================== */
-
-    let previousDate:
-      | string
-      | null = null;
+    let previousDataDate:
+      string | null =
+      null;
 
     for (
       let daysBack = 1;
       daysBack <= 7;
       daysBack++
     ) {
-      const candidateDate =
+      const checkDate =
         getPreviousDate(
-          date,
+          actualDataDate,
           daysBack
         );
 
-      const candidateRows =
-        historyRowsByDate.get(
-          candidateDate
-        ) || [];
+      const result =
+        await fetchDAMPrice(
+          checkDate,
+
+          division,
+
+          district,
+
+          upazila,
+
+          market
+        );
 
       if (
-        candidateRows.length > 0
+        result.length > 0
       ) {
-        previousDate =
-          candidateDate;
+        previousRows =
+          result;
+
+        previousDataDate =
+          checkDate;
 
         break;
       }
     }
 
-    /* Previous prices */
+    /* =====================================================
+       PREVIOUS PRICE MAP
+    ===================================================== */
 
     const previousPriceMap =
       new Map<
@@ -1579,82 +1637,25 @@ export async function GET(
         number
       >();
 
-    if (
-      previousDate
+    for (
+      const row of
+        previousRows
     ) {
-      const previousRows =
-        historyRowsByDate.get(
-          previousDate
-        ) || [];
+      const id =
+        commodityId(row);
 
-      const grouped =
-        new Map<
-          number,
-          number[]
-        >();
+      const price =
+        retailAverage(row);
 
-      for (
-        const row of
-          previousRows
+      if (
+        id > 0 &&
+        price > 0
       ) {
-        const commodityId =
-          getCommodityId(
-            row
-          );
-
-        const retailAvg =
-          getRetailAverage(
-            row
-          );
-
-        if (
-          commodityId <= 0 ||
-          retailAvg <= 0
-        ) {
-          continue;
-        }
-
-        const values =
-          grouped.get(
-            commodityId
-          ) || [];
-
-        values.push(
-          retailAvg
-        );
-
-        grouped.set(
-          commodityId,
-          values
+        previousPriceMap.set(
+          id,
+          price
         );
       }
-
-      grouped.forEach(
-        (
-          values,
-          commodityId
-        ) => {
-          const average =
-            values.reduce(
-              (
-                sum,
-                value
-              ) =>
-                sum + value,
-              0
-            ) /
-            values.length;
-
-          previousPriceMap.set(
-            commodityId,
-            Number(
-              average.toFixed(
-                2
-              )
-            )
-          );
-        }
-      );
     }
 
     /* =====================================================
@@ -1666,175 +1667,101 @@ export async function GET(
 
     for (
       const row of
-        priceRows
+        rows
     ) {
-      const commodityId =
-        getCommodityId(
-          row
-        );
+      const id =
+        commodityId(row);
 
-      const retailAvg =
-        getRetailAverage(
-          row
-        );
-
-      /*
-        Only real official rows.
-      */
+      const price =
+        retailAverage(row);
 
       if (
-        commodityId <= 0 ||
-        retailAvg <= 0
+        id <= 0 ||
+        price <= 0
       ) {
         continue;
       }
 
-      const officialCommodity =
+      const commodity =
         commodityMap.get(
-          commodityId
+          id
         );
 
-      const commodityNameBn =
-        getText(
-          officialCommodity?.text_bn,
-
-          officialCommodity?.commodity_name_bn,
-
-          officialCommodity?.commodityNameBn,
-
-          officialCommodity?.name_bn,
-
-          officialCommodity?.nameBn,
-
-          officialCommodity?.text,
-
-          row?.commodity_name_bn,
-
-          row?.commodityNameBn,
-
-          row?.commodityName,
-
-          row?.text_bn,
-
-          row?.text
+      const nameBn =
+        commodityBanglaName(
+          commodity,
+          row
         );
 
-      const commodityName =
-        getText(
-          officialCommodity?.text_en,
-
-          officialCommodity?.commodity_name,
-
-          officialCommodity?.commodityName,
-
-          officialCommodity?.name_en,
-
-          officialCommodity?.nameEn,
-
-          officialCommodity?.text,
-
-          row?.commodity_name,
-
-          row?.commodityName,
-
-          row?.text_en,
-
-          row?.text
+      const nameEn =
+        commodityEnglishName(
+          commodity,
+          row
         );
 
       if (
-        !commodityNameBn &&
-        !commodityName
+        !nameBn &&
+        !nameEn
       ) {
         continue;
       }
 
-      const officialRetailUnitId =
-        getNumber(
-          officialCommodity?.unit_retail,
+      const finalNameBn =
+        nameBn ||
+        nameEn;
 
-          officialCommodity?.retail_unit_id,
+      const finalNameEn =
+        nameEn ||
+        nameBn;
 
-          officialCommodity?.retailUnitId
+      const finalUnitId =
+        firstNumber(
+          row?.unit_retail,
+
+          unitId(row),
+
+          commodity?.unit_retail
         );
 
-      const rowUnitId =
-        getUnitId(
-          row
-        );
-
-      const unitId =
-        officialRetailUnitId > 0
-          ? officialRetailUnitId
-          : rowUnitId;
-
-      const unitInfo =
+      const unit =
         getUnitInfo(
-          unitId,
-          measurementUnitList
+          finalUnitId,
+
+          units
         );
 
-      const retailLow =
-        getRetailLow(
-          row
-        );
-
-      const retailHigh =
-        getRetailHigh(
-          row
-        );
-
-      const wholesaleAvg =
-        getWholesaleAverage(
-          row
-        );
-
-      const wholesaleLow =
-        getWholesaleLow(
-          row
-        );
-
-      const wholesaleHigh =
-        getWholesaleHigh(
-          row
-        );
-
-      const previousAvgPrice =
+      const previousPrice =
         previousPriceMap.get(
-          commodityId
+          id
         ) || 0;
 
-      let priceChange = 0;
+      let priceChange =
+        0;
 
-      let priceChangePercent = 0;
+      let pctChange =
+        0;
 
       let priceChangeType:
-        | "increase"
-        | "decrease"
-        | "unchanged"
-        | "no_data" =
+        PriceChangeType =
         "no_data";
 
       if (
-        previousAvgPrice > 0
+        previousPrice > 0
       ) {
         priceChange =
           Number(
             (
-              retailAvg -
-              previousAvgPrice
+              price -
+              previousPrice
             ).toFixed(2)
           );
 
-        priceChangePercent =
+        pctChange =
           Number(
             (
               (
-                (
-                  retailAvg -
-                  previousAvgPrice
-                ) /
-                previousAvgPrice
+                priceChange /
+                previousPrice
               ) *
               100
             ).toFixed(2)
@@ -1857,118 +1784,106 @@ export async function GET(
       }
 
       products.push({
-        id:
-          commodityId,
+        id,
 
         commodityId:
-          commodityId,
+          id,
 
         name:
-          commodityNameBn ||
-          commodityName,
+          finalNameBn,
 
         nameBn:
-          commodityNameBn ||
-          commodityName,
+          finalNameBn,
 
         nameEn:
-          commodityName ||
-          commodityNameBn,
+          finalNameEn,
 
         commodityNameBn:
-          commodityNameBn ||
-          commodityName,
+          finalNameBn,
 
         commodityName:
-          commodityName ||
-          commodityNameBn,
+          finalNameEn,
 
         category:
-          getCategory({
-            ...officialCommodity,
-            ...row,
+          getCategory(
+            `${finalNameBn} ${finalNameEn}`
+          ),
 
-            commodity_name_bn:
-              commodityNameBn,
-
-            commodity_name:
-              commodityName,
-          }),
-
-        /* REAL OFFICIAL RETAIL PRICE */
-
-        price:
-          retailAvg,
+        price,
 
         avgPrice:
-          retailAvg,
+          price,
 
         averagePrice:
-          retailAvg,
+          price,
 
         retailPrice:
-          retailAvg,
+          price,
 
         retailAvg:
-          retailAvg,
+          price,
 
         retailLow:
-          retailLow,
+          retailLow(row),
 
         retailHigh:
-          retailHigh,
+          retailHigh(row),
 
         wholesaleAvg:
-          wholesaleAvg > 0
-            ? wholesaleAvg
-            : null,
+          wholesaleAverage(row) ||
+          null,
 
         wholesaleLow:
-          wholesaleLow > 0
-            ? wholesaleLow
-            : null,
+          wholesaleLow(row) ||
+          null,
 
         wholesaleHigh:
-          wholesaleHigh > 0
-            ? wholesaleHigh
-            : null,
+          wholesaleHigh(row) ||
+          null,
 
         unitId:
-          unitId,
+          finalUnitId,
 
         unitBn:
-          unitInfo.unitBn,
+          unit.bn,
 
         unitEn:
-          unitInfo.unitEn,
+          unit.en,
 
         previousAvgPrice:
-          previousAvgPrice > 0
-            ? previousAvgPrice
-            : null,
+          previousPrice ||
+          null,
+
+        previousPrice:
+          previousPrice ||
+          null,
 
         previousPriceDate:
-          previousDate,
+          previousDataDate,
 
-        priceChange:
-          priceChange,
+        priceChange,
+
+        pctChange,
 
         priceChangePercent:
-          priceChangePercent,
+          pctChange,
 
-        priceChangeType:
-          priceChangeType,
+        priceChangeType,
 
-        history30Days:
-          historyMap.get(
-            commodityId
-          ) || [],
+        movement:
+          priceChangeType ===
+          "increase"
+            ? "up"
+            : priceChangeType ===
+              "decrease"
+            ? "down"
+            : "stable",
 
         source:
           "Ministry of Agriculture / DAM",
 
         reportDate:
-          date,
+          actualDataDate,
       });
     }
 
@@ -1987,12 +1902,14 @@ export async function GET(
         products
     ) {
       uniqueProducts.set(
-        product.commodityId,
+        Number(
+          product.commodityId
+        ),
         product
       );
     }
 
-    const finalProducts =
+    const items =
       Array.from(
         uniqueProducts.values()
       );
@@ -2008,23 +1925,28 @@ export async function GET(
       > = {};
 
     for (
-      const product of
-        finalProducts
+      const item of
+        items
     ) {
       const category =
         String(
-          product.category ||
+          item.category ||
           "নিত্যপণ্য"
         );
 
+      if (
+        categoryCounts[
+          category
+        ] === undefined
+      ) {
+        categoryCounts[
+          category
+        ] = 0;
+      }
+
       categoryCounts[
         category
-      ] =
-        (
-          categoryCounts[
-            category
-          ] || 0
-        ) + 1;
+      ]++;
     }
 
     /* =====================================================
@@ -2033,30 +1955,35 @@ export async function GET(
 
     const priceChangeCounts = {
       increase: 0,
+
       decrease: 0,
+
       unchanged: 0,
+
       no_data: 0,
     };
 
     for (
-      const product of
-        finalProducts
+      const item of
+        items
     ) {
       const type =
-        String(
-          product.priceChangeType
-        );
+        item.priceChangeType as
+          PriceChangeType;
 
       if (
-        type === "increase"
+        type ===
+        "increase"
       ) {
         priceChangeCounts.increase++;
       } else if (
-        type === "decrease"
+        type ===
+        "decrease"
       ) {
         priceChangeCounts.decrease++;
       } else if (
-        type === "unchanged"
+        type ===
+        "unchanged"
       ) {
         priceChangeCounts.unchanged++;
       } else {
@@ -2093,16 +2020,18 @@ export async function GET(
       marketName:
         resolved.marketName,
 
-      date,
+      date:
+        requestedDate,
+
+      actualDataDate,
 
       previousPriceDate:
-        previousDate,
+        previousDataDate,
 
       total:
-        finalProducts.length,
+        items.length,
 
-      items:
-        finalProducts,
+      items,
 
       categoryCounts,
 
@@ -2116,7 +2045,7 @@ export async function GET(
     });
   } catch (error) {
     console.error(
-      "DaamBD API Error:",
+      "DaamBD PRICE API ERROR:",
       error
     );
 
@@ -2127,7 +2056,7 @@ export async function GET(
         error:
           error instanceof Error
             ? error.message
-            : "Unknown API error",
+            : "Unknown error",
 
         source:
           "Ministry of Agriculture / DAM",
