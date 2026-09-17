@@ -12,11 +12,16 @@ type AnyObject = Record<string, any>;
 
 function getNumber(...values: unknown[]): number {
   for (const value of values) {
-    if (typeof value === "number" && Number.isFinite(value)) return value;
+    if (typeof value === "number" && Number.isFinite(value)) {
+      return value;
+    }
 
     if (typeof value === "string" && value.trim() !== "") {
       const number = Number(value.replace(/,/g, "").trim());
-      if (Number.isFinite(number)) return number;
+
+      if (Number.isFinite(number)) {
+        return number;
+      }
     }
   }
 
@@ -37,21 +42,46 @@ function getText(...values: unknown[]): string {
   return "";
 }
 
-function getPreviousDate(dateString: string, daysBack: number): string {
-  const [year, month, day] = dateString.split("-").map(Number);
-  const d = new Date(Date.UTC(year, month - 1, day));
+function getPreviousDate(
+  dateString: string,
+  daysBack: number
+): string {
+  const [year, month, day] =
+    dateString.split("-").map(Number);
 
-  d.setUTCDate(d.getUTCDate() - daysBack);
+  const date = new Date(
+    Date.UTC(year, month - 1, day)
+  );
 
-  return d.toISOString().split("T")[0];
+  date.setUTCDate(
+    date.getUTCDate() - daysBack
+  );
+
+  return date.toISOString().split("T")[0];
 }
 
-function extractList(data: AnyObject, keys: string[]): AnyObject[] {
+function extractList(
+  data: AnyObject,
+  keys: string[]
+): AnyObject[] {
   for (const key of keys) {
-    if (Array.isArray(data?.[key])) return data[key];
-    if (Array.isArray(data?.data?.[key])) return data.data[key];
-    if (Array.isArray(data?.result?.[key])) return data.result[key];
-    if (Array.isArray(data?.data?.data?.[key])) {
+    if (Array.isArray(data?.[key])) {
+      return data[key];
+    }
+
+    if (Array.isArray(data?.data?.[key])) {
+      return data.data[key];
+    }
+
+    if (Array.isArray(data?.result?.[key])) {
+      return data.result[key];
+    }
+
+    if (
+      Array.isArray(
+        data?.data?.data?.[key]
+      )
+    ) {
       return data.data.data[key];
     }
   }
@@ -60,13 +90,16 @@ function extractList(data: AnyObject, keys: string[]): AnyObject[] {
 }
 
 async function fetchCommonDropdowns(): Promise<AnyObject> {
-  const response = await fetch(COMMON_DROPDOWN_API, {
-    method: "GET",
-    headers: {
-      Accept: "application/json",
-    },
-    cache: "no-store",
-  });
+  const response = await fetch(
+    COMMON_DROPDOWN_API,
+    {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+      cache: "no-store",
+    }
+  );
 
   if (!response.ok) {
     throw new Error(
@@ -77,7 +110,13 @@ async function fetchCommonDropdowns(): Promise<AnyObject> {
   return response.json();
 }
 
-function getMarketId(item: AnyObject): number {
+/* =========================================================
+   MARKET / HAT HELPERS
+========================================================= */
+
+function getMarketId(
+  item: AnyObject
+): number {
   return getNumber(
     item?.value,
     item?.id,
@@ -86,34 +125,56 @@ function getMarketId(item: AnyObject): number {
   );
 }
 
-function getMarketDivisionId(item: AnyObject): number {
+function getMarketDivisionId(
+  item: AnyObject
+): number {
   return getNumber(
     item?.division_id,
-    item?.divisionId,
-    item?.region_id,
-    item?.regionId
+    item?.divisionId
   );
 }
 
-function getMarketDistrictId(item: AnyObject): number {
+function getMarketDistrictId(
+  item: AnyObject
+): number {
   return getNumber(
     item?.district_id,
-    item?.districtId,
-    item?.zone_id,
-    item?.zoneId
+    item?.districtId
   );
 }
 
-function getMarketUpazilaId(item: AnyObject): number {
+function getMarketUpazilaId(
+  item: AnyObject
+): number {
   return getNumber(
     item?.upazilla_id,
     item?.upazila_id,
     item?.upazillaId,
-    item?.upazilaId,
-    item?.unit_id,
-    item?.unitId
+    item?.upazilaId
   );
 }
+
+function getMarketName(
+  item: AnyObject
+): string {
+  return getText(
+    item?.text_bn,
+    item?.market_name_bn,
+    item?.marketNameBn,
+    item?.text,
+    item?.name_bn,
+    item?.nameBn,
+    item?.text_en,
+    item?.market_name,
+    item?.marketName,
+    item?.name_en,
+    item?.name
+  );
+}
+
+/* =========================================================
+   RESOLVE OFFICIAL MARKET
+========================================================= */
 
 function resolveMarket(
   marketList: AnyObject[],
@@ -122,35 +183,49 @@ function resolveMarket(
   requestedUpazila: number,
   requestedMarket: number
 ) {
-  const validMarkets = marketList.filter((item) => {
-    return (
-      getMarketDivisionId(item) === division &&
-      getMarketDistrictId(item) === district
-    );
-  });
+  const validMarkets =
+    marketList.filter((item) => {
+      return (
+        getMarketDivisionId(item) === division &&
+        getMarketDistrictId(item) === district
+      );
+    });
 
   if (validMarkets.length === 0) {
     return {
       upazila: 0,
       market: 0,
-      error: `No official DAM market found for division ${division}, district ${district}.`,
+      marketName: "",
+      error:
+        `No official DAM market found for division ${division}, district ${district}.`,
     };
   }
 
+  /* -------------------------------------------------------
+     Explicit market requested
+  ------------------------------------------------------- */
+
   if (requestedMarket > 0) {
-    const selectedMarket = validMarkets.find(
-      (item) => getMarketId(item) === requestedMarket
-    );
+    const selectedMarket =
+      validMarkets.find(
+        (item) =>
+          getMarketId(item) === requestedMarket
+      );
 
     if (!selectedMarket) {
       return {
         upazila: 0,
         market: 0,
-        error: `The selected DAM market ${requestedMarket} does not belong to district ${district}.`,
+        marketName: "",
+        error:
+          `The selected DAM market ${requestedMarket} does not belong to district ${district}.`,
       };
     }
 
-    const marketUpazila = getMarketUpazilaId(selectedMarket);
+    const marketUpazila =
+      getMarketUpazilaId(
+        selectedMarket
+      );
 
     if (
       requestedUpazila > 0 &&
@@ -160,7 +235,9 @@ function resolveMarket(
       return {
         upazila: 0,
         market: 0,
-        error: `The selected DAM market ${requestedMarket} does not belong to upazila ${requestedUpazila}.`,
+        marketName: "",
+        error:
+          `The selected DAM market ${requestedMarket} does not belong to upazila ${requestedUpazila}.`,
       };
     }
 
@@ -169,51 +246,139 @@ function resolveMarket(
         requestedUpazila > 0
           ? requestedUpazila
           : marketUpazila,
-      market: requestedMarket,
+
+      market:
+        requestedMarket,
+
+      marketName:
+        getMarketName(
+          selectedMarket
+        ),
+
       error: null,
     };
   }
 
+  /* -------------------------------------------------------
+     Explicit upazila requested
+  ------------------------------------------------------- */
+
   if (requestedUpazila > 0) {
-    const upazilaMarkets = validMarkets.filter(
-      (item) => getMarketUpazilaId(item) === requestedUpazila
-    );
+    const upazilaMarkets =
+      validMarkets.filter(
+        (item) =>
+          getMarketUpazilaId(item) ===
+          requestedUpazila
+      );
 
     if (upazilaMarkets.length === 0) {
       return {
         upazila: 0,
         market: 0,
-        error: `No official DAM market found for upazila ${requestedUpazila}.`,
+        marketName: "",
+        error:
+          `No official DAM market found for upazila ${requestedUpazila}.`,
       };
     }
 
+    const selected =
+      upazilaMarkets[0];
+
     return {
-      upazila: requestedUpazila,
-      market: getMarketId(upazilaMarkets[0]),
+      upazila:
+        requestedUpazila,
+
+      market:
+        getMarketId(selected),
+
+      marketName:
+        getMarketName(selected),
+
       error: null,
     };
   }
 
-  const firstMarket = validMarkets[0];
+  /* -------------------------------------------------------
+     No market / upazila supplied.
+     Use first official market in this district.
+  ------------------------------------------------------- */
+
+  const firstMarket =
+    validMarkets[0];
 
   return {
-    upazila: getMarketUpazilaId(firstMarket),
-    market: getMarketId(firstMarket),
+    upazila:
+      getMarketUpazilaId(
+        firstMarket
+      ),
+
+    market:
+      getMarketId(
+        firstMarket
+      ),
+
+    marketName:
+      getMarketName(
+        firstMarket
+      ),
+
     error: null,
   };
 }
 
-function extractPriceRows(data: AnyObject): AnyObject[] {
-  if (Array.isArray(data)) return data;
-  if (Array.isArray(data?.data)) return data.data;
-  if (Array.isArray(data?.result)) return data.result;
-  if (Array.isArray(data?.content)) return data.content;
-  if (Array.isArray(data?.data?.content)) return data.data.content;
-  if (Array.isArray(data?.data?.result)) return data.data.result;
-  if (Array.isArray(data?.data?.data)) return data.data.data;
+/* =========================================================
+   PRICE ROW EXTRACTION
+========================================================= */
+
+function extractPriceRows(
+  data: AnyObject
+): AnyObject[] {
+  if (Array.isArray(data)) {
+    return data;
+  }
+
+  if (Array.isArray(data?.data)) {
+    return data.data;
+  }
+
+  if (Array.isArray(data?.result)) {
+    return data.result;
+  }
+
+  if (Array.isArray(data?.content)) {
+    return data.content;
+  }
+
+  if (
+    Array.isArray(
+      data?.data?.content
+    )
+  ) {
+    return data.data.content;
+  }
+
+  if (
+    Array.isArray(
+      data?.data?.result
+    )
+  ) {
+    return data.data.result;
+  }
+
+  if (
+    Array.isArray(
+      data?.data?.data
+    )
+  ) {
+    return data.data.data;
+  }
 
   return [];
 }
+
+/* =========================================================
+   OFFICIAL PRICE API
+========================================================= */
 
 async function fetchPriceRows(
   reportDate: string,
@@ -222,18 +387,24 @@ async function fetchPriceRows(
   upazila: number,
   market: number
 ): Promise<AnyObject[]> {
-  const date = new Date(`${reportDate}T00:00:00Z`);
-
-  const monthId = date.getUTCMonth() + 1;
-  const yearId = date.getUTCFullYear();
-
-  const firstDay = new Date(
-    Date.UTC(
-      date.getUTCFullYear(),
-      date.getUTCMonth(),
-      1
-    )
+  const date = new Date(
+    `${reportDate}T00:00:00Z`
   );
+
+  const monthId =
+    date.getUTCMonth() + 1;
+
+  const yearId =
+    date.getUTCFullYear();
+
+  const firstDay =
+    new Date(
+      Date.UTC(
+        date.getUTCFullYear(),
+        date.getUTCMonth(),
+        1
+      )
+    );
 
   const weekId =
     Math.floor(
@@ -246,26 +417,56 @@ async function fetchPriceRows(
 
   const payload = {
     division_id: [division],
+
     district_id: [district],
+
     upazila_id: [upazila],
+
     market_id: [market],
-    price_type_id: ["Retail"],
-    price_date: reportDate,
-    select_type: "Daily",
-    month_id: monthId,
-    year_id: yearId,
-    week_id: weekId,
+
+    price_type_id: [
+      "Retail",
+    ],
+
+    price_date:
+      reportDate,
+
+    select_type:
+      "Daily",
+
+    month_id:
+      monthId,
+
+    year_id:
+      yearId,
+
+    week_id:
+      weekId,
   };
 
-  const response = await fetch(PRICE_API, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-    body: JSON.stringify(payload),
-    cache: "no-store",
-  });
+  const response =
+    await fetch(
+      PRICE_API,
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/json",
+
+          Accept:
+            "application/json",
+        },
+
+        body:
+          JSON.stringify(
+            payload
+          ),
+
+        cache:
+          "no-store",
+      }
+    );
 
   if (!response.ok) {
     throw new Error(
@@ -273,12 +474,21 @@ async function fetchPriceRows(
     );
   }
 
-  const data = await response.json();
+  const data =
+    await response.json();
 
-  return extractPriceRows(data);
+  return extractPriceRows(
+    data
+  );
 }
 
-function getCommodityId(row: AnyObject): number {
+/* =========================================================
+   COMMODITY
+========================================================= */
+
+function getCommodityId(
+  row: AnyObject
+): number {
   return getNumber(
     row?.commodity_id,
     row?.commodityId,
@@ -288,133 +498,246 @@ function getCommodityId(row: AnyObject): number {
   );
 }
 
-function getRetailAverage(row: AnyObject): number {
+/* =========================================================
+   RETAIL PRICE
+========================================================= */
+
+function getRetailAverage(
+  row: AnyObject
+): number {
   return getNumber(
     row?.r_avgPriceAvg,
+
     row?.retail_avg,
     row?.retailAvg,
+
     row?.retail_average,
     row?.retailAverage,
+
     row?.retail_avg_price,
     row?.retailAvgPrice,
+
     row?.avg_retail_price,
     row?.average_retail_price,
+
     row?.r_avg_price,
     row?.rAveragePrice,
+
     row?.retail_price_avg,
     row?.retailPriceAvg,
+
     row?.avgPrice,
     row?.averagePrice,
+
     row?.price
   );
 }
 
-function getRetailLow(row: AnyObject): number {
+function getRetailLow(
+  row: AnyObject
+): number {
   return getNumber(
     row?.r_avgPriceMin,
+
     row?.retail_low,
     row?.retailLow,
+
     row?.retail_min,
     row?.retailMin,
+
     row?.r_min_price,
     row?.rMinPrice,
+
     row?.retail_price_min,
     row?.retailPriceMin
   );
 }
 
-function getRetailHigh(row: AnyObject): number {
+function getRetailHigh(
+  row: AnyObject
+): number {
   return getNumber(
     row?.r_avgPriceMax,
+
     row?.retail_high,
     row?.retailHigh,
+
     row?.retail_max,
     row?.retailMax,
+
     row?.r_max_price,
     row?.rMaxPrice,
+
     row?.retail_price_max,
     row?.retailPriceMax
   );
 }
 
-function getWholesaleAverage(row: AnyObject): number {
+/* =========================================================
+   WHOLESALE
+========================================================= */
+
+function getWholesaleAverage(
+  row: AnyObject
+): number {
   return getNumber(
     row?.w_avgPriceAvg,
+
     row?.wholesale_avg,
     row?.wholesaleAvg,
+
     row?.wholesale_average,
     row?.wholesaleAverage,
+
     row?.wholesale_avg_price,
     row?.wholesaleAvgPrice,
+
     row?.avg_wholesale_price,
     row?.average_wholesale_price,
+
     row?.w_avg_price,
     row?.wAveragePrice,
+
     row?.wholesale_price_avg,
     row?.wholesalePriceAvg
   );
 }
 
-function getWholesaleLow(row: AnyObject): number {
+function getWholesaleLow(
+  row: AnyObject
+): number {
   return getNumber(
     row?.w_avgPriceMin,
+
     row?.wholesale_low,
     row?.wholesaleLow,
+
     row?.wholesale_min,
     row?.wholesaleMin,
+
     row?.w_min_price,
     row?.wMinPrice,
+
     row?.wholesale_price_min,
     row?.wholesalePriceMin
   );
 }
 
-function getWholesaleHigh(row: AnyObject): number {
+function getWholesaleHigh(
+  row: AnyObject
+): number {
   return getNumber(
     row?.w_avgPriceMax,
+
     row?.wholesale_high,
     row?.wholesaleHigh,
+
     row?.wholesale_max,
     row?.wholesaleMax,
+
     row?.w_max_price,
     row?.wMaxPrice,
+
     row?.wholesale_price_max,
     row?.wholesalePriceMax
   );
 }
 
-function getUnitId(row: AnyObject): number {
+/* =========================================================
+   UNIT
+========================================================= */
+
+function getUnitId(
+  row: AnyObject
+): number {
   return getNumber(
     row?.unit_id,
     row?.unitId,
+
     row?.measurement_unit_id,
     row?.measurementUnitId,
+
     row?.retail_unit_id,
     row?.retailUnitId,
+
     row?.r_unit_id,
     row?.rUnitId
   );
 }
 
-function getCategory(row: AnyObject): string {
-  const bn = getText(
-    row?.commodity_name_bn,
-    row?.commodityNameBn,
-    row?.text_bn,
-    row?.text,
-    row?.name_bn,
-    row?.nameBn
-  ).toLowerCase();
+function getUnitInfo(
+  unitId: number,
+  measurementUnitList: AnyObject[]
+) {
+  const unit =
+    measurementUnitList.find(
+      (item) =>
+        getNumber(
+          item?.value,
+          item?.id,
+          item?.unit_id,
+          item?.unitId
+        ) === unitId
+    );
 
-  const en = getText(
-    row?.commodity_name,
-    row?.commodityName,
-    row?.text_en,
-    row?.name_en,
-    row?.nameEn
-  ).toLowerCase();
+  if (!unit) {
+    return {
+      unitBn: "কেজি",
+      unitEn: "kg",
+    };
+  }
 
-  const text = `${bn} ${en}`;
+  return {
+    unitBn:
+      getText(
+        unit?.text_bn,
+        unit?.unit_name_bn,
+        unit?.unitNameBn,
+        unit?.name_bn,
+        unit?.text
+      ) || "কেজি",
+
+    unitEn:
+      getText(
+        unit?.text_en,
+        unit?.unit_name,
+        unit?.unitName,
+        unit?.name_en,
+        unit?.name
+      ) || "kg",
+  };
+}
+
+/* =========================================================
+   CATEGORY
+========================================================= */
+
+function getCategory(
+  row: AnyObject
+): string {
+  const bn =
+    getText(
+      row?.commodity_name_bn,
+      row?.commodityNameBn,
+      row?.text_bn,
+      row?.text,
+      row?.name_bn,
+      row?.nameBn
+    ).toLowerCase();
+
+  const en =
+    getText(
+      row?.commodity_name,
+      row?.commodityName,
+      row?.text_en,
+      row?.name_en,
+      row?.nameEn
+    ).toLowerCase();
+
+  const text =
+    `${bn} ${en}`;
+
+  /* মাছ */
 
   if (
     text.includes("রুই") ||
@@ -444,6 +767,8 @@ function getCategory(row: AnyObject): string {
     return "মাছ";
   }
 
+  /* মাংস ও ডিম */
+
   if (
     text.includes("ডিম") ||
     text.includes("egg") ||
@@ -468,6 +793,8 @@ function getCategory(row: AnyObject): string {
     return "মাংস ও ডিম";
   }
 
+  /* ভোজ্যতেল */
+
   if (
     text.includes("তেল") ||
     text.includes("তৈল") ||
@@ -482,6 +809,8 @@ function getCategory(row: AnyObject): string {
   ) {
     return "ভোজ্যতেল";
   }
+
+  /* ডাল */
 
   if (
     text.includes("ডাল") ||
@@ -506,6 +835,8 @@ function getCategory(row: AnyObject): string {
   ) {
     return "ডাল ও শিম";
   }
+
+  /* মসলা */
 
   if (
     text.includes("পেঁয়াজ") ||
@@ -534,6 +865,8 @@ function getCategory(row: AnyObject): string {
   ) {
     return "মসলা";
   }
+
+  /* শাকসবজি */
 
   if (
     text.includes("আলু") ||
@@ -580,6 +913,8 @@ function getCategory(row: AnyObject): string {
     return "শাকসবজি";
   }
 
+  /* চাল ও খাদ্যশস্য */
+
   if (
     text.includes("চাল") ||
     text.includes("rice") ||
@@ -597,172 +932,236 @@ function getCategory(row: AnyObject): string {
   return "নিত্যপণ্য";
 }
 
-function getUnitInfo(
-  unitId: number,
-  measurementUnitList: AnyObject[]
+/* =========================================================
+   GET
+========================================================= */
+
+export async function GET(
+  request: NextRequest
 ) {
-  const unit = measurementUnitList.find(
-    (item) =>
-      getNumber(
-        item?.value,
-        item?.id,
-        item?.unit_id,
-        item?.unitId
-      ) === unitId
-  );
-
-  if (!unit) {
-    return {
-      unitBn: "কেজি",
-      unitEn: "kg",
-    };
-  }
-
-  return {
-    unitBn:
-      getText(
-        unit?.text_bn,
-        unit?.unit_name_bn,
-        unit?.unitNameBn,
-        unit?.name_bn,
-        unit?.text
-      ) || "কেজি",
-
-    unitEn:
-      getText(
-        unit?.text_en,
-        unit?.unit_name,
-        unit?.unitName,
-        unit?.name_en,
-        unit?.name
-      ) || "kg",
-  };
-}
-
-export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-
-    const division = getNumber(
-      searchParams.get("division")
+    const {
+      searchParams,
+    } = new URL(
+      request.url
     );
 
-    const district = getNumber(
-      searchParams.get("district")
-    );
+    const division =
+      getNumber(
+        searchParams.get(
+          "division"
+        )
+      );
 
-    const requestedUpazila = getNumber(
-      searchParams.get("upazila")
-    );
+    const district =
+      getNumber(
+        searchParams.get(
+          "district"
+        )
+      );
 
-    const requestedMarket = getNumber(
-      searchParams.get("market")
-    );
+    const requestedUpazila =
+      getNumber(
+        searchParams.get(
+          "upazila"
+        )
+      );
+
+    const requestedMarket =
+      getNumber(
+        searchParams.get(
+          "market"
+        )
+      );
 
     const date =
-      searchParams.get("date") ||
-      new Date().toISOString().split("T")[0];
+      searchParams.get(
+        "date"
+      ) ||
+      new Date()
+        .toISOString()
+        .split("T")[0];
 
-    if (division <= 0 || district <= 0) {
+    /* -----------------------------------------------------
+       Validate IDs
+    ----------------------------------------------------- */
+
+    if (
+      division <= 0 ||
+      district <= 0
+    ) {
       return NextResponse.json(
         {
           success: false,
+
           error:
             "Valid official DAM division and district IDs are required.",
+
+          source:
+            "Ministry of Agriculture / DAM",
         },
-        { status: 400 }
+        {
+          status: 400,
+        }
       );
     }
+
+    /* -----------------------------------------------------
+       Official dropdown data
+    ----------------------------------------------------- */
 
     const commonDropdownData =
       await fetchCommonDropdowns();
 
-    const marketList = extractList(
-      commonDropdownData,
-      [
-        "hatsList",
-        "hatList",
-        "marketList",
-        "market_list",
-        "markets",
-      ]
-    );
+    /* -----------------------------------------------------
+       ONLY official market list
+    ----------------------------------------------------- */
 
-    if (marketList.length === 0) {
+    const marketList =
+      extractList(
+        commonDropdownData,
+        [
+          "hatsList",
+          "hatList",
+          "marketList",
+          "market_list",
+          "markets",
+        ]
+      );
+
+    if (
+      marketList.length === 0
+    ) {
       return NextResponse.json(
         {
           success: false,
+
           error:
             "Official DAM market list is empty.",
+
           source:
             "Ministry of Agriculture / DAM",
         },
-        { status: 502 }
+        {
+          status: 502,
+        }
       );
     }
 
-    const resolved = resolveMarket(
-      marketList,
-      division,
-      district,
-      requestedUpazila,
-      requestedMarket
-    );
+    /* -----------------------------------------------------
+       Resolve official market
+    ----------------------------------------------------- */
 
-    if (resolved.error) {
+    const resolved =
+      resolveMarket(
+        marketList,
+        division,
+        district,
+        requestedUpazila,
+        requestedMarket
+      );
+
+    if (
+      resolved.error
+    ) {
       return NextResponse.json(
         {
           success: false,
-          error: resolved.error,
+
+          error:
+            resolved.error,
+
           location: {
             division,
             district,
-            upazila: requestedUpazila,
-            market: requestedMarket,
+
+            upazila:
+              requestedUpazila,
+
+            market:
+              requestedMarket,
           },
+
           source:
             "Ministry of Agriculture / DAM",
         },
-        { status: 400 }
+        {
+          status: 400,
+        }
       );
     }
 
-    const upazila = resolved.upazila;
-    const market = resolved.market;
+    const upazila =
+      resolved.upazila;
 
-    const commodityList = extractList(
-      commonDropdownData,
-      [
-        "commodityNameList",
-        "commodity_name_list",
-        "commodities",
-      ]
-    );
+    const market =
+      resolved.market;
 
-    const measurementUnitList = extractList(
-      commonDropdownData,
-      [
-        "measurementUnitList",
-        "measurement_unit_list",
-        "units",
-      ]
-    );
+    /* -----------------------------------------------------
+       Commodity list
+    ----------------------------------------------------- */
+
+    const commodityList =
+      extractList(
+        commonDropdownData,
+        [
+          "commodityNameList",
+          "commodity_name_list",
+          "commodities",
+          "commodityList",
+        ]
+      );
+
+    /* -----------------------------------------------------
+       IMPORTANT:
+       Do NOT use unitList here.
+       unitList from common-dropdowns is not a safe
+       measurement-unit source.
+    ----------------------------------------------------- */
+
+    const measurementUnitList =
+      extractList(
+        commonDropdownData,
+        [
+          "measurementUnitList",
+          "measurement_unit_list",
+          "measurementUnits",
+        ]
+      );
+
+    /* -----------------------------------------------------
+       Commodity map
+    ----------------------------------------------------- */
 
     const commodityMap =
-      new Map<number, AnyObject>();
+      new Map<
+        number,
+        AnyObject
+      >();
 
-    for (const commodity of commodityList) {
-      const id = getNumber(
-        commodity?.value,
-        commodity?.id,
-        commodity?.commodity_id,
-        commodity?.commodityId
-      );
+    for (
+      const commodity of
+        commodityList
+    ) {
+      const id =
+        getNumber(
+          commodity?.value,
+          commodity?.id,
+          commodity?.commodity_id,
+          commodity?.commodityId
+        );
 
       if (id > 0) {
-        commodityMap.set(id, commodity);
+        commodityMap.set(
+          id,
+          commodity
+        );
       }
     }
+
+    /* -----------------------------------------------------
+       Today's official price rows
+    ----------------------------------------------------- */
 
     const priceRows =
       await fetchPriceRows(
@@ -773,12 +1172,20 @@ export async function GET(request: NextRequest) {
         market
       );
 
+    /* -----------------------------------------------------
+       30-day history
+    ----------------------------------------------------- */
+
     const historyRequests: {
       date: string;
       promise: Promise<AnyObject[]>;
     }[] = [];
 
-    for (let index = 0; index < 30; index++) {
+    for (
+      let index = 0;
+      index < 30;
+      index++
+    ) {
       const historyDate =
         getPreviousDate(
           date,
@@ -786,10 +1193,14 @@ export async function GET(request: NextRequest) {
         );
 
       historyRequests.push({
-        date: historyDate,
+        date:
+          historyDate,
+
         promise:
           index === 0
-            ? Promise.resolve(priceRows)
+            ? Promise.resolve(
+                priceRows
+              )
             : fetchPriceRows(
                 historyDate,
                 division,
@@ -801,13 +1212,17 @@ export async function GET(request: NextRequest) {
     }
 
     const historyRowsByDate =
-      new Map<string, AnyObject[]>();
+      new Map<
+        string,
+        AnyObject[]
+      >();
 
     const BATCH_SIZE = 5;
 
     for (
       let i = 0;
-      i < historyRequests.length;
+      i <
+      historyRequests.length;
       i += BATCH_SIZE
     ) {
       const batch =
@@ -820,7 +1235,8 @@ export async function GET(request: NextRequest) {
         await Promise.all(
           batch.map(
             async ({
-              date: historyDate,
+              date:
+                historyDate,
               promise,
             }) => {
               try {
@@ -828,15 +1244,21 @@ export async function GET(request: NextRequest) {
                   await promise;
 
                 return {
-                  date: historyDate,
+                  date:
+                    historyDate,
+
                   rows:
-                    Array.isArray(rows)
+                    Array.isArray(
+                      rows
+                    )
                       ? rows
                       : [],
                 };
               } catch {
                 return {
-                  date: historyDate,
+                  date:
+                    historyDate,
+
                   rows: [],
                 };
               }
@@ -844,13 +1266,20 @@ export async function GET(request: NextRequest) {
           )
         );
 
-      for (const result of results) {
+      for (
+        const result of
+          results
+      ) {
         historyRowsByDate.set(
           result.date,
           result.rows
         );
       }
     }
+
+    /* -----------------------------------------------------
+       History map
+    ----------------------------------------------------- */
 
     const historyMap =
       new Map<
@@ -862,16 +1291,28 @@ export async function GET(request: NextRequest) {
       >();
 
     historyRowsByDate.forEach(
-      (rows, historyDate) => {
+      (
+        rows,
+        historyDate
+      ) => {
         const dailyCommodityPrices =
-          new Map<number, number[]>();
+          new Map<
+            number,
+            number[]
+          >();
 
-        for (const row of rows) {
+        for (
+          const row of rows
+        ) {
           const commodityId =
-            getCommodityId(row);
+            getCommodityId(
+              row
+            );
 
           const retailAvg =
-            getRetailAverage(row);
+            getRetailAverage(
+              row
+            );
 
           if (
             commodityId <= 0 ||
@@ -902,10 +1343,14 @@ export async function GET(request: NextRequest) {
           ) => {
             const averagePrice =
               prices.reduce(
-                (sum, price) =>
+                (
+                  sum,
+                  price
+                ) =>
                   sum + price,
                 0
-              ) / prices.length;
+              ) /
+              prices.length;
 
             const existingHistory =
               historyMap.get(
@@ -913,10 +1358,14 @@ export async function GET(request: NextRequest) {
               ) || [];
 
             existingHistory.push({
-              date: historyDate,
+              date:
+                historyDate,
+
               avgPrice:
                 Number(
-                  averagePrice.toFixed(2)
+                  averagePrice.toFixed(
+                    2
+                  )
                 ),
             });
 
@@ -928,6 +1377,10 @@ export async function GET(request: NextRequest) {
         );
       }
     );
+
+    /* -----------------------------------------------------
+       Sort history
+    ----------------------------------------------------- */
 
     historyMap.forEach(
       (
@@ -943,7 +1396,10 @@ export async function GET(request: NextRequest) {
             }
           >();
 
-        for (const point of history) {
+        for (
+          const point of
+            history
+        ) {
           uniqueByDate.set(
             point.date,
             point
@@ -954,7 +1410,10 @@ export async function GET(request: NextRequest) {
           Array.from(
             uniqueByDate.values()
           ).sort(
-            (a, b) =>
+            (
+              a,
+              b
+            ) =>
               a.date.localeCompare(
                 b.date
               )
@@ -966,6 +1425,10 @@ export async function GET(request: NextRequest) {
         );
       }
     );
+
+    /* -----------------------------------------------------
+       Previous available date
+    ----------------------------------------------------- */
 
     let previousDate:
       | string
@@ -987,17 +1450,30 @@ export async function GET(request: NextRequest) {
           candidateDate
         ) || [];
 
-      if (candidateRows.length > 0) {
+      if (
+        candidateRows.length >
+        0
+      ) {
         previousDate =
           candidateDate;
+
         break;
       }
     }
 
-    const previousPriceMap =
-      new Map<number, number>();
+    /* -----------------------------------------------------
+       Previous prices
+    ----------------------------------------------------- */
 
-    if (previousDate) {
+    const previousPriceMap =
+      new Map<
+        number,
+        number
+      >();
+
+    if (
+      previousDate
+    ) {
       const previousRows =
         historyRowsByDate.get(
           previousDate
@@ -1009,12 +1485,19 @@ export async function GET(request: NextRequest) {
           number[]
         >();
 
-      for (const row of previousRows) {
+      for (
+        const row of
+          previousRows
+      ) {
         const commodityId =
-          getCommodityId(row);
+          getCommodityId(
+            row
+          );
 
         const retailAvg =
-          getRetailAverage(row);
+          getRetailAverage(
+            row
+          );
 
         if (
           commodityId <= 0 ||
@@ -1045,29 +1528,49 @@ export async function GET(request: NextRequest) {
         ) => {
           const average =
             values.reduce(
-              (sum, value) =>
+              (
+                sum,
+                value
+              ) =>
                 sum + value,
               0
-            ) / values.length;
+            ) /
+            values.length;
 
           previousPriceMap.set(
             commodityId,
             Number(
-              average.toFixed(2)
+              average.toFixed(
+                2
+              )
             )
           );
         }
       );
     }
 
-    const products: AnyObject[] = [];
+    /* -----------------------------------------------------
+       Build products
+    ----------------------------------------------------- */
 
-    for (const row of priceRows) {
+    const products:
+      AnyObject[] = [];
+
+    for (
+      const row of
+        priceRows
+    ) {
       const commodityId =
-        getCommodityId(row);
+        getCommodityId(
+          row
+        );
 
       const retailAvg =
-        getRetailAverage(row);
+        getRetailAverage(
+          row
+        );
+
+      /* Ignore invalid official rows */
 
       if (
         commodityId <= 0 ||
@@ -1084,31 +1587,52 @@ export async function GET(request: NextRequest) {
       const commodityNameBn =
         getText(
           officialCommodity?.text_bn,
+
           officialCommodity?.commodity_name_bn,
+
           officialCommodity?.commodityNameBn,
+
           officialCommodity?.name_bn,
+
           officialCommodity?.nameBn,
+
           officialCommodity?.text,
+
           row?.commodity_name_bn,
+
           row?.commodityNameBn,
+
           row?.commodityName,
+
           row?.text_bn,
+
           row?.text
         );
 
       const commodityName =
         getText(
           officialCommodity?.text_en,
+
           officialCommodity?.commodity_name,
+
           officialCommodity?.commodityName,
+
           officialCommodity?.name_en,
+
           officialCommodity?.nameEn,
+
           officialCommodity?.text,
+
           row?.commodity_name,
+
           row?.commodityName,
+
           row?.text_en,
+
           row?.text
         );
+
+      /* Need at least one official name */
 
       if (
         !commodityNameBn &&
@@ -1120,15 +1644,20 @@ export async function GET(request: NextRequest) {
       const officialRetailUnitId =
         getNumber(
           officialCommodity?.unit_retail,
+
           officialCommodity?.retail_unit_id,
+
           officialCommodity?.retailUnitId
         );
 
       const rowUnitId =
-        getUnitId(row);
+        getUnitId(
+          row
+        );
 
       const unitId =
-        officialRetailUnitId > 0
+        officialRetailUnitId >
+        0
           ? officialRetailUnitId
           : rowUnitId;
 
@@ -1139,19 +1668,29 @@ export async function GET(request: NextRequest) {
         );
 
       const retailLow =
-        getRetailLow(row);
+        getRetailLow(
+          row
+        );
 
       const retailHigh =
-        getRetailHigh(row);
+        getRetailHigh(
+          row
+        );
 
       const wholesaleAvg =
-        getWholesaleAverage(row);
+        getWholesaleAverage(
+          row
+        );
 
       const wholesaleLow =
-        getWholesaleLow(row);
+        getWholesaleLow(
+          row
+        );
 
       const wholesaleHigh =
-        getWholesaleHigh(row);
+        getWholesaleHigh(
+          row
+        );
 
       const previousAvgPrice =
         previousPriceMap.get(
@@ -1159,7 +1698,9 @@ export async function GET(request: NextRequest) {
         ) || 0;
 
       let priceChange = 0;
-      let priceChangePercent = 0;
+
+      let priceChangePercent =
+        0;
 
       let priceChangeType:
         | "increase"
@@ -1168,7 +1709,9 @@ export async function GET(request: NextRequest) {
         | "no_data" =
         "no_data";
 
-      if (previousAvgPrice > 0) {
+      if (
+        previousAvgPrice > 0
+      ) {
         priceChange =
           Number(
             (
@@ -1191,7 +1734,9 @@ export async function GET(request: NextRequest) {
             ).toFixed(2)
           );
 
-        if (priceChange > 0) {
+        if (
+          priceChange > 0
+        ) {
           priceChangeType =
             "increase";
         } else if (
@@ -1206,8 +1751,11 @@ export async function GET(request: NextRequest) {
       }
 
       products.push({
-        id: commodityId,
-        commodityId,
+        id:
+          commodityId,
+
+        commodityId:
+          commodityId,
 
         name:
           commodityNameBn ||
@@ -1233,20 +1781,36 @@ export async function GET(request: NextRequest) {
           getCategory({
             ...officialCommodity,
             ...row,
+
             commodity_name_bn:
               commodityNameBn,
+
             commodity_name:
               commodityName,
           }),
 
-        price: retailAvg,
-        avgPrice: retailAvg,
-        averagePrice: retailAvg,
-        retailPrice: retailAvg,
-        retailAvg,
+        /* REAL OFFICIAL RETAIL PRICE */
 
-        retailLow,
-        retailHigh,
+        price:
+          retailAvg,
+
+        avgPrice:
+          retailAvg,
+
+        averagePrice:
+          retailAvg,
+
+        retailPrice:
+          retailAvg,
+
+        retailAvg:
+          retailAvg,
+
+        retailLow:
+          retailLow,
+
+        retailHigh:
+          retailHigh,
 
         wholesaleAvg:
           wholesaleAvg > 0
@@ -1263,7 +1827,8 @@ export async function GET(request: NextRequest) {
             ? wholesaleHigh
             : null,
 
-        unitId,
+        unitId:
+          unitId,
 
         unitBn:
           unitInfo.unitBn,
@@ -1272,16 +1837,22 @@ export async function GET(request: NextRequest) {
           unitInfo.unitEn,
 
         previousAvgPrice:
-          previousAvgPrice > 0
+          previousAvgPrice >
+          0
             ? previousAvgPrice
             : null,
 
         previousPriceDate:
           previousDate,
 
-        priceChange,
-        priceChangePercent,
-        priceChangeType,
+        priceChange:
+          priceChange,
+
+        priceChangePercent:
+          priceChangePercent,
+
+        priceChangeType:
+          priceChangeType,
 
         history30Days:
           historyMap.get(
@@ -1291,14 +1862,25 @@ export async function GET(request: NextRequest) {
         source:
           "Ministry of Agriculture / DAM",
 
-        reportDate: date,
+        reportDate:
+          date,
       });
     }
 
-    const uniqueProducts =
-      new Map<number, AnyObject>();
+    /* -----------------------------------------------------
+       Remove duplicate commodities
+    ----------------------------------------------------- */
 
-    for (const product of products) {
+    const uniqueProducts =
+      new Map<
+        number,
+        AnyObject
+      >();
+
+    for (
+      const product of
+        products
+    ) {
       uniqueProducts.set(
         product.commodityId,
         product
@@ -1310,19 +1892,39 @@ export async function GET(request: NextRequest) {
         uniqueProducts.values()
       );
 
-    const categoryCounts:
-      Record<string, number> = {};
+    /* -----------------------------------------------------
+       Category counts
+    ----------------------------------------------------- */
 
-    for (const product of finalProducts) {
+    const categoryCounts:
+      Record<
+        string,
+        number
+      > = {};
+
+    for (
+      const product of
+        finalProducts
+    ) {
       const category =
         String(
           product.category ||
           "নিত্যপণ্য"
         );
 
-      categoryCounts[category] =
-        (categoryCounts[category] || 0) + 1;
+      categoryCounts[
+        category
+      ] =
+        (
+          categoryCounts[
+            category
+          ] || 0
+        ) + 1;
     }
+
+    /* -----------------------------------------------------
+       Price change counts
+    ----------------------------------------------------- */
 
     const priceChangeCounts = {
       increase: 0,
@@ -1331,13 +1933,18 @@ export async function GET(request: NextRequest) {
       no_data: 0,
     };
 
-    for (const product of finalProducts) {
+    for (
+      const product of
+        finalProducts
+    ) {
       const type =
         String(
           product.priceChangeType
         );
 
-      if (type === "increase") {
+      if (
+        type === "increase"
+      ) {
         priceChangeCounts.increase++;
       } else if (
         type === "decrease"
@@ -1352,6 +1959,10 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    /* -----------------------------------------------------
+       FINAL RESPONSE
+    ----------------------------------------------------- */
+
     return NextResponse.json({
       success: true,
 
@@ -1360,11 +1971,19 @@ export async function GET(request: NextRequest) {
         district,
         upazila,
         market,
+
+        marketName:
+          resolved.marketName,
       },
 
       district,
+
       upazila,
+
       market,
+
+      marketName:
+        resolved.marketName,
 
       date,
 
@@ -1396,12 +2015,18 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
+
         error:
           error instanceof Error
             ? error.message
             : "Unknown API error",
+
+        source:
+          "Ministry of Agriculture / DAM",
       },
-      { status: 500 }
+      {
+        status: 500,
+      }
     );
   }
 }
