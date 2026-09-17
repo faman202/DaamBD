@@ -10,14 +10,26 @@ const COMMON_DROPDOWN_API =
 
 type AnyObject = Record<string, any>;
 
+/* =========================================================
+   BASIC HELPERS
+========================================================= */
+
 function getNumber(...values: unknown[]): number {
   for (const value of values) {
-    if (typeof value === "number" && Number.isFinite(value)) {
+    if (
+      typeof value === "number" &&
+      Number.isFinite(value)
+    ) {
       return value;
     }
 
-    if (typeof value === "string" && value.trim() !== "") {
-      const number = Number(value.replace(/,/g, "").trim());
+    if (
+      typeof value === "string" &&
+      value.trim() !== ""
+    ) {
+      const number = Number(
+        value.replace(/,/g, "").trim()
+      );
 
       if (Number.isFinite(number)) {
         return number;
@@ -30,11 +42,17 @@ function getNumber(...values: unknown[]): number {
 
 function getText(...values: unknown[]): string {
   for (const value of values) {
-    if (typeof value === "string" && value.trim() !== "") {
+    if (
+      typeof value === "string" &&
+      value.trim() !== ""
+    ) {
       return value.trim();
     }
 
-    if (typeof value === "number" && Number.isFinite(value)) {
+    if (
+      typeof value === "number" &&
+      Number.isFinite(value)
+    ) {
       return String(value);
     }
   }
@@ -88,6 +106,10 @@ function extractList(
 
   return [];
 }
+
+/* =========================================================
+   COMMON DROPDOWNS
+========================================================= */
 
 async function fetchCommonDropdowns(): Promise<AnyObject> {
   const response = await fetch(
@@ -201,9 +223,7 @@ function resolveMarket(
     };
   }
 
-  /* -------------------------------------------------------
-     Explicit market requested
-  ------------------------------------------------------- */
+  /* Explicit market */
 
   if (requestedMarket > 0) {
     const selectedMarket =
@@ -259,9 +279,7 @@ function resolveMarket(
     };
   }
 
-  /* -------------------------------------------------------
-     Explicit upazila requested
-  ------------------------------------------------------- */
+  /* Explicit upazila */
 
   if (requestedUpazila > 0) {
     const upazilaMarkets =
@@ -298,10 +316,7 @@ function resolveMarket(
     };
   }
 
-  /* -------------------------------------------------------
-     No market / upazila supplied.
-     Use first official market in this district.
-  ------------------------------------------------------- */
+  /* No market/upazila supplied */
 
   const firstMarket =
     validMarkets[0];
@@ -377,43 +392,72 @@ function extractPriceRows(
 }
 
 /* =========================================================
-   OFFICIAL PRICE API
+   WEEK ID
 ========================================================= */
 
-async function fetchPriceRows(
-  reportDate: string,
-  division: number,
-  district: number,
-  upazila: number,
-  market: number
-): Promise<AnyObject[]> {
+/*
+  DAM endpoint-এর week_id সবসময় simple calendar-week
+  হিসেবে কাজ নাও করতে পারে।
+
+  তাই প্রথমে calculated week পাঠানো হবে।
+  কোনো official row না এলে 1-5 পর্যন্ত অন্য week ID
+  দিয়ে একই official date পুনরায় check করা হবে।
+*/
+
+function getInitialWeekId(
+  reportDate: string
+): number {
+  const [year, month, day] =
+    reportDate
+      .split("-")
+      .map(Number);
+
   const date = new Date(
-    `${reportDate}T00:00:00Z`
+    Date.UTC(
+      year,
+      month - 1,
+      day
+    )
   );
-
-  const monthId =
-    date.getUTCMonth() + 1;
-
-  const yearId =
-    date.getUTCFullYear();
 
   const firstDay =
     new Date(
       Date.UTC(
-        date.getUTCFullYear(),
-        date.getUTCMonth(),
+        year,
+        month - 1,
         1
       )
     );
 
-  const weekId =
+  return (
     Math.floor(
       (
         date.getUTCDate() +
         firstDay.getUTCDay() -
         1
       ) / 7
-    ) + 1;
+    ) + 1
+  );
+}
+
+/* =========================================================
+   OFFICIAL PRICE API
+========================================================= */
+
+async function requestPriceRows(
+  reportDate: string,
+  division: number,
+  district: number,
+  upazila: number,
+  market: number,
+  weekId: number
+): Promise<AnyObject[]> {
+  const [
+    yearId,
+    monthId,
+  ] = reportDate
+    .split("-")
+    .map(Number);
 
   const payload = {
     division_id: [division],
@@ -443,6 +487,11 @@ async function fetchPriceRows(
     week_id:
       weekId,
   };
+
+  console.log(
+    "DaamBD DAM request:",
+    JSON.stringify(payload)
+  );
 
   const response =
     await fetch(
@@ -480,6 +529,84 @@ async function fetchPriceRows(
   return extractPriceRows(
     data
   );
+}
+
+async function fetchPriceRows(
+  reportDate: string,
+  division: number,
+  district: number,
+  upazila: number,
+  market: number
+): Promise<AnyObject[]> {
+  const initialWeek =
+    getInitialWeekId(
+      reportDate
+    );
+
+  /* First try calculated week */
+
+  const firstRows =
+    await requestPriceRows(
+      reportDate,
+      division,
+      district,
+      upazila,
+      market,
+      initialWeek
+    );
+
+  if (
+    firstRows.length > 0
+  ) {
+    return firstRows;
+  }
+
+  /*
+    If DAM returns no rows, try remaining official
+    week IDs. This does NOT create data; every result
+    still comes directly from DAM.
+  */
+
+  const weekIds = [
+    1,
+    2,
+    3,
+    4,
+    5,
+  ].filter(
+    (week) =>
+      week !== initialWeek
+  );
+
+  for (
+    const weekId of weekIds
+  ) {
+    try {
+      const rows =
+        await requestPriceRows(
+          reportDate,
+          division,
+          district,
+          upazila,
+          market,
+          weekId
+        );
+
+      if (
+        rows.length > 0
+      ) {
+        console.log(
+          `DAM data found using week_id=${weekId} for ${reportDate}`
+        );
+
+        return rows;
+      }
+    } catch {
+      /* Try next official week ID */
+    }
+  }
+
+  return [];
 }
 
 /* =========================================================
@@ -737,7 +864,7 @@ function getCategory(
   const text =
     `${bn} ${en}`;
 
-  /* মাছ */
+  /* Fish */
 
   if (
     text.includes("রুই") ||
@@ -767,7 +894,7 @@ function getCategory(
     return "মাছ";
   }
 
-  /* মাংস ও ডিম */
+  /* Meat & Eggs */
 
   if (
     text.includes("ডিম") ||
@@ -793,7 +920,7 @@ function getCategory(
     return "মাংস ও ডিম";
   }
 
-  /* ভোজ্যতেল */
+  /* Edible Oil */
 
   if (
     text.includes("তেল") ||
@@ -810,7 +937,7 @@ function getCategory(
     return "ভোজ্যতেল";
   }
 
-  /* ডাল */
+  /* Pulses */
 
   if (
     text.includes("ডাল") ||
@@ -836,7 +963,7 @@ function getCategory(
     return "ডাল ও শিম";
   }
 
-  /* মসলা */
+  /* Spices */
 
   if (
     text.includes("পেঁয়াজ") ||
@@ -866,7 +993,7 @@ function getCategory(
     return "মসলা";
   }
 
-  /* শাকসবজি */
+  /* Vegetables */
 
   if (
     text.includes("আলু") ||
@@ -913,7 +1040,7 @@ function getCategory(
     return "শাকসবজি";
   }
 
-  /* চাল ও খাদ্যশস্য */
+  /* Grains */
 
   if (
     text.includes("চাল") ||
@@ -982,9 +1109,7 @@ export async function GET(
         .toISOString()
         .split("T")[0];
 
-    /* -----------------------------------------------------
-       Validate IDs
-    ----------------------------------------------------- */
+    /* Validate */
 
     if (
       division <= 0 ||
@@ -1006,16 +1131,12 @@ export async function GET(
       );
     }
 
-    /* -----------------------------------------------------
-       Official dropdown data
-    ----------------------------------------------------- */
+    /* Official dropdowns */
 
     const commonDropdownData =
       await fetchCommonDropdowns();
 
-    /* -----------------------------------------------------
-       ONLY official market list
-    ----------------------------------------------------- */
+    /* Official markets only */
 
     const marketList =
       extractList(
@@ -1048,9 +1169,7 @@ export async function GET(
       );
     }
 
-    /* -----------------------------------------------------
-       Resolve official market
-    ----------------------------------------------------- */
+    /* Resolve market */
 
     const resolved =
       resolveMarket(
@@ -1097,9 +1216,7 @@ export async function GET(
     const market =
       resolved.market;
 
-    /* -----------------------------------------------------
-       Commodity list
-    ----------------------------------------------------- */
+    /* Commodity list */
 
     const commodityList =
       extractList(
@@ -1112,12 +1229,10 @@ export async function GET(
         ]
       );
 
-    /* -----------------------------------------------------
-       IMPORTANT:
-       Do NOT use unitList here.
-       unitList from common-dropdowns is not a safe
-       measurement-unit source.
-    ----------------------------------------------------- */
+    /*
+      IMPORTANT:
+      Do NOT use unitList.
+    */
 
     const measurementUnitList =
       extractList(
@@ -1129,9 +1244,7 @@ export async function GET(
         ]
       );
 
-    /* -----------------------------------------------------
-       Commodity map
-    ----------------------------------------------------- */
+    /* Commodity map */
 
     const commodityMap =
       new Map<
@@ -1151,7 +1264,9 @@ export async function GET(
           commodity?.commodityId
         );
 
-      if (id > 0) {
+      if (
+        id > 0
+      ) {
         commodityMap.set(
           id,
           commodity
@@ -1159,9 +1274,7 @@ export async function GET(
       }
     }
 
-    /* -----------------------------------------------------
-       Today's official price rows
-    ----------------------------------------------------- */
+    /* Today's official data */
 
     const priceRows =
       await fetchPriceRows(
@@ -1172,9 +1285,9 @@ export async function GET(
         market
       );
 
-    /* -----------------------------------------------------
-       30-day history
-    ----------------------------------------------------- */
+    /* =====================================================
+       30 DAY HISTORY
+    ===================================================== */
 
     const historyRequests: {
       date: string;
@@ -1277,9 +1390,9 @@ export async function GET(
       }
     }
 
-    /* -----------------------------------------------------
-       History map
-    ----------------------------------------------------- */
+    /* =====================================================
+       HISTORY MAP
+    ===================================================== */
 
     const historyMap =
       new Map<
@@ -1378,9 +1491,7 @@ export async function GET(
       }
     );
 
-    /* -----------------------------------------------------
-       Sort history
-    ----------------------------------------------------- */
+    /* Sort history */
 
     historyMap.forEach(
       (
@@ -1426,9 +1537,9 @@ export async function GET(
       }
     );
 
-    /* -----------------------------------------------------
-       Previous available date
-    ----------------------------------------------------- */
+    /* =====================================================
+       PREVIOUS AVAILABLE DATE
+    ===================================================== */
 
     let previousDate:
       | string
@@ -1451,8 +1562,7 @@ export async function GET(
         ) || [];
 
       if (
-        candidateRows.length >
-        0
+        candidateRows.length > 0
       ) {
         previousDate =
           candidateDate;
@@ -1461,9 +1571,7 @@ export async function GET(
       }
     }
 
-    /* -----------------------------------------------------
-       Previous prices
-    ----------------------------------------------------- */
+    /* Previous prices */
 
     const previousPriceMap =
       new Map<
@@ -1549,9 +1657,9 @@ export async function GET(
       );
     }
 
-    /* -----------------------------------------------------
-       Build products
-    ----------------------------------------------------- */
+    /* =====================================================
+       BUILD PRODUCTS
+    ===================================================== */
 
     const products:
       AnyObject[] = [];
@@ -1570,7 +1678,9 @@ export async function GET(
           row
         );
 
-      /* Ignore invalid official rows */
+      /*
+        Only real official rows.
+      */
 
       if (
         commodityId <= 0 ||
@@ -1632,8 +1742,6 @@ export async function GET(
           row?.text
         );
 
-      /* Need at least one official name */
-
       if (
         !commodityNameBn &&
         !commodityName
@@ -1656,8 +1764,7 @@ export async function GET(
         );
 
       const unitId =
-        officialRetailUnitId >
-        0
+        officialRetailUnitId > 0
           ? officialRetailUnitId
           : rowUnitId;
 
@@ -1699,8 +1806,7 @@ export async function GET(
 
       let priceChange = 0;
 
-      let priceChangePercent =
-        0;
+      let priceChangePercent = 0;
 
       let priceChangeType:
         | "increase"
@@ -1837,8 +1943,7 @@ export async function GET(
           unitInfo.unitEn,
 
         previousAvgPrice:
-          previousAvgPrice >
-          0
+          previousAvgPrice > 0
             ? previousAvgPrice
             : null,
 
@@ -1867,9 +1972,9 @@ export async function GET(
       });
     }
 
-    /* -----------------------------------------------------
-       Remove duplicate commodities
-    ----------------------------------------------------- */
+    /* =====================================================
+       REMOVE DUPLICATES
+    ===================================================== */
 
     const uniqueProducts =
       new Map<
@@ -1892,9 +1997,9 @@ export async function GET(
         uniqueProducts.values()
       );
 
-    /* -----------------------------------------------------
-       Category counts
-    ----------------------------------------------------- */
+    /* =====================================================
+       CATEGORY COUNTS
+    ===================================================== */
 
     const categoryCounts:
       Record<
@@ -1922,9 +2027,9 @@ export async function GET(
         ) + 1;
     }
 
-    /* -----------------------------------------------------
-       Price change counts
-    ----------------------------------------------------- */
+    /* =====================================================
+       PRICE CHANGE COUNTS
+    ===================================================== */
 
     const priceChangeCounts = {
       increase: 0,
@@ -1959,17 +2064,20 @@ export async function GET(
       }
     }
 
-    /* -----------------------------------------------------
+    /* =====================================================
        FINAL RESPONSE
-    ----------------------------------------------------- */
+    ===================================================== */
 
     return NextResponse.json({
       success: true,
 
       location: {
         division,
+
         district,
+
         upazila,
+
         market,
 
         marketName:
