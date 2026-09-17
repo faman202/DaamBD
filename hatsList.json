@@ -1,0 +1,178 @@
+﻿[
+    {
+        "value":  25,
+        "org_id":  null,
+        "division_id":  6,
+        "district_id":  40,
+        "upazilla_id":  311,
+        "text":  "Belabo Bazar",
+        "text_en":  "Belabo Bazar",
+        "text_bn":  "বেলাবো বাজার",
+        "status":  2
+    },
+    {
+        "value":  18,
+        "org_id":  null,
+        "division_id":  6,
+        "district_id":  44,
+        "upazilla_id":  340,
+        "text":  "Betulia Mor",
+        "text_en":  "Betulia Mor",
+        "text_bn":  "বেতুলিয়া মোড়",
+        "status":  1
+    },
+    {
+        "value":  29,
+        "org_id":  null,
+        "division_id":  7,
+        "district_id":  57,
+        "upazilla_id":  429,
+        "text":  "Gaibandha Super Market",
+        "text_en":  "Gaibandha Super Market",
+        "text_bn":  "গাইবান্ধা সুপার মার্কেট",
+        "status":  2
+    },
+    {
+        "value":  17,
+        "org_id":  null,
+        "division_id":  6,
+        "district_id":  46,
+        "upazilla_id":  361,
+        "text":  "Gior Bazar",
+        "text_en":  "Gior Bazar",
+        "text_bn":  "ঘিওর বাজার ",
+        "status":  2
+    },
+    {
+        "value":  28,
+        "org_id":  null,
+        "division_id":  7,
+        "district_id":  57,
+        "upazilla_id":  432,
+        "text":  "Gobindaganj Krishi Bazar",
+        "text_en":  "Gobindaganj Krishi Bazar",
+        "text_bn":  "গোবিন্দগঞ্জ কৃষি বাজার",
+        "status":  2
+    },
+    {
+        "value":  20,
+        "org_id":  null,
+        "division_id":  6,
+        "district_id":  41,
+        "upazilla_id":  318,
+        "text":  "Kaliakair Krishi Bazar",
+        "text_en":  "Kaliakair Krishi Bazar",
+        "text_bn":  "কালিয়াকইর কৃষি বাজার ",
+        "status":  2
+    },
+    {
+        "value":  24,
+        "org_id":  null,
+        "division_id":  6,
+        "district_id":  44,
+        "upazilla_id":  343,
+        "text":  "kalihati Bazar",
+        "text_en":  "kalihati Bazar",
+        "text_bn":  "কালিহাতি বাজার ",
+        "status":  2
+    },
+    {
+        "value":  21,
+        "org_id":  null,
+        "division_id":  6,
+        "district_id":  41,
+        "upazilla_id":  319,
+        "text":  "Kapisa Market",
+        "text_en":  "Kapisa Market",
+        "text_bn":  "কাপাসিয়া মার্কেট ",
+        "status":  2
+    },
+    {
+        "value":  23,
+        "org_id":  null,
+        "division_id":  6,
+        "district_id":  44,
+        "upazilla_id":  339,
+        "text":  "Mirzapur Town Hall Market ",
+        "text_en":  "Mirzapur Town Hall Market ",
+        "text_bn":  "মির্জাপুর টাউন হল মার্কেট ",
+        "status":  2
+    },
+    {
+        "value":  26,
+        "org_id":  null,
+        "division_id":  6,
+        "district_id":  40,
+        "upazilla_id":  312,
+        "text":  "Monohardi Bazar",
+        "text_en":  "Monohardi Bazar",
+        "text_bn":  "মনহারদি বাজার ",
+        "status":  2
+    },
+    {
+        "value":  27,
+        "org_id":  null,
+        "division_id":  6,
+        "district_id":  45,
+        "upazilla_id":  350,
+        "text":  "Pakundia bazar ",
+        "text_en":  "Pakundia bazar ",
+        "text_bn":  "পাকুন্দিয়া বাজার ",
+        "status":  2
+    },
+    {
+        "value":  16,
+        "org_id":  null,
+        "division_id":  6,
+        "district_id":  44,
+        "upazilla_id":  340,
+        "text":  "Pakutia College Field",
+        "text_en":  "Pakutia College Field",
+        "text_bn":  "পাকুটিয়া কলেজ মাঠ",
+        "status":  1
+    },
+    {
+        "value":  15,
+        "org_id":  null,
+        "division_id":  6,
+        "district_id":  44,
+        "upazilla_id":  340,
+        "text":  "Rathura Bazar",
+        "text_en":  "Rathura Bazar",
+        "text_bn":  "রাথুরা বাজার",
+        "status":  1
+    },
+    {
+        "value":  30,
+        "org_id":  null,
+        "division_id":  6,
+        "district_id":  44,
+        "upazilla_id":  340,
+        "text":  "Rautara",
+        "text_en":  "Rautara",
+        "text_bn":  "রাউতারা ",
+        "status":  1
+    },
+    {
+        "value":  19,
+        "org_id":  null,
+        "division_id":  6,
+        "district_id":  46,
+        "upazilla_id":  362,
+        "text":  "Shibaloy Bazar",
+        "text_en":  "Shibaloy Bazar",
+        "text_bn":  "শিবালয় বাজার ",
+        "status":  2
+    },
+    {
+        "value":  22,
+        "org_id":  null,
+        "division_id":  6,
+        "district_id":  41,
+        "upazilla_id":  321,
+        "text":  "Sreepur Rayer bazar",
+        "text_en":  "Sreepur Rayer bazar",
+        "text_bn":  "শ্রীপুর রায়ের বাজার ",
+        "status":  2
+    }
+]

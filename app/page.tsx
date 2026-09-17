@@ -19,7 +19,6 @@ import { PriceTrendModal } from '@/components/PriceTrendModal';
 import { TransparencyModal } from '@/components/TransparencyModal';
 
 import {
-  DIVISIONS,
   DISTRICTS,
 } from '@/lib/mockData';
 
@@ -48,10 +47,8 @@ interface OfficialDistrict {
 /* =========================================================
    OFFICIAL DAM LOCATION IDs
    ---------------------------------------------------------
-   Only IDs that have been confirmed from official DAM data
-   are included here.
-
-   Do NOT put guessed IDs here.
+   These IDs come from the official MOA / DAM marketList.
+   No guessed IDs are used.
    ========================================================= */
 
 const officialLocationMap: Record<
@@ -63,23 +60,279 @@ const officialLocationMap: Record<
     marketId?: number;
   }
 > = {
-  // Confirmed official DAM IDs
+  // ==================== DHAKA DIVISION ====================
+
+  Dhaka: {
+    divisionId: 6,
+    districtId: 47,
+    upazilaId: 493,
+    marketId: 162,
+  },
+
   Manikganj: {
     divisionId: 6,
     districtId: 46,
     upazilaId: 360,
+    marketId: 109,
   },
 
   Gazipur: {
     divisionId: 6,
     districtId: 41,
     upazilaId: 320,
+    marketId: 172,
+  },
+
+  Narayanganj: {
+    divisionId: 6,
+    districtId: 43,
+    upazilaId: 330,
+    marketId: 17,
   },
 
   Savar: {
     divisionId: 6,
     districtId: 47,
     upazilaId: 365,
+    marketId: 169,
+  },
+
+  Tangail: {
+    divisionId: 6,
+    districtId: 44,
+    upazilaId: 342,
+    marketId: 111,
+  },
+
+  Munshiganj: {
+    divisionId: 6,
+    districtId: 48,
+    upazilaId: 370,
+    marketId: 59,
+  },
+
+  Narsingdi: {
+    divisionId: 6,
+    districtId: 40,
+    upazilaId: 313,
+    marketId: 26,
+  },
+
+  Faridpur: {
+    divisionId: 6,
+    districtId: 52,
+    upazilaId: 390,
+    marketId: 52,
+  },
+
+  // ==================== CHATTOGRAM DIVISION ====================
+
+  Chattogram: {
+    divisionId: 1,
+    districtId: 8,
+    upazilaId: 499,
+    marketId: 79,
+  },
+
+  Cumilla: {
+    divisionId: 1,
+    districtId: 1,
+    upazilaId: 11,
+    marketId: 56,
+  },
+
+  CoxsBazar: {
+    divisionId: 1,
+    districtId: 9,
+    upazilaId: 80,
+    marketId: 103,
+  },
+
+  Feni: {
+    divisionId: 1,
+    districtId: 2,
+    upazilaId: 19,
+    marketId: 104,
+  },
+
+  Noakhali: {
+    divisionId: 1,
+    districtId: 5,
+    upazilaId: 43,
+    marketId: 106,
+  },
+
+  Brahmanbaria: {
+    divisionId: 1,
+    districtId: 3,
+    upazilaId: 24,
+    marketId: 23,
+  },
+
+  // ==================== RAJSHAHI DIVISION ====================
+
+  Rajshahi: {
+    divisionId: 2,
+    districtId: 15,
+    upazilaId: 496,
+    marketId: 13,
+  },
+
+  Bogura: {
+    divisionId: 2,
+    districtId: 14,
+    upazilaId: 123,
+    marketId: 67,
+  },
+
+  Pabna: {
+    divisionId: 2,
+    districtId: 13,
+    upazilaId: 116,
+    marketId: 20,
+  },
+
+  Naogaon: {
+    divisionId: 2,
+    districtId: 19,
+    upazilaId: 168,
+    marketId: 30,
+  },
+
+  Sirajganj: {
+    divisionId: 2,
+    districtId: 12,
+    upazilaId: 110,
+    marketId: 115,
+  },
+
+  // ==================== KHULNA DIVISION ====================
+
+  Khulna: {
+    divisionId: 3,
+    districtId: 27,
+    upazilaId: 495,
+    marketId: 37,
+  },
+
+  Jashore: {
+    divisionId: 3,
+    districtId: 20,
+    upazilaId: 177,
+    marketId: 112,
+  },
+
+  Kushtia: {
+    divisionId: 3,
+    districtId: 25,
+    upazilaId: 196,
+    marketId: 65,
+  },
+
+  Satkhira: {
+    divisionId: 3,
+    districtId: 21,
+    upazilaId: 182,
+    marketId: 119,
+  },
+
+  // ==================== SYLHET DIVISION ====================
+
+  Sylhet: {
+    divisionId: 5,
+    districtId: 36,
+    upazilaId: 281,
+    marketId: 51,
+  },
+
+  Moulvibazar: {
+    divisionId: 5,
+    districtId: 37,
+    upazilaId: 288,
+    marketId: 24,
+  },
+
+  Habiganj: {
+    divisionId: 5,
+    districtId: 38,
+    upazilaId: 298,
+    marketId: 116,
+  },
+
+  Sunamganj: {
+    divisionId: 5,
+    districtId: 39,
+    upazilaId: 300,
+    marketId: 19,
+  },
+
+  // ==================== BARISHAL DIVISION ====================
+
+  Barishal: {
+    divisionId: 4,
+    districtId: 33,
+    upazilaId: 249,
+    marketId: 27,
+  },
+
+  Bhola: {
+    divisionId: 4,
+    districtId: 34,
+    upazilaId: 259,
+    marketId: 28,
+  },
+
+  Patuakhali: {
+    divisionId: 4,
+    districtId: 31,
+    upazilaId: 235,
+    marketId: 70,
+  },
+
+  // ==================== RANGPUR DIVISION ====================
+
+  Rangpur: {
+    divisionId: 7,
+    districtId: 59,
+    upazilaId: 502,
+    marketId: 5,
+  },
+
+  Dinajpur: {
+    divisionId: 7,
+    districtId: 54,
+    upazilaId: 412,
+    marketId: 220,
+  },
+
+  Kurigram: {
+    divisionId: 7,
+    districtId: 60,
+    upazilaId: 448,
+    marketId: 21,
+  },
+
+  // ==================== MYMENSINGH DIVISION ====================
+
+  Mymensingh: {
+    divisionId: 8,
+    districtId: 62,
+    upazilaId: 466,
+    marketId: 176,
+  },
+
+  Jamalpur: {
+    divisionId: 8,
+    districtId: 63,
+    upazilaId: 475,
+    marketId: 29,
+  },
+
+  Netrokona: {
+    divisionId: 8,
+    districtId: 64,
+    upazilaId: 491,
+    marketId: 81,
   },
 };
 
@@ -508,9 +761,7 @@ export default function Home() {
 
       /*
        * No official ID = no API request.
-       *
-       * This prevents fake/guessed IDs from being sent
-       * to the official DAM service.
+       * This prevents fake/guessed IDs.
        */
 
       if (
@@ -752,7 +1003,12 @@ export default function Home() {
                   spikeChange,
 
                 pctChange:
-                  spikeChange,
+                  Number(
+                    (
+                      topSpike as unknown as AnyObject
+                    ).priceChangePercent ||
+                    spikeChange
+                  ),
               }
             : null,
 
@@ -770,7 +1026,14 @@ export default function Home() {
                   dropChange,
 
                 pctChange:
-                  Math.abs(dropChange),
+                  Math.abs(
+                    Number(
+                      (
+                        topDrop as unknown as AnyObject
+                      ).priceChangePercent ||
+                      dropChange
+                    )
+                  ),
               }
             : null,
 
@@ -1378,6 +1641,7 @@ export default function Home() {
                 </span>
 
                 <ExternalLink className="w-3 h-3" />
+
               </a>
 
             </div>

@@ -1,0 +1,3532 @@
+﻿[
+    {
+        "value":  7,
+        "text":  "Abdullahpur Bazar",
+        "text_en":  "Abdullahpur Bazar",
+        "text_bn":  "আবদুল্লাহপুর বাজার",
+        "district_id":  47,
+        "upazila_id":  494,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  222,
+        "text":  "Ambari Bazar",
+        "text_en":  "Ambari Bazar",
+        "text_bn":  "আমবাড়ী বাজার",
+        "district_id":  54,
+        "upazila_id":  408,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  346,
+        "text":  "Amtali Bazar",
+        "text_en":  "Amtali Bazar",
+        "text_bn":  "আমতলী বাজার",
+        "district_id":  35,
+        "upazila_id":  266,
+        "division_id":  4,
+        "parent":  "district_id"
+    },
+    {
+        "value":  250,
+        "text":  "Amtoli Bazar",
+        "text_en":  "Amtoli Bazar",
+        "text_bn":  "আমতলী বাজার",
+        "district_id":  14,
+        "upazila_id":  123,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  292,
+        "text":  "Amtoli Bazar",
+        "text_en":  "Amtoli Bazar",
+        "text_bn":  "আমতলী বাজার",
+        "district_id":  35,
+        "upazila_id":  267,
+        "division_id":  4,
+        "parent":  "district_id"
+    },
+    {
+        "value":  371,
+        "text":  "Amtoli Bazar",
+        "text_en":  "Amtoli Bazar",
+        "text_bn":  "আমতলী বাজার",
+        "district_id":  3,
+        "upazila_id":  32,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  184,
+        "text":  "Ananda Bazar",
+        "text_en":  "Ananda Bazar",
+        "text_bn":  "আনন্দ বাজার ",
+        "district_id":  43,
+        "upazila_id":  332,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  190,
+        "text":  "Angaria Bazar",
+        "text_en":  "Angaria Bazar",
+        "text_bn":  "আঙ্গারিয়া বাজার ",
+        "district_id":  42,
+        "upazila_id":  322,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  183,
+        "text":  "Araihazar Bazar",
+        "text_en":  "Araihazar Bazar",
+        "text_bn":  "আড়াইহাজার বাজার ",
+        "district_id":  43,
+        "upazila_id":  328,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  95,
+        "text":  "Aramnagar Bazar",
+        "text_en":  "Aramnagar Bazar",
+        "text_bn":  "আরামনগর বাজার  ",
+        "district_id":  63,
+        "upazila_id":  479,
+        "division_id":  8,
+        "parent":  "district_id"
+    },
+    {
+        "value":  174,
+        "text":  "Arpara Bazar",
+        "text_en":  "Arpara Bazar",
+        "text_bn":  "আড়পাড়া বাজার",
+        "district_id":  26,
+        "upazila_id":  202,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  234,
+        "text":  "Ataikula Bazar",
+        "text_en":  "Ataikula Bazar",
+        "text_bn":  "আতাইকুলা বাজার",
+        "district_id":  13,
+        "upazila_id":  120,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  148,
+        "text":  "Atakpaliya Bazar",
+        "text_en":  "Atakpaliya Bazar",
+        "text_bn":  "আটকপালিয়া বাজার",
+        "district_id":  5,
+        "upazila_id":  47,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  160,
+        "text":  "Babu Bazar",
+        "text_en":  "Babu Bazar",
+        "text_bn":  "বাবুবাজার",
+        "district_id":  47,
+        "upazila_id":  493,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  163,
+        "text":  "Badamtali and Wiseghat Bazar",
+        "text_en":  "Badamtali and Wiseghat Bazar",
+        "text_bn":  "বাদামতলী এবং ওয়াসঘাট বাজার",
+        "district_id":  47,
+        "upazila_id":  493,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  261,
+        "text":  "Badshah Miar Bazar",
+        "text_en":  "Badshah Miar Bazar",
+        "text_bn":  "বাদশা মিয়ার বাজার",
+        "district_id":  1,
+        "upazila_id":  11,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  62,
+        "text":  "Bagerhat Sadar Bazar",
+        "text_en":  "Bagerhat Sadar Bazar",
+        "text_bn":  "বাগেরহাট সদর বাজার",
+        "district_id":  28,
+        "upazila_id":  216,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  134,
+        "text":  "Baghri Bazar",
+        "text_en":  "Baghri Bazar",
+        "text_bn":  "বাঘরী বাজার",
+        "district_id":  30,
+        "upazila_id":  233,
+        "division_id":  4,
+        "parent":  "district_id"
+    },
+    {
+        "value":  53,
+        "text":  "Bahadur Bazar, Dinajpur",
+        "text_en":  "Bahadur Bazar, Dinajpur",
+        "text_bn":  "বাহাদুর বাজার, দিনাজপুর",
+        "district_id":  54,
+        "upazila_id":  412,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  49,
+        "text":  "Baharpur Bazar ",
+        "text_en":  "Baharpur Bazar ",
+        "text_bn":  "বহরপুর বাজার",
+        "district_id":  49,
+        "upazila_id":  379,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  254,
+        "text":  "Baish Mouza Bazar",
+        "text_en":  "Baish Mouza Bazar",
+        "text_bn":  "বাইশ মৌজা বাজার",
+        "district_id":  3,
+        "upazila_id":  30,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  358,
+        "text":  "Bajitpur Bazar",
+        "text_en":  "Bajitpur Bazar",
+        "text_bn":  "বাজিতপুর বাজার",
+        "district_id":  45,
+        "upazila_id":  354,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  192,
+        "text":  "Baliyati Bazar",
+        "text_en":  "Baliyati Bazar",
+        "text_bn":  "বালিয়াটি বাজার",
+        "district_id":  46,
+        "upazila_id":  359,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  12,
+        "text":  "Banashri Bazar",
+        "text_en":  "Banashri Bazar",
+        "text_bn":  "বনশ্রী বাজার ",
+        "district_id":  47,
+        "upazila_id":  494,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  35,
+        "text":  "Bandarban Sadar Bazar",
+        "text_en":  "Bandarban Sadar Bazar",
+        "text_bn":  "বান্দরবান সদর বাজার ",
+        "district_id":  11,
+        "upazila_id":  97,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  241,
+        "text":  "Baneshor Bazar",
+        "text_en":  "Baneshor Bazar",
+        "text_bn":  "বানেশ্বর বাজার",
+        "district_id":  15,
+        "upazila_id":  138,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  383,
+        "text":  "Banyachong Market",
+        "text_en":  "Banyachong Market",
+        "text_bn":  "বানিয়াচং বাজার",
+        "district_id":  38,
+        "upazila_id":  295,
+        "division_id":  5,
+        "parent":  "district_id"
+    },
+    {
+        "value":  91,
+        "text":  "Baradi Bazar",
+        "text_en":  "Baradi Bazar",
+        "text_bn":  "বারাদি বাজার",
+        "district_id":  22,
+        "upazila_id":  187,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  291,
+        "text":  "Baradia Bazar",
+        "text_en":  "Baradia Bazar",
+        "text_bn":  "বড়দিয়া বাজার",
+        "district_id":  23,
+        "upazila_id":  189,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  34,
+        "text":  "Barguna Sadar Bazar",
+        "text_en":  "Barguna Sadar Bazar",
+        "text_bn":  "বরগুনা সদর বাজার",
+        "district_id":  35,
+        "upazila_id":  267,
+        "division_id":  4,
+        "parent":  "district_id"
+    },
+    {
+        "value":  204,
+        "text":  "Bari Nagar Bazar",
+        "text_en":  "Bari Nagar Bazar",
+        "text_bn":  "বারী নগর বাজার ",
+        "district_id":  20,
+        "upazila_id":  177,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  27,
+        "text":  "Barisal Sadar Bazar",
+        "text_en":  "Barisal Sadar Bazar",
+        "text_bn":  "বরিশাল সদর বাজার",
+        "district_id":  33,
+        "upazila_id":  249,
+        "division_id":  4,
+        "parent":  "district_id"
+    },
+    {
+        "value":  90,
+        "text":  "Baro Bazar",
+        "text_en":  "Baro Bazar",
+        "text_bn":  "বারো বাজার",
+        "district_id":  29,
+        "upazila_id":  227,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  262,
+        "text":  "Baro Darogar Hat Bazar ",
+        "text_en":  "Baro Darogar Hat Bazar ",
+        "text_bn":  "বড় দারোগার হাট বাজার",
+        "district_id":  8,
+        "upazila_id":  66,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  213,
+        "text":  "Basail Sadar Market",
+        "text_en":  "Basail Sadar Market",
+        "text_bn":  "বাসাইল সদর বাজার",
+        "district_id":  44,
+        "upazila_id":  333,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  60,
+        "text":  "Batka Bazaar",
+        "text_en":  "Batka Bazaar",
+        "text_bn":  "বেতকা বাজার",
+        "district_id":  48,
+        "upazila_id":  375,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  294,
+        "text":  "Baukathi Bazar",
+        "text_en":  "Baukathi Bazar",
+        "text_bn":  "বাউকাঠী বাজার",
+        "district_id":  30,
+        "upazila_id":  230,
+        "division_id":  4,
+        "parent":  "district_id"
+    },
+    {
+        "value":  355,
+        "text":  "Beanibazar Market",
+        "text_en":  "Beanibazar Market",
+        "text_bn":  "বিয়ানীবাজার বাজার",
+        "district_id":  36,
+        "upazila_id":  273,
+        "division_id":  5,
+        "parent":  "district_id"
+    },
+    {
+        "value":  369,
+        "text":  "Begumganj Bazar",
+        "text_en":  "Begumganj Bazar",
+        "text_bn":  "বেগমগঞ্জ বাজার",
+        "district_id":  5,
+        "upazila_id":  45,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  187,
+        "text":  "Belabo Bazar",
+        "text_en":  "Belabo Bazar",
+        "text_bn":  "বেলাবো বাজার",
+        "district_id":  40,
+        "upazila_id":  311,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  363,
+        "text":  "Belabo Bazar",
+        "text_en":  "Belabo Bazar",
+        "text_bn":  "বেলাবো বাজার",
+        "district_id":  40,
+        "upazila_id":  311,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  201,
+        "text":  "BhairabBazar",
+        "text_en":  "BhairabBazar",
+        "text_bn":  "ভৈরববাজার",
+        "district_id":  45,
+        "upazila_id":  347,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  89,
+        "text":  "Bhatai Bazar",
+        "text_en":  "Bhatai Bazar",
+        "text_bn":  "ভাটই বাজার",
+        "district_id":  29,
+        "upazila_id":  225,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  45,
+        "text":  "Bhavaniganj Bazar",
+        "text_en":  "Bhavaniganj Bazar",
+        "text_bn":  "ভবানীগঞ্জ বাজার",
+        "district_id":  56,
+        "upazila_id":  427,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  150,
+        "text":  "Bhojeshwar Bazar",
+        "text_en":  "Bhojeshwar Bazar",
+        "text_bn":  "ভোজেশ্বর বাজার",
+        "district_id":  42,
+        "upazila_id":  323,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  28,
+        "text":  "Bhola Sadar Bazar",
+        "text_en":  "Bhola Sadar Bazar",
+        "text_bn":  "ভোলা সদর বাজার",
+        "district_id":  34,
+        "upazila_id":  259,
+        "division_id":  4,
+        "parent":  "district_id"
+    },
+    {
+        "value":  205,
+        "text":  "Bhuyapur Sadar Bazar",
+        "text_en":  "Bhuyapur Sadar Bazar",
+        "text_bn":  "ভুয়াপুর সদর বাজার",
+        "district_id":  44,
+        "upazila_id":  334,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  221,
+        "text":  "Birgonj Bazar",
+        "text_en":  "Birgonj Bazar",
+        "text_bn":  "বীরগঞ্জ বাজার",
+        "district_id":  54,
+        "upazila_id":  405,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  271,
+        "text":  "Bishwanath Bazar",
+        "text_en":  "Bishwanath Bazar",
+        "text_bn":  "বিশ্বনাথ বাজার",
+        "district_id":  38,
+        "upazila_id":  298,
+        "division_id":  5,
+        "parent":  "district_id"
+    },
+    {
+        "value":  151,
+        "text":  "Boda Bazar",
+        "text_en":  "Boda Bazar",
+        "text_bn":  "বোদা বাজার",
+        "district_id":  53,
+        "upazila_id":  401,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  236,
+        "text":  "Boda Nagar Kumari Hat",
+        "text_en":  "Boda Nagar Kumari Hat",
+        "text_bn":  "বোদা নগর কুমারী হাট",
+        "district_id":  53,
+        "upazila_id":  399,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  67,
+        "text":  "Bogra Sadar Bazar",
+        "text_en":  "Bogra Sadar Bazar",
+        "text_bn":  "বগুড়া সদর বাজার",
+        "district_id":  14,
+        "upazila_id":  123,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  181,
+        "text":  "Bondar Sadar Bazar ",
+        "text_en":  "Bondar Sadar Bazar ",
+        "text_bn":  "বন্দর সদর বাজার ",
+        "district_id":  43,
+        "upazila_id":  329,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  23,
+        "text":  "Brahmanbaria Sadar Bazar",
+        "text_en":  "Brahmanbaria Sadar Bazar",
+        "text_bn":  "ব্রাহ্মণবাড়িয়া সদর বাজার",
+        "district_id":  3,
+        "upazila_id":  24,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  266,
+        "text":  "Burichang Bazar",
+        "text_en":  "Burichang Bazar",
+        "text_bn":  "বুড়িচং বাজার",
+        "district_id":  1,
+        "upazila_id":  11,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  370,
+        "text":  "Burichong Bazar",
+        "text_en":  "Burichong Bazar",
+        "text_bn":  "বুড়িচং বাজার",
+        "district_id":  1,
+        "upazila_id":  16,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  372,
+        "text":  "Chagalnaiya Bazar",
+        "text_en":  "Chagalnaiya Bazar",
+        "text_bn":  "ছাগলনাইয়া বাজার",
+        "district_id":  2,
+        "upazila_id":  18,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  280,
+        "text":  "Chagalniya Bazar",
+        "text_en":  "Chagalniya Bazar",
+        "text_bn":  "ছাগলনাইয়া বাজার",
+        "district_id":  2,
+        "upazila_id":  20,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  282,
+        "text":  "Chagolnaia Bazar",
+        "text_en":  "Chagolnaia Bazar",
+        "text_bn":  "ছাগলনাইয়া বাজার",
+        "district_id":  2,
+        "upazila_id":  18,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  364,
+        "text":  "Chakaria Bazar",
+        "text_en":  "Chakaria Bazar",
+        "text_bn":  "চকরিয়া বাজার",
+        "district_id":  9,
+        "upazila_id":  81,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  75,
+        "text":  "Chaktai-Khatunganj Bazar",
+        "text_en":  "Chaktai-Khatunganj Bazar",
+        "text_bn":  "চাক্তাই-খাতুনগঞ্জ বাজার",
+        "district_id":  8,
+        "upazila_id":  499,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  264,
+        "text":  "Chalk Bazar",
+        "text_en":  "Chalk Bazar",
+        "text_bn":  "চক বাজার",
+        "district_id":  8,
+        "upazila_id":  499,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  135,
+        "text":  "Chandaikona Bazar",
+        "text_en":  "Chandaikona Bazar",
+        "text_bn":  "চান্দাইকোনা বাজার",
+        "district_id":  12,
+        "upazila_id":  108,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  275,
+        "text":  "Chandina Bazar",
+        "text_en":  "Chandina Bazar",
+        "text_bn":  "চান্দিনা বাজার",
+        "district_id":  1,
+        "upazila_id":  4,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  373,
+        "text":  "Chandina Bazar",
+        "text_en":  "Chandina Bazar",
+        "text_bn":  "চান্দিনা বাজার",
+        "district_id":  1,
+        "upazila_id":  4,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  293,
+        "text":  "Chandkhali Bazar",
+        "text_en":  "Chandkhali Bazar",
+        "text_bn":  "চাঁদখালী বাজার",
+        "district_id":  35,
+        "upazila_id":  266,
+        "division_id":  4,
+        "parent":  "district_id"
+    },
+    {
+        "value":  102,
+        "text":  "Chandpur Sadaar",
+        "text_en":  "Chandpur Sadaar",
+        "text_bn":  "চাঁদপুর সদর",
+        "district_id":  6,
+        "upazila_id":  55,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  232,
+        "text":  "Chapainawabganj Sadar Bazar",
+        "text_en":  "Chapainawabganj Sadar Bazar",
+        "text_bn":  "চাঁপাইনবাবগঞ্জ সদর বাজার",
+        "district_id":  18,
+        "upazila_id":  155,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  226,
+        "text":  "Chapar Hat",
+        "text_en":  "Chapar Hat",
+        "text_bn":  "চাপার হাট",
+        "district_id":  55,
+        "upazila_id":  418,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  251,
+        "text":  "Charfashion Bazar",
+        "text_en":  "Charfashion Bazar",
+        "text_bn":  "চরফ্যাশন বাজার",
+        "district_id":  34,
+        "upazila_id":  261,
+        "division_id":  4,
+        "parent":  "district_id"
+    },
+    {
+        "value":  289,
+        "text":  "Chatarpaiea Bazar",
+        "text_en":  "Chatarpaiea Bazar",
+        "text_bn":  "ছাতারপাইয়া বাজার",
+        "district_id":  5,
+        "upazila_id":  49,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  198,
+        "text":  "Chirang Bazar",
+        "text_en":  "Chirang Bazar",
+        "text_bn":  "চিরাং বাজার",
+        "district_id":  64,
+        "upazila_id":  484,
+        "division_id":  8,
+        "parent":  "district_id"
+    },
+    {
+        "value":  79,
+        "text":  "Chittagong Sadar Bazar",
+        "text_en":  "Chittagong Sadar Bazar",
+        "text_bn":  "চট্টগ্রাম সদর বাজার",
+        "district_id":  8,
+        "upazila_id":  499,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  180,
+        "text":  "Chittalmari Bazar",
+        "text_en":  "Chittalmari Bazar",
+        "text_bn":  "চিতলমারী বাজার ",
+        "district_id":  28,
+        "upazila_id":  223,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  288,
+        "text":  "Chomohani Bazar ",
+        "text_en":  "Chomohani Bazar ",
+        "text_bn":  "চৌমুহনী বাজার",
+        "district_id":  5,
+        "upazila_id":  49,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  157,
+        "text":  "Chowmuhani Bazar",
+        "text_en":  "Chowmuhani Bazar",
+        "text_bn":  "চৌমুহনী বাজার",
+        "district_id":  39,
+        "upazila_id":  300,
+        "division_id":  5,
+        "parent":  "district_id"
+    },
+    {
+        "value":  50,
+        "text":  "Chuadanga Sadar Bazaar",
+        "text_en":  "Chuadanga Sadar Bazaar",
+        "text_bn":  "চুয়াডাঙ্গা সদর বাজার",
+        "district_id":  24,
+        "upazila_id":  192,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  193,
+        "text":  "Chuknagor Bazar ",
+        "text_en":  "Chuknagor Bazar ",
+        "text_bn":  "চুকনগর বাজার ",
+        "district_id":  27,
+        "upazila_id":  210,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  38,
+        "text":  "City Bazar, Rangpur",
+        "text_en":  "City Bazar, Rangpur",
+        "text_bn":  "সিটি বাজার, রংপুর",
+        "district_id":  59,
+        "upazila_id":  502,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  263,
+        "text":  "Comill Chalk Bazar",
+        "text_en":  "Comill Chalk Bazar",
+        "text_bn":  "কুমিল্লা চক বাজার",
+        "district_id":  1,
+        "upazila_id":  11,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  56,
+        "text":  "Comilla Sadar Bazar",
+        "text_en":  "Comilla Sadar Bazar",
+        "text_bn":  "কুমিল্লা সদর বাজার",
+        "district_id":  1,
+        "upazila_id":  11,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  103,
+        "text":  "Cox\u0027s Bazar Sadar",
+        "text_en":  "Cox\u0027s Bazar Sadar",
+        "text_bn":  "কক্সবাজার সদর ",
+        "district_id":  9,
+        "upazila_id":  80,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  197,
+        "text":  "Dakhin Bishiurah Bazar ",
+        "text_en":  "Dakhin Bishiurah Bazar ",
+        "text_bn":  "দক্ষিণ বিশিউরা",
+        "district_id":  64,
+        "upazila_id":  491,
+        "division_id":  8,
+        "parent":  "district_id"
+    },
+    {
+        "value":  186,
+        "text":  "Damudda Sadar Bazar ",
+        "text_en":  "Damudda Sadar Bazar ",
+        "text_bn":  "ডামুড্যা সদর বাজার ",
+        "district_id":  42,
+        "upazila_id":  327,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  338,
+        "text":  "Damurhuda Bazar",
+        "text_en":  "Damurhuda Bazar",
+        "text_bn":  "দামুড়হুদা বাজার",
+        "district_id":  24,
+        "upazila_id":  194,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  189,
+        "text":  "Daulatpur Bazar",
+        "text_en":  "Daulatpur Bazar",
+        "text_bn":  "দৌলতপুর বাজার",
+        "district_id":  46,
+        "upazila_id":  363,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  217,
+        "text":  "Delduar Sadar Market",
+        "text_en":  "Delduar Sadar Market",
+        "text_bn":  "দেলদুয়ার সদর বাজার",
+        "district_id":  44,
+        "upazila_id":  335,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  99,
+        "text":  "Delua Bari Bazaar",
+        "text_en":  "Delua Bari Bazaar",
+        "text_bn":  "দেলুয়া বাড়ি বাজার",
+        "district_id":  19,
+        "upazila_id":  165,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  167,
+        "text":  "Dhaka Mohanogor Bazar",
+        "text_en":  "Dhaka Mohanogor Bazar",
+        "text_bn":  "ঢাকা মহানগর বাজার",
+        "district_id":  47,
+        "upazila_id":  493,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  162,
+        "text":  "Dhaka Sadar Bazar",
+        "text_en":  "Dhaka Sadar Bazar",
+        "text_bn":  "ঢাকা সদর বাজার",
+        "district_id":  47,
+        "upazila_id":  493,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  331,
+        "text":  "Dhanbari Bazar",
+        "text_en":  "Dhanbari Bazar",
+        "text_bn":  "ধনবাড়ী বাজার",
+        "district_id":  44,
+        "upazila_id":  344,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  382,
+        "text":  "Dhanbari Bazar",
+        "text_en":  "Dhanbari Bazar",
+        "text_bn":  "ধনবাড়ি বাজার",
+        "district_id":  44,
+        "upazila_id":  344,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  87,
+        "text":  "Dhaper Haat Bazar",
+        "text_en":  "Dhaper Haat Bazar",
+        "text_bn":  "ধাপেরহাট বাজার ",
+        "district_id":  14,
+        "upazila_id":  126,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  137,
+        "text":  "Dhaperhat Bazar",
+        "text_en":  "Dhaperhat Bazar",
+        "text_bn":  "ধাপের হাট বাজার",
+        "district_id":  57,
+        "upazila_id":  428,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  235,
+        "text":  "Dhasuria Bazar",
+        "text_en":  "Dhasuria Bazar",
+        "text_bn":  "ধাসুরিয়া বাজার",
+        "district_id":  13,
+        "upazila_id":  114,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  283,
+        "text":  "Dhighinala Bazar",
+        "text_en":  "Dhighinala Bazar",
+        "text_bn":  "দীঘিনালা বাজার",
+        "district_id":  10,
+        "upazila_id":  89,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  220,
+        "text":  "Dinajpur Sadar Bazar",
+        "text_en":  "Dinajpur Sadar Bazar",
+        "text_bn":  "দিনাজপুর সদর বাজার",
+        "district_id":  54,
+        "upazila_id":  412,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  1,
+        "text":  "Dohar Boro Market",
+        "text_en":  "Dohar Boro Market",
+        "text_bn":  "দোহার বড় বাজার ",
+        "district_id":  47,
+        "upazila_id":  369,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  351,
+        "text":  "Domar Bazar",
+        "text_en":  "Domar Bazar",
+        "text_bn":  "ডোমার বাজার",
+        "district_id":  56,
+        "upazila_id":  423,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  82,
+        "text":  "Dorbosto Bazar",
+        "text_en":  "Dorbosto Bazar",
+        "text_bn":  "দরবস্ত বাজার",
+        "district_id":  36,
+        "upazila_id":  279,
+        "division_id":  5,
+        "parent":  "district_id"
+    },
+    {
+        "value":  335,
+        "text":  "Dumuria Bazar",
+        "text_en":  "Dumuria Bazar",
+        "text_bn":  "ডুমুরিয়া বাজার",
+        "district_id":  27,
+        "upazila_id":  211,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  237,
+        "text":  "Fakirganj Hat",
+        "text_en":  "Fakirganj Hat",
+        "text_bn":  "ফকিরগঞ্জ হাট",
+        "district_id":  53,
+        "upazila_id":  399,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  52,
+        "text":  "Faridpur Sadar Bazar",
+        "text_en":  "Faridpur Sadar Bazar",
+        "text_bn":  "ফরিদপুর সদর বাজার",
+        "district_id":  52,
+        "upazila_id":  390,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  104,
+        "text":  "Feni Sadar",
+        "text_en":  "Feni Sadar",
+        "text_bn":  "ফেনী সদর",
+        "district_id":  2,
+        "upazila_id":  19,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  152,
+        "text":  "Fokirgonj Bazar",
+        "text_en":  "Fokirgonj Bazar",
+        "text_bn":  "ফকিরগঞ্জ বাজার",
+        "district_id":  53,
+        "upazila_id":  402,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  130,
+        "text":  "Fulbari Bazar",
+        "text_en":  "Fulbari Bazar",
+        "text_bn":  " ফুলবাড়ি বাজার",
+        "district_id":  54,
+        "upazila_id":  411,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  330,
+        "text":  "Fulbari Market",
+        "text_en":  "Fulbari Market",
+        "text_bn":  "ফুলবাড়ি বাজার",
+        "district_id":  14,
+        "upazila_id":  132,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  340,
+        "text":  "Fulbaria Bazar",
+        "text_en":  "Fulbaria Bazar",
+        "text_bn":  "ফুলবাড়ীয়া বাজার",
+        "district_id":  62,
+        "upazila_id":  462,
+        "division_id":  8,
+        "parent":  "district_id"
+    },
+    {
+        "value":  36,
+        "text":  "Gaibandha Sadar Bazar",
+        "text_en":  "Gaibandha Sadar Bazar",
+        "text_bn":  "গাইবান্ধা  সদর বাজার",
+        "district_id":  57,
+        "upazila_id":  429,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  153,
+        "text":  "Galachipa Bazar",
+        "text_en":  "Galachipa Bazar",
+        "text_bn":  "গলাচিপা বাজার",
+        "district_id":  31,
+        "upazila_id":  240,
+        "division_id":  4,
+        "parent":  "district_id"
+    },
+    {
+        "value":  337,
+        "text":  "Gangni Bazar",
+        "text_en":  "Gangni Bazar",
+        "text_bn":  "গাংনী বাজার",
+        "district_id":  22,
+        "upazila_id":  188,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  296,
+        "text":  "Garia Bazar, Thakurgaon",
+        "text_en":  "Garia Bazar, Thakurgaon",
+        "text_bn":  "গড়েয়া বাজার, ঠাকুরগাঁও",
+        "district_id":  58,
+        "upazila_id":  435,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  211,
+        "text":  "Ghatail Sadar Market",
+        "text_en":  "Ghatail Sadar Market",
+        "text_bn":  "ঘাটাইল সদর বাজার",
+        "district_id":  44,
+        "upazila_id":  336,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  191,
+        "text":  "Gheor Bazar",
+        "text_en":  "Gheor Bazar",
+        "text_bn":  "ঘিওর বাজার",
+        "district_id":  46,
+        "upazila_id":  361,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  128,
+        "text":  "Ghutia Bazar ",
+        "text_en":  "Ghutia Bazar ",
+        "text_bn":  "গুটিয়া বাজার",
+        "district_id":  33,
+        "upazila_id":  252,
+        "division_id":  4,
+        "parent":  "district_id"
+    },
+    {
+        "value":  375,
+        "text":  "Gobindaganj Bazar",
+        "text_en":  "Gobindaganj Bazar",
+        "text_bn":  "গোবিন্দগঞ্জ বাজার",
+        "district_id":  57,
+        "upazila_id":  432,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  156,
+        "text":  "Gobindoganj Bazar",
+        "text_en":  "Gobindoganj Bazar",
+        "text_bn":  "গোবিন্দগঞ্জ বাজার",
+        "district_id":  39,
+        "upazila_id":  303,
+        "division_id":  5,
+        "parent":  "district_id"
+    },
+    {
+        "value":  344,
+        "text":  "Godagari Bazar",
+        "text_en":  "Godagari Bazar",
+        "text_bn":  "গোদাগাড়ী বাজার",
+        "district_id":  15,
+        "upazila_id":  140,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  327,
+        "text":  "Godagari Sadar Bazar",
+        "text_en":  "Godagari Sadar Bazar",
+        "text_bn":  "গোদাগাড়ী সদর বাজার",
+        "district_id":  15,
+        "upazila_id":  140,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  182,
+        "text":  "Golakanda Bazar",
+        "text_en":  "Golakanda Bazar",
+        "text_bn":  "গলাকান্দা বাজার ",
+        "district_id":  43,
+        "upazila_id":  331,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  138,
+        "text":  "Golapbag Bazar",
+        "text_en":  "Golapbag Bazar",
+        "text_bn":  "গোলাপবাগ বাজার",
+        "district_id":  57,
+        "upazila_id":  432,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  356,
+        "text":  "Golapganj Bazar",
+        "text_en":  "Golapganj Bazar",
+        "text_bn":  "গোলাপগঞ্জ বাজার",
+        "district_id":  36,
+        "upazila_id":  277,
+        "division_id":  5,
+        "parent":  "district_id"
+    },
+    {
+        "value":  208,
+        "text":  "Gop Market Bazar ",
+        "text_en":  "Gop Market Bazar ",
+        "text_bn":  "গোপ মার্কেট বাজার",
+        "district_id":  20,
+        "upazila_id":  177,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  54,
+        "text":  "Gopaldanj Sadar Boro Bazar",
+        "text_en":  "Gopaldanj Sadar Boro Bazar",
+        "text_bn":  "গোপালদঞ্জ সদর বড় বাজার",
+        "district_id":  51,
+        "upazila_id":  385,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  218,
+        "text":  "Gopalpur Sadar Market",
+        "text_en":  "Gopalpur Sadar Market",
+        "text_bn":  "গোপালপুর সদর বাজার",
+        "district_id":  44,
+        "upazila_id":  337,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  260,
+        "text":  "Gora Bazar",
+        "text_en":  "Gora Bazar",
+        "text_bn":  "গোরা বাজার ",
+        "district_id":  8,
+        "upazila_id":  67,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  6,
+        "text":  "Goran Kacha Bazar",
+        "text_en":  "Goran Kacha Bazar",
+        "text_bn":  "গোড়ান কাঁচাবাজার",
+        "district_id":  47,
+        "upazila_id":  493,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  155,
+        "text":  "Goshair Hat Bazar",
+        "text_en":  "Goshair Hat Bazar",
+        "text_bn":  "গোসাইর হাট বাজার ",
+        "district_id":  42,
+        "upazila_id":  325,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  42,
+        "text":  "Goshala Bazar, Lalmonirhat",
+        "text_en":  "Goshala Bazar, Lalmonirhat",
+        "text_bn":  "গোশালা বাজার, লালমনিরহাট",
+        "district_id":  55,
+        "upazila_id":  417,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  116,
+        "text":  "Habiganj Sadar Bazar",
+        "text_en":  "Habiganj Sadar Bazar",
+        "text_bn":  "হবিগঞ্জ সদর বাজার",
+        "district_id":  38,
+        "upazila_id":  298,
+        "division_id":  5,
+        "parent":  "district_id"
+    },
+    {
+        "value":  365,
+        "text":  "Hajiganj Bazar",
+        "text_en":  "Hajiganj Bazar",
+        "text_bn":  "হাজীগঞ্জ বাজার",
+        "district_id":  6,
+        "upazila_id":  57,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  9,
+        "text":  "Hatirpul Bazar",
+        "text_en":  "Hatirpul Bazar",
+        "text_bn":  "হাতিরপুল বাজার ",
+        "district_id":  47,
+        "upazila_id":  494,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  203,
+        "text":  "Hossainpur Bazar",
+        "text_en":  "Hossainpur Bazar",
+        "text_bn":  "হোসেনপুর বাজার",
+        "district_id":  45,
+        "upazila_id":  349,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  269,
+        "text":  "Islamia Bazar",
+        "text_en":  "Islamia Bazar",
+        "text_bn":  "ইসলামিয়া বাজার",
+        "district_id":  38,
+        "upazila_id":  298,
+        "division_id":  5,
+        "parent":  "district_id"
+    },
+    {
+        "value":  46,
+        "text":  "Jaldhaka Bazar",
+        "text_en":  "Jaldhaka Bazar",
+        "text_bn":  "জলঢাকা বাজার",
+        "district_id":  56,
+        "upazila_id":  425,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  29,
+        "text":  "Jamalpur Sadar Bazar",
+        "text_en":  "Jamalpur Sadar Bazar",
+        "text_bn":  "জামালপুর সদর বাজার",
+        "district_id":  63,
+        "upazila_id":  475,
+        "division_id":  8,
+        "parent":  "district_id"
+    },
+    {
+        "value":  120,
+        "text":  "Jatpur Bazar",
+        "text_en":  "Jatpur Bazar",
+        "text_bn":  "যাতপুর বাজার",
+        "district_id":  21,
+        "upazila_id":  184,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  64,
+        "text":  "Jatrapur Bazar",
+        "text_en":  "Jatrapur Bazar",
+        "text_bn":  "যাত্রাপুর বাজার",
+        "district_id":  28,
+        "upazila_id":  216,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  10,
+        "text":  "Jattra Bari Market",
+        "text_en":  "Jattra Bari Market",
+        "text_bn":  "যাত্রাবাড়ি বাজার ",
+        "district_id":  47,
+        "upazila_id":  493,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  112,
+        "text":  "Jessore Sadar Bazar",
+        "text_en":  "Jessore Sadar Bazar",
+        "text_bn":  "যশোর সদর বাজার",
+        "district_id":  20,
+        "upazila_id":  177,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  185,
+        "text":  "Jhajira Sadar Bazar",
+        "text_en":  "Jhajira Sadar Bazar",
+        "text_bn":  "জাজিরা সদর বাজার ",
+        "district_id":  42,
+        "upazila_id":  324,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  101,
+        "text":  "Jhalakathi Sadar Bazar",
+        "text_en":  "Jhalakathi Sadar Bazar",
+        "text_bn":  "ঝালকাঠী সদর বাজার",
+        "district_id":  30,
+        "upazila_id":  230,
+        "division_id":  4,
+        "parent":  "district_id"
+    },
+    {
+        "value":  57,
+        "text":  "Jhenaidah Sadar Paura Boro Bazar",
+        "text_en":  "Jhenaidah Sadar Paura Boro Bazar",
+        "text_bn":  "ঝিনাইদহ সদর পৌর বড় বাজার",
+        "district_id":  29,
+        "upazila_id":  224,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  178,
+        "text":  "Jhikargacha Bazar",
+        "text_en":  "Jhikargacha Bazar",
+        "text_bn":  "ঝিকরগাছা বাজার ",
+        "district_id":  20,
+        "upazila_id":  175,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  80,
+        "text":  "Jibonnagor Bazar",
+        "text_en":  "Jibonnagor Bazar",
+        "text_bn":  "জীবননগর বাজার",
+        "district_id":  24,
+        "upazila_id":  195,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  127,
+        "text":  "Joydevpur market",
+        "text_en":  "Joydevpur market",
+        "text_bn":  "জয়দেবপুর বাজার",
+        "district_id":  41,
+        "upazila_id":  320,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  66,
+        "text":  "Joypurhat Sadar Bazar",
+        "text_en":  "Joypurhat Sadar Bazar",
+        "text_bn":  "জয়পুরহাট সদর বাজার",
+        "district_id":  17,
+        "upazila_id":  154,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  256,
+        "text":  "Kachua Bazar",
+        "text_en":  "Kachua Bazar",
+        "text_bn":  "কচুয়া বাজার",
+        "district_id":  6,
+        "upazila_id":  53,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  98,
+        "text":  "Kaderdi Bazar",
+        "text_en":  "Kaderdi Bazar",
+        "text_bn":  "কাদেরদি বাজার",
+        "district_id":  52,
+        "upazila_id":  392,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  247,
+        "text":  "Kaderganj Bazar",
+        "text_en":  "Kaderganj Bazar",
+        "text_bn":  "কাদেরগঞ্জ বাজার",
+        "district_id":  15,
+        "upazila_id":  496,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  212,
+        "text":  "Kaikertake Bazar",
+        "text_en":  "Kaikertake Bazar",
+        "text_bn":  "কাইকারটেক বাজার ",
+        "district_id":  43,
+        "upazila_id":  332,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  154,
+        "text":  "Kalaiya Bazar",
+        "text_en":  "Kalaiya Bazar",
+        "text_bn":  "কালাইয়া বাজার",
+        "district_id":  31,
+        "upazila_id":  234,
+        "division_id":  4,
+        "parent":  "district_id"
+    },
+    {
+        "value":  170,
+        "text":  "Kalampur Bazar",
+        "text_en":  "Kalampur Bazar",
+        "text_bn":  "কালামপুর বাজার",
+        "district_id":  47,
+        "upazila_id":  365,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  334,
+        "text":  "Kalaroa Bazar",
+        "text_en":  "Kalaroa Bazar",
+        "text_bn":  "কলারোয়া বাজার",
+        "district_id":  21,
+        "upazila_id":  181,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  173,
+        "text":  "Kaliakoyr Bazar",
+        "text_en":  "Kaliakoyr Bazar",
+        "text_bn":  "কালিয়াকৈর বাজার",
+        "district_id":  41,
+        "upazila_id":  318,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  349,
+        "text":  "Kaliganj Bazar",
+        "text_en":  "Kaliganj Bazar",
+        "text_bn":  "কালীগঞ্জ বাজার",
+        "district_id":  55,
+        "upazila_id":  418,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  377,
+        "text":  "Kaliganj Bazar,",
+        "text_en":  "Kaliganj Bazar,",
+        "text_bn":  "কালীগঞ্জ বাজার",
+        "district_id":  29,
+        "upazila_id":  227,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  268,
+        "text":  "Kalighat Bazar",
+        "text_en":  "Kalighat Bazar",
+        "text_bn":  "কালীঘাট বাজার",
+        "district_id":  38,
+        "upazila_id":  298,
+        "division_id":  5,
+        "parent":  "district_id"
+    },
+    {
+        "value":  215,
+        "text":  "Kalihati Sadar Market",
+        "text_en":  "Kalihati Sadar Market",
+        "text_bn":  "কালিহাটি সদর বাজার",
+        "district_id":  44,
+        "upazila_id":  343,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  353,
+        "text":  "Kamalganj Bazar",
+        "text_en":  "Kamalganj Bazar",
+        "text_bn":  "কমলগঞ্জ বাজার",
+        "district_id":  37,
+        "upazila_id":  286,
+        "division_id":  5,
+        "parent":  "district_id"
+    },
+    {
+        "value":  123,
+        "text":  "Kanaipur Bazar",
+        "text_en":  "Kanaipur Bazar",
+        "text_bn":  "কানাইপুর বাজার",
+        "district_id":  52,
+        "upazila_id":  390,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  74,
+        "text":  "Kangshanagar Bazar",
+        "text_en":  "Kangshanagar Bazar",
+        "text_bn":  "কংশনগর বাজার",
+        "district_id":  1,
+        "upazila_id":  16,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  385,
+        "text":  "Kapasia Market",
+        "text_en":  "Kapasia Market",
+        "text_bn":  "কাপাসিয়া বাজার",
+        "district_id":  41,
+        "upazila_id":  319,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  290,
+        "text":  "Kaptai Bazar",
+        "text_en":  "Kaptai Bazar",
+        "text_bn":  "কাপ্তাই বাজার",
+        "district_id":  4,
+        "upazila_id":  35,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  379,
+        "text":  "Kaptai Bazar",
+        "text_en":  "Kaptai Bazar",
+        "text_bn":  "কাপ্তাই বাজার",
+        "district_id":  4,
+        "upazila_id":  34,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  202,
+        "text":  "Karimgonj Bazar",
+        "text_en":  "Karimgonj Bazar",
+        "text_bn":  "করিমগঞ্জ বাজার",
+        "district_id":  45,
+        "upazila_id":  353,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  374,
+        "text":  "Kaukhali Bazar",
+        "text_en":  "Kaukhali Bazar",
+        "text_bn":  "কাউখালী বাজার",
+        "district_id":  4,
+        "upazila_id":  35,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  8,
+        "text":  "kawran Bazar",
+        "text_en":  "kawran Bazar",
+        "text_bn":  "কাওরান বাজার ",
+        "district_id":  47,
+        "upazila_id":  494,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  194,
+        "text":  "KCC Paikari Kacha Bazar",
+        "text_en":  "KCC Paikari Kacha Bazar",
+        "text_bn":  "কেসিসি পাইকারি কাঁচা বাজার",
+        "district_id":  27,
+        "upazila_id":  495,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  92,
+        "text":  "Kedargonj Bazar",
+        "text_en":  "Kedargonj Bazar",
+        "text_bn":  "কেদারগঞ্জ বাজার ",
+        "district_id":  22,
+        "upazila_id":  186,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  238,
+        "text":  "Keshorhat Bazar",
+        "text_en":  "Keshorhat Bazar",
+        "text_bn":  "কিশোরহাট বাজার",
+        "district_id":  15,
+        "upazila_id":  136,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  105,
+        "text":  "Khagrachari Sadar Pouro Bazar",
+        "text_en":  "Khagrachari Sadar Pouro Bazar",
+        "text_bn":  "খাগড়াছড়ি সদর পৌর বাজার",
+        "district_id":  10,
+        "upazila_id":  88,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  48,
+        "text":  "Khankhanapur Bazar",
+        "text_en":  "Khankhanapur Bazar",
+        "text_bn":  "খানখানাপুর বাজার",
+        "district_id":  49,
+        "upazila_id":  376,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  347,
+        "text":  "khepupara Bazar,",
+        "text_en":  "khepupara Bazar,",
+        "text_bn":  "খেপুপাড়া বাজার",
+        "district_id":  31,
+        "upazila_id":  238,
+        "division_id":  4,
+        "parent":  "district_id"
+    },
+    {
+        "value":  37,
+        "text":  "Khulna Sadar Bazar",
+        "text_en":  "Khulna Sadar Bazar",
+        "text_bn":  "খুলনা সদর বাজার",
+        "district_id":  27,
+        "upazila_id":  495,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  41,
+        "text":  "Khwajpur Bazar",
+        "text_en":  "Khwajpur Bazar",
+        "text_bn":  "খোয়াজপুর বাজার",
+        "district_id":  50,
+        "upazila_id":  381,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  100,
+        "text":  "Kirtipur Market",
+        "text_en":  "Kirtipur Market",
+        "text_bn":  "কীর্তিপুর বাজার",
+        "district_id":  19,
+        "upazila_id":  168,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  108,
+        "text":  "Kishoreganj Bazar",
+        "text_en":  "Kishoreganj Bazar",
+        "text_bn":  "কিশোরগঞ্জ বাজার",
+        "district_id":  45,
+        "upazila_id":  352,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  229,
+        "text":  "Kola Bazar",
+        "text_en":  "Kola Bazar",
+        "text_bn":  "কলা বাজার",
+        "district_id":  19,
+        "upazila_id":  161,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  274,
+        "text":  "Kompanigonj Bazar",
+        "text_en":  "Kompanigonj Bazar",
+        "text_bn":  "কোম্পানীগঞ্জ বাজার",
+        "district_id":  1,
+        "upazila_id":  9,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  97,
+        "text":  "Konabari Bazar",
+        "text_en":  "Konabari Bazar",
+        "text_bn":  "কোনাবাড়ি বাজার",
+        "district_id":  41,
+        "upazila_id":  497,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  200,
+        "text":  "Kopilmuni Bazar",
+        "text_en":  "Kopilmuni Bazar",
+        "text_bn":  "কপিলমুনি বাজার ",
+        "district_id":  27,
+        "upazila_id":  206,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  65,
+        "text":  "Kushtia Sadar Bazar",
+        "text_en":  "Kushtia Sadar Bazar",
+        "text_bn":  "কুষ্টিয়া সদর বাজার",
+        "district_id":  25,
+        "upazila_id":  196,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  366,
+        "text":  "Lalmai Bazar",
+        "text_en":  "Lalmai Bazar",
+        "text_bn":  "লালমাই বাজার",
+        "district_id":  1,
+        "upazila_id":  17,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  252,
+        "text":  "Lalmohan Bazar",
+        "text_en":  "Lalmohan Bazar",
+        "text_bn":  "লালমোহন বাজার",
+        "district_id":  34,
+        "upazila_id":  265,
+        "division_id":  4,
+        "parent":  "district_id"
+    },
+    {
+        "value":  43,
+        "text":  "Lalmonirhat Sadar Bazar",
+        "text_en":  "Lalmonirhat Sadar Bazar",
+        "text_bn":  "লালমনিরহাট সদর বাজার",
+        "district_id":  55,
+        "upazila_id":  417,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  253,
+        "text":  "Lama Bazar",
+        "text_en":  "Lama Bazar",
+        "text_bn":  "লামা বাজার",
+        "district_id":  11,
+        "upazila_id":  100,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  380,
+        "text":  "Lama Bazar",
+        "text_en":  "Lama Bazar",
+        "text_bn":  "লামা বাজার",
+        "district_id":  11,
+        "upazila_id":  101,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  175,
+        "text":  "Langalbadh Bazar",
+        "text_en":  "Langalbadh Bazar",
+        "text_bn":  "লাঙ্গলবাধ বাজার",
+        "district_id":  26,
+        "upazila_id":  203,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  124,
+        "text":  "Lohagora Bazar",
+        "text_en":  "Lohagora Bazar",
+        "text_bn":  "লোহাগড়া বাজার",
+        "district_id":  23,
+        "upazila_id":  190,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  285,
+        "text":  "Madari Bazar",
+        "text_en":  "Madari Bazar",
+        "text_bn":  "মাদারী বাজার",
+        "district_id":  7,
+        "upazila_id":  60,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  14,
+        "text":  "Madartek Bazar",
+        "text_en":  "Madartek Bazar",
+        "text_bn":  "মাদারটেক বাজার",
+        "district_id":  47,
+        "upazila_id":  493,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  272,
+        "text":  "Madhabpur Bazar",
+        "text_en":  "Madhabpur Bazar",
+        "text_bn":  "মাধবপুর বাজার",
+        "district_id":  38,
+        "upazila_id":  299,
+        "division_id":  5,
+        "parent":  "district_id"
+    },
+    {
+        "value":  207,
+        "text":  "Madhupur Bazar",
+        "text_en":  "Madhupur Bazar",
+        "text_bn":  "মধুপুর বাজার",
+        "district_id":  44,
+        "upazila_id":  338,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  228,
+        "text":  "Maduil Bazar",
+        "text_en":  "Maduil Bazar",
+        "text_bn":  "মাদুইল বাজার",
+        "district_id":  19,
+        "upazila_id":  162,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  18,
+        "text":  "Magura Sadar Bazar",
+        "text_en":  "Magura Sadar Bazar",
+        "text_bn":  "মাগুরা সদর বাজার",
+        "district_id":  26,
+        "upazila_id":  204,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  88,
+        "text":  "Mahasthangarh Bazar",
+        "text_en":  "Mahasthangarh Bazar",
+        "text_bn":  "মহাস্থানগড় বাজার",
+        "district_id":  14,
+        "upazila_id":  133,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  239,
+        "text":  "Mahiganj bazar",
+        "text_en":  "Mahiganj bazar",
+        "text_bn":  "মাহিগঞ্জ বাজার",
+        "district_id":  59,
+        "upazila_id":  440,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  265,
+        "text":  "Majhir Ghat Bazar",
+        "text_en":  "Majhir Ghat Bazar",
+        "text_bn":  "মাঝির ঘাট বাজার",
+        "district_id":  8,
+        "upazila_id":  499,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  233,
+        "text":  "Mallikpur Bazar",
+        "text_en":  "Mallikpur Bazar",
+        "text_bn":  "মল্লিকপুর বাজার",
+        "district_id":  18,
+        "upazila_id":  157,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  227,
+        "text":  "Manda Bazar",
+        "text_en":  "Manda Bazar",
+        "text_bn":  "মান্দা বাজার",
+        "district_id":  19,
+        "upazila_id":  168,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  109,
+        "text":  "Manikganj Bazar",
+        "text_en":  "Manikganj Bazar",
+        "text_bn":  "মানিকগঞ্জ বাজার",
+        "district_id":  46,
+        "upazila_id":  360,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  336,
+        "text":  "Manirampur Bazar, Jessore",
+        "text_en":  "Manirampur Bazar, Jessore",
+        "text_bn":  "মণিরামপুর বাজার, যশোর",
+        "district_id":  20,
+        "upazila_id":  171,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  258,
+        "text":  "Matalab Bazar",
+        "text_en":  "Matalab Bazar",
+        "text_bn":  "মতলব বাজার",
+        "district_id":  6,
+        "upazila_id":  58,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  368,
+        "text":  "Matiranga Bazar",
+        "text_en":  "Matiranga Bazar",
+        "text_bn":  "মাটিরাঙ্গা বাজার",
+        "district_id":  10,
+        "upazila_id":  95,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  96,
+        "text":  "Mawna Chowrasta Bazar",
+        "text_en":  "Mawna Chowrasta Bazar",
+        "text_bn":  "মাওনা চৌরাস্তা বাজার",
+        "district_id":  41,
+        "upazila_id":  321,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  44,
+        "text":  "Mechua Bazar, Mymensingh",
+        "text_en":  "Mechua Bazar, Mymensingh",
+        "text_bn":  "মেছুয়া বাজার, ময়মনসিংহ",
+        "district_id":  62,
+        "upazila_id":  466,
+        "division_id":  8,
+        "parent":  "district_id"
+    },
+    {
+        "value":  58,
+        "text":  "Meherpur Sadar Bazar",
+        "text_en":  "Meherpur Sadar Bazar",
+        "text_bn":  "মেহেরপুর সদর বাজার",
+        "district_id":  22,
+        "upazila_id":  187,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  195,
+        "text":  "Mirkadim Bazar",
+        "text_en":  "Mirkadim Bazar",
+        "text_bn":  "মিরকাদিম বাজার",
+        "district_id":  48,
+        "upazila_id":  370,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  11,
+        "text":  "Mirpur 1 no. Bazar",
+        "text_en":  "Mirpur 1 no. Bazar",
+        "text_bn":  "মিরপুর ১ নং বাজার ",
+        "district_id":  47,
+        "upazila_id":  494,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  72,
+        "text":  "Mirpur Bazar",
+        "text_en":  "Mirpur Bazar",
+        "text_bn":  "মিরপুর বাজার ",
+        "district_id":  25,
+        "upazila_id":  199,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  273,
+        "text":  "Mirpur Bazar",
+        "text_en":  "Mirpur Bazar",
+        "text_bn":  "মিরপুর বাজার",
+        "district_id":  38,
+        "upazila_id":  293,
+        "division_id":  5,
+        "parent":  "district_id"
+    },
+    {
+        "value":  214,
+        "text":  "Mirzapur Sadar Market",
+        "text_en":  "Mirzapur Sadar Market",
+        "text_bn":  "মির্জাপুর সদর বাজার",
+        "district_id":  44,
+        "upazila_id":  339,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  267,
+        "text":  "Mithachari Bazar",
+        "text_en":  "Mithachari Bazar",
+        "text_bn":  "মিঠাছড়ি বাজার",
+        "district_id":  8,
+        "upazila_id":  499,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  352,
+        "text":  "Mithapukur Bazar",
+        "text_en":  "Mithapukur Bazar",
+        "text_bn":  "মিঠাপুকুর বাজার",
+        "district_id":  59,
+        "upazila_id":  444,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  4,
+        "text":  "Mohammadpur Krishi Market",
+        "text_en":  "Mohammadpur Krishi Market",
+        "text_bn":  "মোহাম্মদপুর কৃষি মার্কেট",
+        "district_id":  47,
+        "upazila_id":  494,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  129,
+        "text":  "Mohanganj Bazar",
+        "text_en":  "Mohanganj Bazar",
+        "text_bn":  "মোহনগঞ্জ বাজার",
+        "district_id":  33,
+        "upazila_id":  251,
+        "division_id":  4,
+        "parent":  "district_id"
+    },
+    {
+        "value":  341,
+        "text":  "Mohanganj Bazar",
+        "text_en":  "Mohanganj Bazar",
+        "text_bn":  "মোহনগঞ্জ বাজার",
+        "district_id":  64,
+        "upazila_id":  489,
+        "division_id":  8,
+        "parent":  "district_id"
+    },
+    {
+        "value":  328,
+        "text":  "Mohisalbari Bazar",
+        "text_en":  "Mohisalbari Bazar",
+        "text_bn":  "মহিষালবাড়ি বাজার",
+        "district_id":  15,
+        "upazila_id":  140,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  209,
+        "text":  "Monihar Bus Stand Bazar",
+        "text_en":  "Monihar Bus Stand Bazar",
+        "text_bn":  "মনিহার বাসস্ট্যান্ড বাজার",
+        "district_id":  20,
+        "upazila_id":  177,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  159,
+        "text":  "Moulavi Bazar",
+        "text_en":  "Moulavi Bazar",
+        "text_bn":  "মৌলভীবাজার",
+        "district_id":  47,
+        "upazila_id":  493,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  24,
+        "text":  "Moulvibazar Sadar Bazar",
+        "text_en":  "Moulvibazar Sadar Bazar",
+        "text_bn":  "মৌলভীবাজার সদর বাজার",
+        "district_id":  37,
+        "upazila_id":  288,
+        "division_id":  5,
+        "parent":  "district_id"
+    },
+    {
+        "value":  59,
+        "text":  "Munshiganj Sadar Bazar",
+        "text_en":  "Munshiganj Sadar Bazar",
+        "text_bn":  "মুন্সিগঞ্জ সদর বাজার",
+        "district_id":  48,
+        "upazila_id":  370,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  61,
+        "text":  "Munshir Hat Bazar",
+        "text_en":  "Munshir Hat Bazar",
+        "text_bn":  "মুন্সীরহাট বাজার",
+        "district_id":  48,
+        "upazila_id":  370,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  176,
+        "text":  "Mymensingh Sadar Bazar",
+        "text_en":  "Mymensingh Sadar Bazar",
+        "text_bn":  "ময়মনসিংহ সদর বাজার",
+        "district_id":  62,
+        "upazila_id":  466,
+        "division_id":  8,
+        "parent":  "district_id"
+    },
+    {
+        "value":  255,
+        "text":  "Nabinagar Bazar",
+        "text_en":  "Nabinagar Bazar",
+        "text_bn":  "নবীনগর বাজার",
+        "district_id":  3,
+        "upazila_id":  30,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  139,
+        "text":  "Nageshwari Bazar",
+        "text_en":  "Nageshwari Bazar",
+        "text_bn":  "নাগেশ্বরী বাজার",
+        "district_id":  60,
+        "upazila_id":  449,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  71,
+        "text":  "Nakla Bazar",
+        "text_en":  "Nakla Bazar",
+        "text_bn":  "নকলা বাজার",
+        "district_id":  61,
+        "upazila_id":  460,
+        "division_id":  8,
+        "parent":  "district_id"
+    },
+    {
+        "value":  132,
+        "text":  "Nalchiti Bazar",
+        "text_en":  "Nalchiti Bazar",
+        "text_bn":  "নলছিটি বাজার ",
+        "district_id":  30,
+        "upazila_id":  232,
+        "division_id":  4,
+        "parent":  "district_id"
+    },
+    {
+        "value":  63,
+        "text":  "Nalua Bazar",
+        "text_en":  "Nalua Bazar",
+        "text_bn":  "নালুয়া বাজার",
+        "district_id":  28,
+        "upazila_id":  223,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  177,
+        "text":  "Nandail Bazar",
+        "text_en":  "Nandail Bazar",
+        "text_bn":  "নান্দাইল বাজার",
+        "district_id":  62,
+        "upazila_id":  473,
+        "division_id":  8,
+        "parent":  "district_id"
+    },
+    {
+        "value":  94,
+        "text":  "Nandina Bazar",
+        "text_en":  "Nandina Bazar",
+        "text_bn":  "নান্দিনা বাজার",
+        "district_id":  63,
+        "upazila_id":  475,
+        "division_id":  8,
+        "parent":  "district_id"
+    },
+    {
+        "value":  30,
+        "text":  "Naogaon Sadar Bazar",
+        "text_en":  "Naogaon Sadar Bazar",
+        "text_bn":  "নওগাঁ সদর বাজার",
+        "district_id":  19,
+        "upazila_id":  168,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  113,
+        "text":  "Narail Sadar Bazar",
+        "text_en":  "Narail Sadar Bazar",
+        "text_bn":  "নড়াইল সদর বাজার",
+        "district_id":  23,
+        "upazila_id":  189,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  17,
+        "text":  "Narayanganj Sadar Bazar",
+        "text_en":  "Narayanganj Sadar Bazar",
+        "text_bn":  "নারায়ণগঞ্জ সদর বাজার ",
+        "district_id":  43,
+        "upazila_id":  330,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  26,
+        "text":  "Narsingdi Sadar Bazar",
+        "text_en":  "Narsingdi Sadar Bazar",
+        "text_bn":  "নরসিংদী সদর বাজার",
+        "district_id":  40,
+        "upazila_id":  313,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  219,
+        "text":  "Narua Mala Bazar",
+        "text_en":  "Narua Mala Bazar",
+        "text_bn":  "নারুয়া মালা বাজার",
+        "district_id":  14,
+        "upazila_id":  131,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  114,
+        "text":  "Nator Bazar",
+        "text_en":  "Nator Bazar",
+        "text_bn":  "নাটোর বাজার",
+        "district_id":  16,
+        "upazila_id":  143,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  384,
+        "text":  "Navaron Bazar",
+        "text_en":  "Navaron Bazar",
+        "text_bn":  "নাভারণ বাজার",
+        "district_id":  20,
+        "upazila_id":  178,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  242,
+        "text":  "Nawabganj Bazar",
+        "text_en":  "Nawabganj Bazar",
+        "text_bn":  "নবাবগঞ্জ বাজার",
+        "district_id":  59,
+        "upazila_id":  440,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  333,
+        "text":  "Nawabganj Bazar",
+        "text_en":  "Nawabganj Bazar",
+        "text_bn":  "নবাবগঞ্জ বাজার",
+        "district_id":  47,
+        "upazila_id":  368,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  3,
+        "text":  "Nawabpur Market",
+        "text_en":  "Nawabpur Market",
+        "text_bn":  "নওয়াবপুর বাজার",
+        "district_id":  47,
+        "upazila_id":  493,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  345,
+        "text":  "Nazirpur Bazar",
+        "text_en":  "Nazirpur Bazar",
+        "text_bn":  "নাজিরপুর বাজার",
+        "district_id":  32,
+        "upazila_id":  243,
+        "division_id":  4,
+        "parent":  "district_id"
+    },
+    {
+        "value":  168,
+        "text":  "New Market",
+        "text_en":  "New Market",
+        "text_bn":  "নিউ মার্কেট",
+        "district_id":  47,
+        "upazila_id":  494,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  33,
+        "text":  "Nilphamari Sadar Bazar",
+        "text_en":  "Nilphamari Sadar Bazar",
+        "text_bn":  "নীলফামারী সদর বাজার",
+        "district_id":  56,
+        "upazila_id":  427,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  69,
+        "text":  "NImsar Bazar",
+        "text_en":  "NImsar Bazar",
+        "text_bn":  "নিমসার বাজার",
+        "district_id":  1,
+        "upazila_id":  16,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  106,
+        "text":  "Noakhali Sadar Bazar",
+        "text_en":  "Noakhali Sadar Bazar",
+        "text_bn":  "নোয়াখালী সদর বাজার",
+        "district_id":  5,
+        "upazila_id":  43,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  244,
+        "text":  "Nowahata Bazar",
+        "text_en":  "Nowahata Bazar",
+        "text_bn":  "নওহাটা বাজার",
+        "district_id":  15,
+        "upazila_id":  496,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  76,
+        "text":  "Pahartali Bazar",
+        "text_en":  "Pahartali Bazar",
+        "text_bn":  "পাহাড়তলী বাজার",
+        "district_id":  8,
+        "upazila_id":  499,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  32,
+        "text":  "Panchagarh Sadar Bazar",
+        "text_en":  "Panchagarh Sadar Bazar",
+        "text_bn":  "পঞ্চগড় সদর বাজার",
+        "district_id":  53,
+        "upazila_id":  399,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  281,
+        "text":  "Panchari Bazar",
+        "text_en":  "Panchari Bazar",
+        "text_bn":  "পানছড়ি বাজার",
+        "district_id":  10,
+        "upazila_id":  90,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  77,
+        "text":  "Panchbibi Bazar",
+        "text_en":  "Panchbibi Bazar",
+        "text_bn":  "পাঁচবিবি বাজার",
+        "district_id":  17,
+        "upazila_id":  153,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  361,
+        "text":  "Pangsha Bazar",
+        "text_en":  "Pangsha Bazar",
+        "text_bn":  "পাংশা বাজার",
+        "district_id":  49,
+        "upazila_id":  378,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  133,
+        "text":  "Panjiputhipara Bazar",
+        "text_en":  "Panjiputhipara Bazar",
+        "text_bn":  "পাঞ্জিপুথিপাড়া বাজার",
+        "district_id":  30,
+        "upazila_id":  230,
+        "division_id":  4,
+        "parent":  "district_id"
+    },
+    {
+        "value":  348,
+        "text":  "Parbatipur Bazar",
+        "text_en":  "Parbatipur Bazar",
+        "text_bn":  "পার্বতীপুর বাজার",
+        "district_id":  54,
+        "upazila_id":  408,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  22,
+        "text":  "Parerhat Bazar, Pirojpur",
+        "text_en":  "Parerhat Bazar, Pirojpur",
+        "text_bn":  "পাড়েরহাট বাজার, পিরোজপুর",
+        "district_id":  32,
+        "upazila_id":  505,
+        "division_id":  4,
+        "parent":  "district_id"
+    },
+    {
+        "value":  381,
+        "text":  "Patiya Bazar",
+        "text_en":  "Patiya Bazar",
+        "text_bn":  "পটিয়া বাজার",
+        "district_id":  8,
+        "upazila_id":  68,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  257,
+        "text":  "Patiya Sadar Bazar",
+        "text_en":  "Patiya Sadar Bazar",
+        "text_bn":  "পটিয়া সদর বাজার",
+        "district_id":  8,
+        "upazila_id":  68,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  70,
+        "text":  "Patuakhali Sadar Bazar",
+        "text_en":  "Patuakhali Sadar Bazar",
+        "text_bn":  "পটুয়াখালী সদর বাজার",
+        "district_id":  31,
+        "upazila_id":  235,
+        "division_id":  4,
+        "parent":  "district_id"
+    },
+    {
+        "value":  249,
+        "text":  "Pirgonj Bazar",
+        "text_en":  "Pirgonj Bazar",
+        "text_bn":  "পীরগঞ্জ বাজার",
+        "district_id":  58,
+        "upazila_id":  436,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  15,
+        "text":  "Pirojpur Sadar Bazar",
+        "text_en":  "Pirojpur Sadar Bazar",
+        "text_bn":  "পিরোজপুর সদর বাজার",
+        "district_id":  32,
+        "upazila_id":  242,
+        "division_id":  4,
+        "parent":  "district_id"
+    },
+    {
+        "value":  81,
+        "text":  "Pouro Super Market, Netrokona",
+        "text_en":  "Pouro Super Market, Netrokona",
+        "text_bn":  "পৌর সুপার মার্কেট, নেত্রকোনা",
+        "district_id":  64,
+        "upazila_id":  491,
+        "division_id":  8,
+        "parent":  "district_id"
+    },
+    {
+        "value":  240,
+        "text":  "Puthia Bazar",
+        "text_en":  "Puthia Bazar",
+        "text_bn":  "পুঠিয়া বাজার",
+        "district_id":  15,
+        "upazila_id":  138,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  164,
+        "text":  "Rahmatgong and Moulavhi Bazar",
+        "text_en":  "Rahmatgong and Moulavhi Bazar",
+        "text_bn":  "রহমতগঞ্জ ও মৌলভীবাজার",
+        "district_id":  47,
+        "upazila_id":  493,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  367,
+        "text":  "Raipur Bazar",
+        "text_en":  "Raipur Bazar",
+        "text_bn":  "রায়পুর বাজার",
+        "district_id":  7,
+        "upazila_id":  62,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  230,
+        "text":  "Rajapur Bazar",
+        "text_en":  "Rajapur Bazar",
+        "text_bn":  "রাজাপুর বাজার",
+        "district_id":  16,
+        "upazila_id":  145,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  47,
+        "text":  "Rajbari Sadar Bazar",
+        "text_en":  "Rajbari Sadar Bazar",
+        "text_bn":  "রাজবাড়ী সদর বাজার",
+        "district_id":  49,
+        "upazila_id":  376,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  171,
+        "text":  "Rajfulbaria Bazar",
+        "text_en":  "Rajfulbaria Bazar",
+        "text_bn":  "রাজফুলবাড়িয়া বাজার",
+        "district_id":  47,
+        "upazila_id":  365,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  259,
+        "text":  "Rajganj Bazar",
+        "text_en":  "Rajganj Bazar",
+        "text_bn":  "রাজগঞ্জ বাজার",
+        "district_id":  1,
+        "upazila_id":  11,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  245,
+        "text":  "Rajshahi New Market Bazar",
+        "text_en":  "Rajshahi New Market Bazar",
+        "text_bn":  "রাজশাহী নতুন বাজার",
+        "district_id":  15,
+        "upazila_id":  496,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  13,
+        "text":  "Rajshahi Sadar Bazar",
+        "text_en":  "Rajshahi Sadar Bazar",
+        "text_bn":  "রাজশাহী সদর বাজার",
+        "district_id":  15,
+        "upazila_id":  496,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  117,
+        "text":  "Ramchandrapur Bazar, Chapainawabganj",
+        "text_en":  "Ramchandrapur Bazar, Chapainawabganj",
+        "text_bn":  "রামচন্দ্রপুর বাজার, চাপাইনবাবগঞ্জ",
+        "district_id":  18,
+        "upazila_id":  155,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  55,
+        "text":  "Ramdia Bazar",
+        "text_en":  "Ramdia Bazar",
+        "text_bn":  "রামদিয়া বাজার ",
+        "district_id":  51,
+        "upazila_id":  386,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  279,
+        "text":  "Ramgarh Bazar",
+        "text_en":  "Ramgarh Bazar",
+        "text_bn":  "রামগড় বাজার",
+        "district_id":  10,
+        "upazila_id":  94,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  378,
+        "text":  "Ramgarh Bazar",
+        "text_en":  "Ramgarh Bazar",
+        "text_bn":  "রামগড় বাজার",
+        "district_id":  10,
+        "upazila_id":  94,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  276,
+        "text":  "Ramu Bazar",
+        "text_en":  "Ramu Bazar",
+        "text_bn":  "রামু বাজার",
+        "district_id":  9,
+        "upazila_id":  86,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  146,
+        "text":  "Rangamati Sadar Bazar",
+        "text_en":  "Rangamati Sadar Bazar",
+        "text_bn":  "রাঙ্গামাটি সদর বাজার",
+        "district_id":  4,
+        "upazila_id":  33,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  5,
+        "text":  "Rangpur Krishi Market",
+        "text_en":  "Rangpur Krishi Market",
+        "text_bn":  "রংপুর কৃষি মার্কেট ",
+        "district_id":  59,
+        "upazila_id":  502,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  243,
+        "text":  "Rangpur Municipality Market",
+        "text_en":  "Rangpur Municipality Market",
+        "text_bn":  "রংপুর পৌরসভার বাজার",
+        "district_id":  59,
+        "upazila_id":  440,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  78,
+        "text":  "Riazuddin Bazar",
+        "text_en":  "Riazuddin Bazar",
+        "text_bn":  "রিয়াজউদ্দিন বাজার",
+        "district_id":  8,
+        "upazila_id":  499,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  40,
+        "text":  "Rowangchhari Bazar",
+        "text_en":  "Rowangchhari Bazar",
+        "text_bn":  "রোয়াংছড়ি বাজার",
+        "district_id":  11,
+        "upazila_id":  100,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  125,
+        "text":  "Rupganj Bazar",
+        "text_en":  "Rupganj Bazar",
+        "text_bn":  "রুপগঞ্জ বাজার",
+        "district_id":  23,
+        "upazila_id":  189,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  210,
+        "text":  "Rupgonj Sadar Bazar",
+        "text_en":  "Rupgonj Sadar Bazar",
+        "text_bn":  "রূপগঞ্জ সদর বাজার",
+        "district_id":  43,
+        "upazila_id":  331,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  2,
+        "text":  "Rupnogor Kachabazar",
+        "text_en":  "Rupnogor Kachabazar",
+        "text_bn":  "রূপনগর কাঁচাবাজার",
+        "district_id":  47,
+        "upazila_id":  494,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  196,
+        "text":  "Rupsha Bazar",
+        "text_en":  "Rupsha Bazar",
+        "text_bn":  "রূপসা বাজার",
+        "district_id":  27,
+        "upazila_id":  209,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  21,
+        "text":  "Sadar (Zia Bazar) Kurigram",
+        "text_en":  "Sadar (Zia Bazar) Kurigram",
+        "text_bn":  "সদর (জিয়া বাজার) কুড়িগ্রাম",
+        "district_id":  60,
+        "upazila_id":  448,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  39,
+        "text":  "Sadar Bazar, Lakshmipur",
+        "text_en":  "Sadar Bazar, Lakshmipur",
+        "text_bn":  "সদর বাজার, লক্ষ্মীপুর",
+        "district_id":  7,
+        "upazila_id":  60,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  25,
+        "text":  "Sadar Bazar, Madaripur",
+        "text_en":  "Sadar Bazar, Madaripur",
+        "text_bn":  "সদর বাজার,  মাদারীপুর ",
+        "district_id":  50,
+        "upazila_id":  381,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  20,
+        "text":  "Sadar Bazar, Pabna",
+        "text_en":  "Sadar Bazar, Pabna",
+        "text_bn":  "সদর বাজার, পাবনা",
+        "district_id":  13,
+        "upazila_id":  116,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  31,
+        "text":  "Sadar Bazar, Thakurgaon",
+        "text_en":  "Sadar Bazar, Thakurgaon",
+        "text_bn":  "সদর বাজার, ঠাকুরগাঁও",
+        "district_id":  58,
+        "upazila_id":  435,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  223,
+        "text":  "Saghata Bazar",
+        "text_en":  "Saghata Bazar",
+        "text_bn":  "সাঘাটা বাজার",
+        "district_id":  57,
+        "upazila_id":  431,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  350,
+        "text":  "Saidpur Bazar",
+        "text_en":  "Saidpur Bazar",
+        "text_bn":  "সৈয়দপুর বাজার",
+        "district_id":  56,
+        "upazila_id":  422,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  216,
+        "text":  "Sakhipur Sadar Market",
+        "text_en":  "Sakhipur Sadar Market",
+        "text_bn":  "সখিপুর সদর বাজার",
+        "district_id":  44,
+        "upazila_id":  341,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  376,
+        "text":  "Sapahar Bazar",
+        "text_en":  "Sapahar Bazar",
+        "text_bn":  "সাপাহার বাজার",
+        "district_id":  19,
+        "upazila_id":  170,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  325,
+        "text":  "Sapahar Market",
+        "text_en":  "Sapahar Market",
+        "text_bn":  "সাপাহার বাজার",
+        "district_id":  19,
+        "upazila_id":  170,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  161,
+        "text":  "Sarojganj Bazar",
+        "text_en":  "Sarojganj Bazar",
+        "text_bn":  "সরোজগঞ্জ বাজার",
+        "district_id":  24,
+        "upazila_id":  192,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  85,
+        "text":  "Satpar Haat Sadar Bazar",
+        "text_en":  "Satpar Haat Sadar Bazar",
+        "text_bn":  "সাতপাড় হাট সদর বাজার ",
+        "district_id":  51,
+        "upazila_id":  385,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  359,
+        "text":  "Saturia Bazar",
+        "text_en":  "Saturia Bazar",
+        "text_bn":  "সাটুরিয়া বাজার",
+        "district_id":  46,
+        "upazila_id":  359,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  169,
+        "text":  "Savar Bazar",
+        "text_en":  "Savar Bazar",
+        "text_bn":  "সাভার বাজার",
+        "district_id":  47,
+        "upazila_id":  365,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  332,
+        "text":  "Savar Bazar",
+        "text_en":  "Savar Bazar",
+        "text_bn":  "সাভার বাজার",
+        "district_id":  47,
+        "upazila_id":  365,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  131,
+        "text":  "Setabganj Bazar",
+        "text_en":  "Setabganj Bazar",
+        "text_bn":  " সেতাবগন্জ বাজার",
+        "district_id":  54,
+        "upazila_id":  409,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  295,
+        "text":  "Shachana Bazar",
+        "text_en":  "Shachana Bazar",
+        "text_bn":  "সাচনা বাজার",
+        "district_id":  37,
+        "upazila_id":  286,
+        "division_id":  5,
+        "parent":  "district_id"
+    },
+    {
+        "value":  248,
+        "text":  "Shaheb Bazar",
+        "text_en":  "Shaheb Bazar",
+        "text_bn":  "সাহেব বাজার",
+        "district_id":  15,
+        "upazila_id":  496,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  284,
+        "text":  "Shalutikar Bazar",
+        "text_en":  "Shalutikar Bazar",
+        "text_bn":  "শালুটিকর বাজার",
+        "district_id":  36,
+        "upazila_id":  278,
+        "division_id":  5,
+        "parent":  "district_id"
+    },
+    {
+        "value":  110,
+        "text":  "Shariatpur Bazar",
+        "text_en":  "Shariatpur Bazar",
+        "text_bn":  "শরীয়তপুর বাজার",
+        "district_id":  42,
+        "upazila_id":  322,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  339,
+        "text":  "Sharsha Bazar",
+        "text_en":  "Sharsha Bazar",
+        "text_bn":  "শার্শা বাজার",
+        "district_id":  20,
+        "upazila_id":  178,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  121,
+        "text":  "Shathibari Bazar",
+        "text_en":  "Shathibari Bazar",
+        "text_bn":  "শঠিবাড়ি বাজার ",
+        "district_id":  59,
+        "upazila_id":  444,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  126,
+        "text":  "Sheikhpur Bazar",
+        "text_en":  "Sheikhpur Bazar",
+        "text_bn":  "শেখপুর বাজার",
+        "district_id":  50,
+        "upazila_id":  382,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  270,
+        "text":  "Shekhghat Bazar",
+        "text_en":  "Shekhghat Bazar",
+        "text_bn":  "শেখঘাট বাজার",
+        "district_id":  38,
+        "upazila_id":  298,
+        "division_id":  5,
+        "parent":  "district_id"
+    },
+    {
+        "value":  343,
+        "text":  "Sherpur Bazar",
+        "text_en":  "Sherpur Bazar",
+        "text_bn":  "শেরপুর বাজার",
+        "district_id":  14,
+        "upazila_id":  132,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  68,
+        "text":  "Sherpur Sadar Bazar",
+        "text_en":  "Sherpur Sadar Bazar",
+        "text_bn":  "শেরপুর সদর বাজার",
+        "district_id":  61,
+        "upazila_id":  457,
+        "division_id":  8,
+        "parent":  "district_id"
+    },
+    {
+        "value":  329,
+        "text":  "Sherpur Sadar Bazar (Baroduari Bazar)",
+        "text_en":  "Sherpur Sadar Bazar (Baroduari Bazar)",
+        "text_bn":  "শেরপুর সদর বাজার (বরোদুয়ারি বাজার)",
+        "district_id":  14,
+        "upazila_id":  132,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  206,
+        "text":  "Shialkol Bazar",
+        "text_en":  "Shialkol Bazar",
+        "text_bn":  "শিয়ালকোল বাজার",
+        "district_id":  44,
+        "upazila_id":  334,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  143,
+        "text":  "Shibganj Bazar",
+        "text_en":  "Shibganj Bazar",
+        "text_bn":  "শিবগঞ্জ বাজার",
+        "district_id":  18,
+        "upazila_id":  159,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  342,
+        "text":  "Shibganj Bazar",
+        "text_en":  "Shibganj Bazar",
+        "text_bn":  "শিবগঞ্জ বাজার",
+        "district_id":  18,
+        "upazila_id":  159,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  326,
+        "text":  "Shibgonj Sadar Bazar",
+        "text_en":  "Shibgonj Sadar Bazar",
+        "text_bn":  "শিবগঞ্জ সদর বাজার",
+        "district_id":  18,
+        "upazila_id":  159,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  362,
+        "text":  "Shibpur Bazar",
+        "text_en":  "Shibpur Bazar",
+        "text_bn":  "শিবপুর বাজার",
+        "district_id":  40,
+        "upazila_id":  316,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  145,
+        "text":  "Shomshergonj Bazar",
+        "text_en":  "Shomshergonj Bazar",
+        "text_bn":  "শমসেরগঞ্জ বাজার",
+        "district_id":  37,
+        "upazila_id":  288,
+        "division_id":  5,
+        "parent":  "district_id"
+    },
+    {
+        "value":  147,
+        "text":  "Shuvolong Bazar",
+        "text_en":  "Shuvolong Bazar",
+        "text_bn":  "শুভলং বাজার",
+        "district_id":  4,
+        "upazila_id":  37,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  158,
+        "text":  "Shyam Bazar",
+        "text_en":  "Shyam Bazar",
+        "text_bn":  "শ্যাম বাজার",
+        "district_id":  47,
+        "upazila_id":  493,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  224,
+        "text":  "Sibpur Bazar",
+        "text_en":  "Sibpur Bazar",
+        "text_bn":  "শিবপুর বাজার",
+        "district_id":  40,
+        "upazila_id":  316,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  360,
+        "text":  "Singair Bazar",
+        "text_en":  "Singair Bazar",
+        "text_bn":  "সিংগাইর বাজার",
+        "district_id":  46,
+        "upazila_id":  364,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  231,
+        "text":  "Singra Bazar",
+        "text_en":  "Singra Bazar",
+        "text_bn":  "সিংড়া বাজার",
+        "district_id":  16,
+        "upazila_id":  144,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  115,
+        "text":  "Sirajganj Sadar Bazar",
+        "text_en":  "Sirajganj Sadar Bazar",
+        "text_bn":  "সিরাজগঞ্জ সদর বাজার",
+        "district_id":  12,
+        "upazila_id":  110,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  144,
+        "text":  "Somser Nagar Bazar",
+        "text_en":  "Somser Nagar Bazar",
+        "text_bn":  "শমসেরনগর বাজার",
+        "district_id":  37,
+        "upazila_id":  286,
+        "division_id":  5,
+        "parent":  "district_id"
+    },
+    {
+        "value":  278,
+        "text":  "Sonagazi Bazar",
+        "text_en":  "Sonagazi Bazar",
+        "text_bn":  "সোনাগাজী বাজার",
+        "district_id":  2,
+        "upazila_id":  20,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  246,
+        "text":  "Sonamukhi Bazar",
+        "text_en":  "Sonamukhi Bazar",
+        "text_bn":  "সোনামুখী বাজার",
+        "district_id":  12,
+        "upazila_id":  107,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  165,
+        "text":  "Sowarighat and Champatali",
+        "text_en":  "Sowarighat and Champatali",
+        "text_bn":  "সোয়ারীঘাট ও চম্পাতলী",
+        "district_id":  47,
+        "upazila_id":  493,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  16,
+        "text":  "Sreeramkathi Bazar",
+        "text_en":  "Sreeramkathi Bazar",
+        "text_bn":  "শ্রীরামকাঠী বাজার",
+        "district_id":  32,
+        "upazila_id":  243,
+        "division_id":  4,
+        "parent":  "district_id"
+    },
+    {
+        "value":  354,
+        "text":  "Srimangal Bazar",
+        "text_en":  "Srimangal Bazar",
+        "text_bn":  "শ্রীমঙ্গল বাজার",
+        "district_id":  37,
+        "upazila_id":  290,
+        "division_id":  5,
+        "parent":  "district_id"
+    },
+    {
+        "value":  119,
+        "text":  "Sultanpur Bazar, Satkhira",
+        "text_en":  "Sultanpur Bazar, Satkhira",
+        "text_bn":  "সুলতানপুর বাজার, সাতক্ষীরা",
+        "district_id":  21,
+        "upazila_id":  182,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  19,
+        "text":  "Sunamganj Sadar Bazar",
+        "text_en":  "Sunamganj Sadar Bazar",
+        "text_bn":  "সুনামগঞ্জ সদর বাজার",
+        "district_id":  39,
+        "upazila_id":  300,
+        "division_id":  5,
+        "parent":  "district_id"
+    },
+    {
+        "value":  51,
+        "text":  "Sylhet Sadar Bazaar",
+        "text_en":  "Sylhet Sadar Bazaar",
+        "text_bn":  "সিলেট সদর বাজার",
+        "district_id":  36,
+        "upazila_id":  281,
+        "division_id":  5,
+        "parent":  "district_id"
+    },
+    {
+        "value":  111,
+        "text":  "Tangail Bazar",
+        "text_en":  "Tangail Bazar",
+        "text_bn":  "টাংগাইল বাজার",
+        "district_id":  44,
+        "upazila_id":  342,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  84,
+        "text":  "Taraganj Bazar",
+        "text_en":  "Taraganj Bazar",
+        "text_bn":  "তারাগঞ্জ বাজার ",
+        "district_id":  61,
+        "upazila_id":  458,
+        "division_id":  8,
+        "parent":  "district_id"
+    },
+    {
+        "value":  122,
+        "text":  "Taraganj Bazar",
+        "text_en":  "Taraganj Bazar",
+        "text_bn":  "তারাগঞ্জ বাজার",
+        "district_id":  59,
+        "upazila_id":  442,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  166,
+        "text":  "Tejgaon Bazar",
+        "text_en":  "Tejgaon Bazar",
+        "text_bn":  "তেজগাঁও বাজার",
+        "district_id":  47,
+        "upazila_id":  494,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  199,
+        "text":  "Teligati Bazar ",
+        "text_en":  "Teligati Bazar ",
+        "text_bn":  "তেলিগাটি বাজার",
+        "district_id":  64,
+        "upazila_id":  485,
+        "division_id":  8,
+        "parent":  "district_id"
+    },
+    {
+        "value":  86,
+        "text":  "Tilakpur Bazar",
+        "text_en":  "Tilakpur Bazar",
+        "text_bn":  "তিলকপুর বাজার ",
+        "district_id":  17,
+        "upazila_id":  150,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  225,
+        "text":  "Tista Bazar",
+        "text_en":  "Tista Bazar",
+        "text_bn":  "তিস্তা বাজার",
+        "district_id":  55,
+        "upazila_id":  417,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  172,
+        "text":  "Tongi Bazar",
+        "text_en":  "Tongi Bazar",
+        "text_bn":  "টঙ্গী বাজার",
+        "district_id":  41,
+        "upazila_id":  320,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  286,
+        "text":  "Torabgonj Bazar",
+        "text_en":  "Torabgonj Bazar",
+        "text_bn":  "তোরাবগঞ্জ বাজার",
+        "district_id":  7,
+        "upazila_id":  63,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  179,
+        "text":  "Trisal Bazar",
+        "text_en":  "Trisal Bazar",
+        "text_bn":  "ত্রিশাল বাজার",
+        "district_id":  62,
+        "upazila_id":  463,
+        "division_id":  8,
+        "parent":  "district_id"
+    },
+    {
+        "value":  357,
+        "text":  "Tungipara Bazar",
+        "text_en":  "Tungipara Bazar",
+        "text_bn":  "টুঙ্গিপাড়া বাজার",
+        "district_id":  51,
+        "upazila_id":  387,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  118,
+        "text":  "Ujangram Hat",
+        "text_en":  "Ujangram Hat",
+        "text_bn":  "উজানগ্রাম হাট",
+        "district_id":  25,
+        "upazila_id":  196,
+        "division_id":  3,
+        "parent":  "district_id"
+    },
+    {
+        "value":  277,
+        "text":  "Ukhia Bazar",
+        "text_en":  "Ukhia Bazar",
+        "text_bn":  "উখিয়া বাজার",
+        "district_id":  9,
+        "upazila_id":  83,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  140,
+        "text":  "Ulipur Bazar",
+        "text_en":  "Ulipur Bazar",
+        "text_bn":  "উলিপুর বাজার",
+        "district_id":  60,
+        "upazila_id":  453,
+        "division_id":  7,
+        "parent":  "district_id"
+    },
+    {
+        "value":  136,
+        "text":  "Ullapara Bazar",
+        "text_en":  "Ullapara Bazar",
+        "text_bn":  "উল্লাপাড়া বাজার",
+        "district_id":  12,
+        "upazila_id":  112,
+        "division_id":  2,
+        "parent":  "district_id"
+    },
+    {
+        "value":  188,
+        "text":  "Vadorgonj Shadar Bazar",
+        "text_en":  "Vadorgonj Shadar Bazar",
+        "text_bn":  "ভেদরগঞ্জ সদর বাজার ",
+        "district_id":  42,
+        "upazila_id":  326,
+        "division_id":  6,
+        "parent":  "district_id"
+    },
+    {
+        "value":  287,
+        "text":  "Veptari Bazar",
+        "text_en":  "Veptari Bazar",
+        "text_bn":  "ভেপ্তারি বাজার",
+        "district_id":  4,
+        "upazila_id":  33,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  73,
+        "text":  "Vishwanath Bazar",
+        "text_en":  "Vishwanath Bazar",
+        "text_bn":  "বিশ্বনাথ বাজার ",
+        "district_id":  36,
+        "upazila_id":  274,
+        "division_id":  5,
+        "parent":  "district_id"
+    },
+    {
+        "value":  149,
+        "text":  "Zaminder Hat Bazar",
+        "text_en":  "Zaminder Hat Bazar",
+        "text_bn":  "জমিদার হাট ",
+        "district_id":  5,
+        "upazila_id":  45,
+        "division_id":  1,
+        "parent":  "district_id"
+    },
+    {
+        "value":  83,
+        "text":  "Zhoudanga Bazar",
+        "text_en":  "Zhoudanga Bazar",
+        "text_bn":  "ঝাউডাংগা বাজার",
+        "district_id":  21,
+        "upazila_id":  182,
+        "division_id":  3,
+        "parent":  "district_id"
+    }
+]
