@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import { Language } from '@/lib/types';
 import { translations } from '@/lib/i18n';
 import {
@@ -8,6 +8,11 @@ import {
   HelpCircle,
   Activity,
 } from 'lucide-react';
+
+import {
+  DIVISIONS,
+  DISTRICTS,
+} from '@/lib/mockData';
 
 interface HeaderLocation {
   id: number;
@@ -41,83 +46,54 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const t = translations[lang];
 
-  const [districts, setDistricts] = useState<HeaderLocation[]>([]);
-  const [divisions, setDivisions] = useState<HeaderDivision[]>([]);
-  const [loadingLocations, setLoadingLocations] =
-    useState(true);
+  /*
+   * Location list comes from the existing DaamBD location data.
+   * No /api/locations call and no fake office/administration data.
+   */
+  const divisions = useMemo<HeaderDivision[]>(
+    () =>
+      DIVISIONS.map((division, index) => ({
+        id: index + 1,
+        en: division.en,
+        bn: division.bn,
+      })),
+    []
+  );
 
-  useEffect(() => {
-    let cancelled = false;
-
-    const loadLocations = async () => {
-      try {
-        setLoadingLocations(true);
-
-        const response = await fetch('/api/locations', {
-          method: 'GET',
-          cache: 'no-store',
-        });
-
-        if (!response.ok) {
-          throw new Error(
-            `Location API returned ${response.status}`
-          );
-        }
-
-        const data = await response.json();
-
-        if (!data?.success) {
-          throw new Error(
-            data?.error || 'Failed to load locations'
-          );
-        }
-
-        if (cancelled) {
-          return;
-        }
-
-        setDistricts(
-          Array.isArray(data?.districts)
-            ? data.districts
-            : []
+  const districts = useMemo<HeaderLocation[]>(
+    () =>
+      DISTRICTS.map((district, index) => {
+        const divisionIndex = DIVISIONS.findIndex(
+          (division) =>
+            division.en === district.divisionEn
         );
 
-        setDivisions(
-          Array.isArray(data?.divisions)
-            ? data.divisions
-            : []
-        );
-      } catch (error) {
-        console.error(
-          'DaamBD Location Error:',
-          error
-        );
+        return {
+          id: index + 1,
+          en: district.en,
+          bn: district.bn,
+          divisionId:
+            divisionIndex >= 0
+              ? divisionIndex + 1
+              : 0,
+          divisionEn: district.divisionEn,
+          divisionBn: district.divisionBn,
+        };
+      }),
+    []
+  );
 
-        if (!cancelled) {
-          setDistricts([]);
-          setDivisions([]);
-        }
-      } finally {
-        if (!cancelled) {
-          setLoadingLocations(false);
-        }
-      }
-    };
-
-    loadLocations();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const groupedDistricts = divisions.map((division) => ({
-    division,
-    districts: districts.filter(
-      (district) =>
-        district.divisionId === division.id
-    ),
-  }));
+  const groupedDistricts = useMemo(
+    () =>
+      divisions.map((division) => ({
+        division,
+        districts: districts.filter(
+          (district) =>
+            district.divisionId === division.id
+        ),
+      })),
+    [divisions, districts]
+  );
 
   const fallbackGroups =
     groupedDistricts.length > 0
@@ -198,18 +174,18 @@ export const Header: React.FC<HeaderProps> = ({
                 onChange={(e) =>
                   onDistrictChange(e.target.value)
                 }
-                disabled={loadingLocations}
+                disabled={districts.length === 0}
                 className="w-full sm:w-auto min-w-0 bg-transparent text-white text-[11px] sm:text-sm font-semibold focus:outline-none cursor-pointer pr-1 truncate disabled:opacity-60"
                 aria-label={t.districtSelect}
               >
-                {loadingLocations ? (
+                {districts.length === 0 ? (
                   <option
                     value=""
                     className="bg-[#14532D] text-white"
                   >
                     {lang === 'bn'
-                      ? 'জেলা লোড হচ্ছে...'
-                      : 'Loading districts...'}
+                      ? 'কোনো জেলা পাওয়া যায়নি'
+                      : 'No districts found'}
                   </option>
                 ) : (
                   fallbackGroups.map(
