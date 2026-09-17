@@ -51,7 +51,9 @@ function extractList(data: AnyObject, keys: string[]): AnyObject[] {
     if (Array.isArray(data?.[key])) return data[key];
     if (Array.isArray(data?.data?.[key])) return data.data[key];
     if (Array.isArray(data?.result?.[key])) return data.result[key];
-    if (Array.isArray(data?.data?.data?.[key])) return data.data.data[key];
+    if (Array.isArray(data?.data?.data?.[key])) {
+      return data.data.data[key];
+    }
   }
 
   return [];
@@ -235,10 +237,11 @@ async function fetchPriceRows(
 
   const weekId =
     Math.floor(
-      (date.getUTCDate() +
+      (
+        date.getUTCDate() +
         firstDay.getUTCDay() -
-        1) /
-        7
+        1
+      ) / 7
     ) + 1;
 
   const payload = {
@@ -265,7 +268,9 @@ async function fetchPriceRows(
   });
 
   if (!response.ok) {
-    throw new Error(`DAM price API returned ${response.status}`);
+    throw new Error(
+      `DAM price API returned ${response.status}`
+    );
   }
 
   const data = await response.json();
@@ -638,11 +643,18 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
 
-    const division = getNumber(searchParams.get("division"));
-    const district = getNumber(searchParams.get("district"));
+    const division = getNumber(
+      searchParams.get("division")
+    );
+
+    const district = getNumber(
+      searchParams.get("district")
+    );
+
     const requestedUpazila = getNumber(
       searchParams.get("upazila")
     );
+
     const requestedMarket = getNumber(
       searchParams.get("market")
     );
@@ -655,7 +667,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: "Valid official DAM division and district IDs are required.",
+          error:
+            "Valid official DAM division and district IDs are required.",
         },
         { status: 400 }
       );
@@ -679,8 +692,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: "Official DAM market list is empty.",
-          source: "Ministry of Agriculture / DAM",
+          error:
+            "Official DAM market list is empty.",
+          source:
+            "Ministry of Agriculture / DAM",
         },
         { status: 502 }
       );
@@ -705,7 +720,8 @@ export async function GET(request: NextRequest) {
             upazila: requestedUpazila,
             market: requestedMarket,
           },
-          source: "Ministry of Agriculture / DAM",
+          source:
+            "Ministry of Agriculture / DAM",
         },
         { status: 400 }
       );
@@ -728,7 +744,6 @@ export async function GET(request: NextRequest) {
       [
         "measurementUnitList",
         "measurement_unit_list",
-        "unitList",
         "units",
       ]
     );
@@ -749,13 +764,14 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const priceRows = await fetchPriceRows(
-      date,
-      division,
-      district,
-      upazila,
-      market
-    );
+    const priceRows =
+      await fetchPriceRows(
+        date,
+        division,
+        district,
+        upazila,
+        market
+      );
 
     const historyRequests: {
       date: string;
@@ -763,10 +779,11 @@ export async function GET(request: NextRequest) {
     }[] = [];
 
     for (let index = 0; index < 30; index++) {
-      const historyDate = getPreviousDate(
-        date,
-        index
-      );
+      const historyDate =
+        getPreviousDate(
+          date,
+          index
+        );
 
       historyRequests.push({
         date: historyDate,
@@ -793,35 +810,39 @@ export async function GET(request: NextRequest) {
       i < historyRequests.length;
       i += BATCH_SIZE
     ) {
-      const batch = historyRequests.slice(
-        i,
-        i + BATCH_SIZE
-      );
+      const batch =
+        historyRequests.slice(
+          i,
+          i + BATCH_SIZE
+        );
 
-      const results = await Promise.all(
-        batch.map(
-          async ({
-            date: historyDate,
-            promise,
-          }) => {
-            try {
-              const rows = await promise;
+      const results =
+        await Promise.all(
+          batch.map(
+            async ({
+              date: historyDate,
+              promise,
+            }) => {
+              try {
+                const rows =
+                  await promise;
 
-              return {
-                date: historyDate,
-                rows: Array.isArray(rows)
-                  ? rows
-                  : [],
-              };
-            } catch {
-              return {
-                date: historyDate,
-                rows: [],
-              };
+                return {
+                  date: historyDate,
+                  rows:
+                    Array.isArray(rows)
+                      ? rows
+                      : [],
+                };
+              } catch {
+                return {
+                  date: historyDate,
+                  rows: [],
+                };
+              }
             }
-          }
-        )
-      );
+          )
+        );
 
       for (const result of results) {
         historyRowsByDate.set(
@@ -864,7 +885,9 @@ export async function GET(request: NextRequest) {
               commodityId
             ) || [];
 
-          existing.push(retailAvg);
+          existing.push(
+            retailAvg
+          );
 
           dailyCommodityPrices.set(
             commodityId,
@@ -873,7 +896,10 @@ export async function GET(request: NextRequest) {
         }
 
         dailyCommodityPrices.forEach(
-          (prices, commodityId) => {
+          (
+            prices,
+            commodityId
+          ) => {
             const averagePrice =
               prices.reduce(
                 (sum, price) =>
@@ -904,7 +930,10 @@ export async function GET(request: NextRequest) {
     );
 
     historyMap.forEach(
-      (history, commodityId) => {
+      (
+        history,
+        commodityId
+      ) => {
         const uniqueByDate =
           new Map<
             string,
@@ -975,7 +1004,10 @@ export async function GET(request: NextRequest) {
         ) || [];
 
       const grouped =
-        new Map<number, number[]>();
+        new Map<
+          number,
+          number[]
+        >();
 
       for (const row of previousRows) {
         const commodityId =
@@ -996,7 +1028,9 @@ export async function GET(request: NextRequest) {
             commodityId
           ) || [];
 
-        values.push(retailAvg);
+        values.push(
+          retailAvg
+        );
 
         grouped.set(
           commodityId,
@@ -1005,7 +1039,10 @@ export async function GET(request: NextRequest) {
       }
 
       grouped.forEach(
-        (values, commodityId) => {
+        (
+          values,
+          commodityId
+        ) => {
           const average =
             values.reduce(
               (sum, value) =>
@@ -1073,7 +1110,10 @@ export async function GET(request: NextRequest) {
           row?.text
         );
 
-      if (!commodityNameBn && !commodityName) {
+      if (
+        !commodityNameBn &&
+        !commodityName
+      ) {
         continue;
       }
 
@@ -1129,19 +1169,24 @@ export async function GET(request: NextRequest) {
         "no_data";
 
       if (previousAvgPrice > 0) {
-        priceChange = Number(
-          (
-            retailAvg -
-            previousAvgPrice
-          ).toFixed(2)
-        );
+        priceChange =
+          Number(
+            (
+              retailAvg -
+              previousAvgPrice
+            ).toFixed(2)
+          );
 
         priceChangePercent =
           Number(
             (
-              ((retailAvg -
-                previousAvgPrice) /
-                previousAvgPrice) *
+              (
+                (
+                  retailAvg -
+                  previousAvgPrice
+                ) /
+                previousAvgPrice
+              ) *
               100
             ).toFixed(2)
           );
@@ -1149,7 +1194,9 @@ export async function GET(request: NextRequest) {
         if (priceChange > 0) {
           priceChangeType =
             "increase";
-        } else if (priceChange < 0) {
+        } else if (
+          priceChange < 0
+        ) {
           priceChangeType =
             "decrease";
         } else {
@@ -1161,68 +1208,89 @@ export async function GET(request: NextRequest) {
       products.push({
         id: commodityId,
         commodityId,
+
         name:
           commodityNameBn ||
           commodityName,
+
         nameBn:
           commodityNameBn ||
           commodityName,
+
         nameEn:
           commodityName ||
           commodityNameBn,
+
         commodityNameBn:
           commodityNameBn ||
           commodityName,
+
         commodityName:
           commodityName ||
           commodityNameBn,
-        category: getCategory({
-          ...officialCommodity,
-          ...row,
-          commodity_name_bn:
-            commodityNameBn,
-          commodity_name:
-            commodityName,
-        }),
+
+        category:
+          getCategory({
+            ...officialCommodity,
+            ...row,
+            commodity_name_bn:
+              commodityNameBn,
+            commodity_name:
+              commodityName,
+          }),
+
         price: retailAvg,
         avgPrice: retailAvg,
         averagePrice: retailAvg,
         retailPrice: retailAvg,
         retailAvg,
+
         retailLow,
         retailHigh,
+
         wholesaleAvg:
           wholesaleAvg > 0
             ? wholesaleAvg
             : null,
+
         wholesaleLow:
           wholesaleLow > 0
             ? wholesaleLow
             : null,
+
         wholesaleHigh:
           wholesaleHigh > 0
             ? wholesaleHigh
             : null,
+
         unitId,
+
         unitBn:
           unitInfo.unitBn,
+
         unitEn:
           unitInfo.unitEn,
+
         previousAvgPrice:
           previousAvgPrice > 0
             ? previousAvgPrice
             : null,
+
         previousPriceDate:
           previousDate,
+
         priceChange,
         priceChangePercent,
         priceChangeType,
+
         history30Days:
           historyMap.get(
             commodityId
           ) || [],
+
         source:
           "Ministry of Agriculture / DAM",
+
         reportDate: date,
       });
     }
@@ -1247,8 +1315,10 @@ export async function GET(request: NextRequest) {
 
     for (const product of finalProducts) {
       const category =
-        product.category ||
-        "নিত্যপণ্য";
+        String(
+          product.category ||
+          "নিত্যপণ্য"
+        );
 
       categoryCounts[category] =
         (categoryCounts[category] || 0) + 1;
@@ -1262,33 +1332,58 @@ export async function GET(request: NextRequest) {
     };
 
     for (const product of finalProducts) {
-      priceChangeCounts[
-        product.priceChangeType
-      ]++;
+      const type =
+        String(
+          product.priceChangeType
+        );
+
+      if (type === "increase") {
+        priceChangeCounts.increase++;
+      } else if (
+        type === "decrease"
+      ) {
+        priceChangeCounts.decrease++;
+      } else if (
+        type === "unchanged"
+      ) {
+        priceChangeCounts.unchanged++;
+      } else {
+        priceChangeCounts.no_data++;
+      }
     }
 
     return NextResponse.json({
       success: true,
+
       location: {
         division,
         district,
         upazila,
         market,
       },
+
       district,
       upazila,
       market,
+
       date,
+
       previousPriceDate:
         previousDate,
+
       total:
         finalProducts.length,
+
       items:
         finalProducts,
+
       categoryCounts,
+
       priceChangeCounts,
+
       source:
         "Ministry of Agriculture / DAM",
+
       timestamp:
         new Date().toISOString(),
     });
