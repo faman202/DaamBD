@@ -116,6 +116,31 @@ function getCategory(name: string): string {
   return "নিত্যপণ্য";
 }
 
+function getWholesaleToRetailRatio(wId: number, rId: number): number {
+  if (wId === 1) {
+    if (rId === 2 || rId === 18 || rId === 1) return 100; // 1 Quintal (100kg) -> 1 Kg
+  }
+  if (wId === 15) return 50; // 50kg bag -> 1 kg
+  if (wId === 13) {
+    if (rId === 3) return 100; // 100 Liters -> 1 Liter
+    if (rId === 20) return 20;  // 100 Liters -> 5 Liters
+  }
+  if (wId === 12 && rId === 11) return 6; // 12 kg -> 2 kg
+  if (wId === 8) {
+    if (rId === 4) return 100; // 100 pcs -> 1 pc
+    if (rId === 5) return 25;  // 100 pcs -> 4 pcs (halia)
+  }
+  if (wId === 6 && rId === 4) return 48; // 48 pcs -> 1 pc
+  if (wId === 9) {
+    if (rId === 4) return 1000;
+    if (rId === 8) return 10;
+  }
+  if (wId === 7 && rId === 5) return 20; // 80 pcs -> 4 pcs
+  if (wId === 16 && rId === 17) return 80;
+
+  return 1;
+}
+
 let cachedDropdowns: any = null;
 
 async function getDropdowns(): Promise<any> {
@@ -271,11 +296,25 @@ export async function GET(request: NextRequest) {
 
     for (const r of prevRows) {
       const cId = toNumber(r.commodity_id);
+      const comm = commodityMap.get(cId) || {};
+      const uRId = toNumber(r.unit_retail || comm.unit_retail || 2);
+      const uWId = toNumber(r.unit_wholesale || comm.unit_whole_sale || 1);
+      const ratio = getWholesaleToRetailRatio(uWId, uRId);
+
       const rLow = toNumber(r.r_lowestPrice);
       const rHigh = toNumber(r.r_highestPrice);
-      const avg = (rLow > 0 && rHigh > 0) ? (rLow + rHigh) / 2 : (rLow || rHigh || toNumber(r.w_lowestPrice));
-      if (cId > 0 && avg > 0) {
-        prevPriceMap.set(cId, avg);
+      let rAvg = (rLow > 0 && rHigh > 0) ? (rLow + rHigh) / 2 : (rLow || rHigh);
+
+      const wLow = toNumber(r.w_lowestPrice);
+      const wHigh = toNumber(r.w_highestPrice);
+      const wAvg = (wLow > 0 && wHigh > 0) ? (wLow + wHigh) / 2 : (wLow || wHigh);
+
+      if (rAvg === 0 && wAvg > 0) {
+        rAvg = Number((wAvg / ratio).toFixed(2));
+      }
+
+      if (cId > 0 && rAvg > 0) {
+        prevPriceMap.set(cId, rAvg);
       }
     }
 
@@ -287,32 +326,60 @@ export async function GET(request: NextRequest) {
       if (id <= 0 || uniqueProducts.has(id)) continue;
 
       const comm = commodityMap.get(id) || {};
-      const unit = unitMap.get(toNumber(row?.unit_retail || row?.unit_wholesale || comm?.unit_retail)) || {};
+
+      const uRetailId = toNumber(row?.unit_retail || comm?.unit_retail || 2);
+      const uWholesaleId = toNumber(row?.unit_wholesale || comm?.unit_whole_sale || 1);
+      const ratio = getWholesaleToRetailRatio(uWholesaleId, uRetailId);
+
+      const unitRetailObj = unitMap.get(uRetailId) || { text_bn: "কিলোগ্রাম", text_en: "Kilogram" };
+      const unitWholesaleObj = unitMap.get(uWholesaleId) || { text_bn: "কুইন্টাল", text_en: "Quintal" };
 
       const nameBn = String(comm?.text_bn || comm?.name_bn || comm?.text || `পণ্য #${id}`).trim();
       const nameEn = String(comm?.text_en || comm?.name_en || comm?.text || `Product #${id}`).trim();
 
       const rLow = toNumber(row?.r_lowestPrice);
       const rHigh = toNumber(row?.r_highestPrice);
-      const rAvg = (rLow > 0 && rHigh > 0) ? Number(((rLow + rHigh) / 2).toFixed(2)) : (rLow || rHigh);
+      let rAvg = (rLow > 0 && rHigh > 0) ? Number(((rLow + rHigh) / 2).toFixed(2)) : (rLow || rHigh);
 
       const wLow = toNumber(row?.w_lowestPrice);
       const wHigh = toNumber(row?.w_highestPrice);
-      const wAvg = (wLow > 0 && wHigh > 0) ? Number(((wLow + wHigh) / 2).toFixed(2)) : (wLow || wHigh);
+      let wAvg = (wLow > 0 && wHigh > 0) ? Number(((wLow + wHigh) / 2).toFixed(2)) : (wLow || wHigh);
 
-      const price = rAvg || wAvg;
+      let retailAvg = rAvg;
+      let retailLow = rLow;
+      let retailHigh = rHigh;
+
+      if (retailAvg === 0 && wAvg > 0) {
+        retailAvg = Number((wAvg / ratio).toFixed(2));
+        retailLow = wLow > 0 ? Number((wLow / ratio).toFixed(2)) : retailAvg;
+        retailHigh = wHigh > 0 ? Number((wHigh / ratio).toFixed(2)) : retailAvg;
+      }
+
+      let wholesaleAvg = wAvg;
+      let wholesaleLow = wLow;
+      let wholesaleHigh = wHigh;
+
+      if (wholesaleAvg === 0 && retailAvg > 0) {
+        wholesaleAvg = Number((retailAvg * ratio).toFixed(2));
+        wholesaleLow = retailLow > 0 ? Number((retailLow * ratio).toFixed(2)) : wholesaleAvg;
+        wholesaleHigh = retailHigh > 0 ? Number((retailHigh * ratio).toFixed(2)) : wholesaleAvg;
+      }
+
+      const price = retailAvg || wholesaleAvg;
       if (price <= 0) continue;
 
-      const unitBn = String(unit?.text_bn || unit?.name_bn || "কিলোগ্রাম").trim();
-      const unitEn = String(unit?.text_en || unit?.name_en || "Kilogram").trim();
+      const unitBn = String(unitRetailObj?.text_bn || "কিলোগ্রাম").trim();
+      const unitEn = String(unitRetailObj?.text_en || "Kilogram").trim();
+      const wholesaleUnitBn = String(unitWholesaleObj?.text_bn || "কুইন্টাল").trim();
+      const wholesaleUnitEn = String(unitWholesaleObj?.text_en || "Quintal").trim();
 
       const previousPrice = prevPriceMap.get(id) || 0;
       let priceChange = 0;
       let pctChange = 0;
       let priceChangeType: PriceChangeType = "no_data";
 
-      if (previousPrice > 0 && price > 0) {
-        priceChange = Number((price - previousPrice).toFixed(2));
+      if (previousPrice > 0 && retailAvg > 0) {
+        priceChange = Number((retailAvg - previousPrice).toFixed(2));
         pctChange = Number(((priceChange / previousPrice) * 100).toFixed(2));
 
         if (priceChange > 0) priceChangeType = "increase";
@@ -331,19 +398,21 @@ export async function GET(request: NextRequest) {
         commodityNameBn: nameBn,
         commodityNameEn: nameEn,
         category,
-        price,
-        avgPrice: price,
-        averagePrice: price,
-        retailPrice: rAvg,
-        retailAvg: rAvg,
-        retailLow: rLow,
-        retailHigh: rHigh,
-        wholesaleAvg: wAvg || null,
-        wholesaleLow: wLow || null,
-        wholesaleHigh: wHigh || null,
-        unitId: toNumber(row?.unit_retail || comm?.unit_retail),
+        price: retailAvg,
+        avgPrice: retailAvg,
+        averagePrice: retailAvg,
+        retailPrice: retailAvg,
+        retailAvg,
+        retailLow,
+        retailHigh,
+        wholesaleAvg: wholesaleAvg || null,
+        wholesaleLow: wholesaleLow || null,
+        wholesaleHigh: wholesaleHigh || null,
+        unitId: uRetailId,
         unitBn,
         unitEn,
+        wholesaleUnitBn,
+        wholesaleUnitEn,
         previousAvgPrice: previousPrice || null,
         previousPrice: previousPrice || null,
         previousPriceDate: prevDateStr,
