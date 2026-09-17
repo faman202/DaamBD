@@ -23,6 +23,15 @@ import {
 
 type AnyObject = Record<string, unknown>;
 
+interface OfficialDistrict {
+  id: number;
+  en: string;
+  bn: string;
+  divisionId: number;
+  divisionEn: string;
+  divisionBn: string;
+}
+
 function isObject(value: unknown): value is AnyObject {
   return typeof value === 'object' && value !== null;
 }
@@ -48,9 +57,7 @@ function getNumber(...values: unknown[]): number {
     }
 
     if (typeof value === 'string' && value.trim() !== '') {
-      const number = Number(
-        value.replace(/,/g, '').trim()
-      );
+      const number = Number(value.replace(/,/g, '').trim());
 
       if (Number.isFinite(number)) {
         return number;
@@ -128,18 +135,13 @@ function categoryMatches(
   item: DailyPriceItem,
   selectedCategory: string
 ): boolean {
-  if (
-    !selectedCategory ||
-    selectedCategory === 'all'
-  ) {
+  if (!selectedCategory || selectedCategory === 'all') {
     return true;
   }
 
   const object = item as unknown as AnyObject;
 
-  const selected = normalizeCategory(
-    selectedCategory
-  );
+  const selected = normalizeCategory(selectedCategory);
 
   const possibleCategories = [
     object.categorySlug,
@@ -270,19 +272,22 @@ function getSearchableText(
     object.category_name_bn,
     object.category_name_en,
   ]
-    .map((value) =>
-      getText(value).toLowerCase()
-    )
+    .map((value) => getText(value).toLowerCase())
     .filter(Boolean)
     .join(' ');
 }
 
 export default function Home() {
-  const [lang, setLang] =
-    useState<Language>('bn');
+  const [lang, setLang] = useState<Language>('bn');
 
   const [selectedDistrict, setSelectedDistrict] =
     useState<string>('Dhaka');
+
+  const [districts, setDistricts] =
+    useState<OfficialDistrict[]>([]);
+
+  const [districtsLoading, setDistrictsLoading] =
+    useState<boolean>(true);
 
   const [priceType, setPriceType] =
     useState<PriceType>('retail');
@@ -327,41 +332,163 @@ export default function Home() {
     useState<string | null>(null);
 
   /*
-   * IMPORTANT:
-   * Only add a district here when its official DAM ID
-   * has been confirmed from the DAM dropdown API.
+   * Load official district list.
    *
-   * Dhaka = 46 is confirmed.
+   * IMPORTANT:
+   * The frontend never needs to know that Dhaka = 46.
+   * The official ID is loaded from our backend and kept
+   * internally. The user only sees the district name.
    */
-  const districtIds: Record<string, number> = {
-    Dhaka: 46,
-  };
+  useEffect(() => {
+    let cancelled = false;
 
+    const loadDistricts = async () => {
+      try {
+        setDistrictsLoading(true);
+
+        const response = await fetch(
+          '/api/dam-dropdowns',
+          {
+            method: 'GET',
+            cache: 'no-store',
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            `Failed to load districts: ${response.status}`
+          );
+        }
+
+        const data = await response.json();
+
+        if (!data?.success) {
+          throw new Error(
+            data?.error ||
+              'Failed to load official district list'
+          );
+        }
+
+        const officialDistricts =
+          Array.isArray(data?.districts)
+            ? data.districts
+            : [];
+
+        if (!cancelled) {
+          setDistricts(officialDistricts);
+
+          /*
+           * Keep Dhaka selected when it exists.
+           * Otherwise select the first official district.
+           */
+          const dhakaExists =
+            officialDistricts.some(
+              (district: OfficialDistrict) =>
+                district.en === 'Dhaka'
+            );
+
+          if (!dhakaExists && officialDistricts.length > 0) {
+            setSelectedDistrict(
+              officialDistricts[0].en
+            );
+          }
+        }
+      } catch (err) {
+        if (cancelled) {
+          return;
+        }
+
+        console.error(
+          'DaamBD District API Error:',
+          err
+        );
+
+        setDistricts([]);
+
+        setError(
+          lang === 'bn'
+            ? 'সরকারি DAM থেকে জেলার তালিকা লোড করা যাচ্ছে না।'
+            : 'Unable to load the official district list from DAM.'
+        );
+      } finally {
+        if (!cancelled) {
+          setDistrictsLoading(false);
+        }
+      }
+    };
+
+    loadDistricts();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [lang]);
+
+  /*
+   * Find the official DAM district object
+   * from the district name selected by the user.
+   */
+  const selectedDistrictInfo = useMemo(() => {
+    return districts.find(
+      (district) =>
+        district.en === selectedDistrict
+    );
+  }, [
+    districts,
+    selectedDistrict,
+  ]);
+
+  /*
+   * Load actual DAM prices for selected district.
+   *
+   * No hardcoded 46.
+   * No fallback to Dhaka.
+   */
   useEffect(() => {
     let cancelled = false;
 
     const loadPrices = async () => {
+      /*
+       * Wait until official district list is ready.
+       */
+      if (districtsLoading) {
+        return;
+      }
+
+      /*
+       * District list failed.
+       */
+      if (districts.length === 0) {
+        setLoading(false);
+        return;
+      }
+
+      /*
+       * Selected district is not in official list.
+       */
+      if (!selectedDistrictInfo) {
+        setLoading(false);
+        setAllDistrictItems([]);
+
+        setError(
+          lang === 'bn'
+            ? 'নির্বাচিত জেলার সরকারি DAM তথ্য পাওয়া যায়নি।'
+            : 'Official DAM information for the selected district was not found.'
+        );
+
+        return;
+      }
+
       try {
         setLoading(true);
         setError(null);
 
-        const districtId =
-          districtIds[selectedDistrict];
-
         /*
-         * Never silently use Dhaka for another district.
-         * That was a serious data-integrity problem.
+         * The ID is sent internally.
+         * User interface continues to show district name.
          */
-        if (!districtId) {
-          throw new Error(
-            lang === 'bn'
-              ? `${selectedDistrict} জেলার সরকারি DAM ID এখনো সংযুক্ত করা হয়নি।`
-              : `The official DAM ID for ${selectedDistrict} has not been connected yet.`
-          );
-        }
-
         const response = await fetch(
-          `/api/prices?district=${districtId}`,
+          `/api/prices?district=${selectedDistrictInfo.id}`,
           {
             method: 'GET',
             cache: 'no-store',
@@ -441,7 +568,12 @@ export default function Home() {
     return () => {
       cancelled = true;
     };
-  }, [selectedDistrict, lang]);
+  }, [
+    selectedDistrictInfo,
+    districtsLoading,
+    districts.length,
+    lang,
+  ]);
 
   const summaryStats = useMemo(() => {
     const totalItems =
@@ -539,9 +671,6 @@ export default function Home() {
     let result =
       [...allDistrictItems];
 
-    /*
-     * Category
-     */
     if (
       selectedCategory !== 'all'
     ) {
@@ -554,9 +683,6 @@ export default function Home() {
         );
     }
 
-    /*
-     * Search
-     */
     if (
       searchQuery.trim() !== ''
     ) {
@@ -574,9 +700,6 @@ export default function Home() {
         );
     }
 
-    /*
-     * Movement
-     */
     if (
       movementFilter !== 'all'
     ) {
@@ -619,9 +742,6 @@ export default function Home() {
         );
     }
 
-    /*
-     * Sort
-     */
     if (
       sortBy === 'price-low'
     ) {
@@ -701,10 +821,10 @@ export default function Home() {
 
   const districtDisplayName =
     lang === 'bn'
-      ? selectedDistrict === 'Dhaka'
-        ? 'ঢাকা'
-        : selectedDistrict
-      : selectedDistrict;
+      ? selectedDistrictInfo?.bn ||
+        selectedDistrict
+      : selectedDistrictInfo?.en ||
+        selectedDistrict;
 
   const formattedUpdatedTime =
     useMemo(() => {
@@ -825,7 +945,7 @@ export default function Home() {
             <span className="truncate">
               {lang === 'bn'
                 ? `আজকের বাজারদর (${districtDisplayName})`
-                : `Today's Market Rates (${selectedDistrict})`}
+                : `Today's Market Rates (${districtDisplayName})`}
             </span>
           </h3>
 
@@ -844,8 +964,28 @@ export default function Home() {
           )}
         </div>
 
-        {/* Loading */}
-        {loading ? (
+        {/* District loading */}
+        {districtsLoading ? (
+          <div className="bg-white rounded-3xl p-8 sm:p-10 text-center border border-surface-border shadow-card-subtle max-w-md mx-auto my-8 space-y-4">
+            <div className="w-16 h-16 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center mx-auto text-brand-700">
+              <RefreshCw className="w-8 h-8 animate-spin" />
+            </div>
+
+            <div>
+              <h4 className="text-lg font-bold text-content-main">
+                {lang === 'bn'
+                  ? 'জেলার তালিকা লোড হচ্ছে...'
+                  : 'Loading districts...'}
+              </h4>
+
+              <p className="text-xs text-content-muted mt-1">
+                {lang === 'bn'
+                  ? 'সরকারি DAM থেকে জেলার তথ্য নেওয়া হচ্ছে।'
+                  : 'Loading official district information from DAM.'}
+              </p>
+            </div>
+          </div>
+        ) : loading ? (
           <div className="bg-white rounded-3xl p-8 sm:p-10 text-center border border-surface-border shadow-card-subtle max-w-md mx-auto my-8 space-y-4">
             <div className="w-16 h-16 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center mx-auto text-brand-700">
               <RefreshCw className="w-8 h-8 animate-spin" />
@@ -866,7 +1006,6 @@ export default function Home() {
             </div>
           </div>
         ) : error ? (
-          /* Error */
           <div className="bg-white rounded-3xl p-8 sm:p-10 text-center border border-red-200 shadow-card-subtle max-w-md mx-auto my-8 space-y-4">
             <div className="w-16 h-16 rounded-full bg-red-50 border border-red-200 flex items-center justify-center mx-auto text-red-600">
               <SearchX className="w-8 h-8" />
@@ -896,7 +1035,6 @@ export default function Home() {
             </button>
           </div>
         ) : filteredItems.length > 0 ? (
-          /* Price cards */
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
             {filteredItems.map(
               (
@@ -936,7 +1074,6 @@ export default function Home() {
             )}
           </div>
         ) : (
-          /* No results */
           <div className="bg-white rounded-3xl p-8 sm:p-10 text-center border border-surface-border shadow-card-subtle max-w-md mx-auto my-8 space-y-4">
             <div className="w-16 h-16 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center mx-auto text-brand-700">
               <SearchX className="w-8 h-8" />
@@ -1038,7 +1175,6 @@ export default function Home() {
 
           <div className="flex flex-col md:flex-row items-center justify-between gap-5 pb-6 border-b border-emerald-800/60">
 
-            {/* Brand */}
             <div className="flex items-center space-x-3 min-w-0">
               <div className="w-10 h-10 shrink-0 rounded-xl bg-emerald-600 flex items-center justify-center text-white font-black text-xl">
                 <Activity className="w-6 h-6" />
@@ -1058,7 +1194,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Links */}
             <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs font-semibold text-emerald-200">
               <button
                 onClick={() =>
@@ -1090,7 +1225,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Copyright */}
           <div className="flex flex-col sm:flex-row items-center justify-between text-xs text-emerald-200/70 gap-3 text-center sm:text-left">
 
             <p>

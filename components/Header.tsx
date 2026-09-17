@@ -1,14 +1,28 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Language } from '@/lib/types';
 import { translations } from '@/lib/i18n';
-import { DISTRICTS, DIVISIONS } from '@/lib/mockData';
 import {
   MapPin,
   HelpCircle,
   Activity,
 } from 'lucide-react';
+
+interface HeaderLocation {
+  id: number;
+  en: string;
+  bn: string;
+  divisionId: number;
+  divisionEn: string;
+  divisionBn: string;
+}
+
+interface HeaderDivision {
+  id: number;
+  en: string;
+  bn: string;
+}
 
 interface HeaderProps {
   lang: Language;
@@ -27,38 +41,113 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const t = translations[lang];
 
+  const [districts, setDistricts] = useState<HeaderLocation[]>([]);
+  const [divisions, setDivisions] = useState<HeaderDivision[]>([]);
+  const [loadingLocations, setLoadingLocations] =
+    useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadLocations = async () => {
+      try {
+        setLoadingLocations(true);
+
+        const response = await fetch('/api/locations', {
+          method: 'GET',
+          cache: 'no-store',
+        });
+
+        if (!response.ok) {
+          throw new Error(
+            `Location API returned ${response.status}`
+          );
+        }
+
+        const data = await response.json();
+
+        if (!data?.success) {
+          throw new Error(
+            data?.error || 'Failed to load locations'
+          );
+        }
+
+        if (cancelled) {
+          return;
+        }
+
+        setDistricts(
+          Array.isArray(data?.districts)
+            ? data.districts
+            : []
+        );
+
+        setDivisions(
+          Array.isArray(data?.divisions)
+            ? data.divisions
+            : []
+        );
+      } catch (error) {
+        console.error(
+          'DaamBD Location Error:',
+          error
+        );
+
+        if (!cancelled) {
+          setDistricts([]);
+          setDivisions([]);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoadingLocations(false);
+        }
+      }
+    };
+
+    loadLocations();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const groupedDistricts = divisions.map((division) => ({
+    division,
+    districts: districts.filter(
+      (district) =>
+        district.divisionId === division.id
+    ),
+  }));
+
+  const fallbackGroups =
+    groupedDistricts.length > 0
+      ? groupedDistricts
+      : [
+          {
+            division: {
+              id: 0,
+              en: '',
+              bn: '',
+            },
+            districts,
+          },
+        ];
+
   return (
     <header className="sticky top-0 z-40 w-full bg-[#14532D] text-white shadow-md border-b border-[#15803D]/40 backdrop-blur-md">
-
-      {/* =========================
-          Top Trust Bar
-      ========================== */}
-
       <div className="bg-[#052e16] text-emerald-300 border-b border-emerald-900/50">
-
         <div className="max-w-7xl mx-auto w-full px-3 sm:px-4 lg:px-8">
-
           <div className="min-h-[30px] py-1.5 flex items-center justify-between gap-3">
-
-            {/* Verified Status */}
-
             <div className="flex items-center gap-2 min-w-0">
-
               <span className="relative flex h-2 w-2 shrink-0">
-
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-
               </span>
 
               <span className="font-medium text-[10px] sm:text-xs tracking-wide truncate">
                 {t.officialVerified}
               </span>
-
             </div>
-
-            {/* Transparency */}
 
             <button
               onClick={onOpenTransparency}
@@ -70,37 +159,19 @@ export const Header: React.FC<HeaderProps> = ({
                 {t.transparencyBtn}
               </span>
             </button>
-
           </div>
-
         </div>
-
       </div>
 
-      {/* =========================
-          Main Navbar
-      ========================== */}
-
       <div className="max-w-7xl mx-auto w-full px-3 sm:px-6 lg:px-8">
-
         <div className="min-h-16 py-2.5 sm:py-0 sm:h-16 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 sm:gap-0">
-
-          {/* =========================
-              Brand
-          ========================== */}
-
           <div className="flex items-center min-w-0">
-
             <div className="w-9 h-9 sm:w-10 sm:h-10 shrink-0 rounded-xl bg-gradient-to-tr from-emerald-600 to-green-500 flex items-center justify-center shadow-lg shadow-green-950/40 border border-emerald-400/30">
-
               <Activity className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-
             </div>
 
             <div className="ml-2.5 sm:ml-3 min-w-0">
-
               <div className="flex items-center min-w-0 gap-1.5">
-
                 <h1 className="text-lg sm:text-2xl font-black tracking-tight text-white leading-none whitespace-nowrap">
                   DaamBD
                 </h1>
@@ -110,89 +181,82 @@ export const Header: React.FC<HeaderProps> = ({
                     ? 'দামবিডি'
                     : 'Live'}
                 </span>
-
               </div>
 
               <p className="hidden sm:block text-[11px] sm:text-xs text-emerald-200/90 font-medium mt-1 truncate">
                 {t.brandTagline}
               </p>
-
             </div>
-
           </div>
 
-          {/* =========================
-              Action Controls
-          ========================== */}
-
           <div className="w-full sm:w-auto flex items-center gap-2">
-
-            {/* District Selector */}
-
             <div className="relative flex-1 sm:flex-none min-w-0 flex items-center bg-[#15803D]/60 hover:bg-[#15803D] rounded-lg px-2 sm:px-2.5 py-1.5 border border-emerald-400/30 transition-all shadow-inner">
-
               <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-200 mr-1.5 shrink-0" />
 
               <select
                 value={selectedDistrict}
                 onChange={(e) =>
-                  onDistrictChange(
-                    e.target.value
-                  )
+                  onDistrictChange(e.target.value)
                 }
-                className="w-full sm:w-auto min-w-0 bg-transparent text-white text-[11px] sm:text-sm font-semibold focus:outline-none cursor-pointer pr-1 truncate"
-                aria-label={
-                  t.districtSelect
-                }
+                disabled={loadingLocations}
+                className="w-full sm:w-auto min-w-0 bg-transparent text-white text-[11px] sm:text-sm font-semibold focus:outline-none cursor-pointer pr-1 truncate disabled:opacity-60"
+                aria-label={t.districtSelect}
               >
-
-                {DIVISIONS.map((div) => {
-
-                  const subItems =
-                    DISTRICTS.filter(
-                      (d) =>
-                        d.divisionEn ===
-                        div.en
-                    );
-
-                  return (
-                    <optgroup
-                      key={div.en}
-                      label={
-                        lang === 'bn'
-                          ? div.bn
-                          : `${div.en} Division`
-                      }
-                      className="bg-[#052e16] text-emerald-300 font-bold"
-                    >
-
-                      {subItems.map(
-                        (d) => (
-                          <option
-                            key={d.en}
-                            value={d.en}
-                            className="bg-[#14532D] text-white font-medium"
-                          >
-                            {lang === 'bn'
-                              ? d.bn
-                              : `${d.en} (${d.divisionEn})`}
-                          </option>
-                        )
-                      )}
-
-                    </optgroup>
-                  );
-
-                })}
-
+                {loadingLocations ? (
+                  <option
+                    value=""
+                    className="bg-[#14532D] text-white"
+                  >
+                    {lang === 'bn'
+                      ? 'জেলা লোড হচ্ছে...'
+                      : 'Loading districts...'}
+                  </option>
+                ) : (
+                  fallbackGroups.map(
+                    ({
+                      division,
+                      districts: divisionDistricts,
+                    }) => (
+                      <optgroup
+                        key={
+                          division.id ||
+                          division.en ||
+                          'locations'
+                        }
+                        label={
+                          division.id
+                            ? lang === 'bn'
+                              ? division.bn
+                              : `${division.en} Division`
+                            : lang === 'bn'
+                              ? 'জেলা'
+                              : 'Districts'
+                        }
+                        className="bg-[#052e16] text-emerald-300 font-bold"
+                      >
+                        {divisionDistricts.map(
+                          (district) => (
+                            <option
+                              key={district.id}
+                              value={String(
+                                district.id
+                              )}
+                              className="bg-[#14532D] text-white font-medium"
+                            >
+                              {lang === 'bn'
+                                ? district.bn
+                                : district.en}
+                            </option>
+                          )
+                        )}
+                      </optgroup>
+                    )
+                  )
+                )}
               </select>
-
             </div>
 
-            {/* Language Toggle */}
-
             <div className="shrink-0 flex items-center bg-black/30 p-1 rounded-lg border border-emerald-600/40">
-
               <button
                 onClick={() =>
                   onLanguageChange('bn')
@@ -218,15 +282,10 @@ export const Header: React.FC<HeaderProps> = ({
               >
                 EN
               </button>
-
             </div>
-
           </div>
-
         </div>
-
       </div>
-
     </header>
   );
 };
