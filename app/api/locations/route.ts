@@ -7,22 +7,16 @@ const COMMON_API =
 
 type AnyObject = Record<string, any>;
 
-function isObject(value: unknown): value is AnyObject {
-  return typeof value === 'object' && value !== null;
-}
+function getNumber(value: unknown): number {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value;
+  }
 
-function getNumber(...values: unknown[]): number {
-  for (const value of values) {
-    if (typeof value === 'number' && Number.isFinite(value)) {
-      return value;
-    }
+  if (typeof value === 'string' && value.trim() !== '') {
+    const number = Number(value.trim());
 
-    if (typeof value === 'string' && value.trim() !== '') {
-      const number = Number(value.replace(/,/g, '').trim());
-
-      if (Number.isFinite(number)) {
-        return number;
-      }
+    if (Number.isFinite(number)) {
+      return number;
     }
   }
 
@@ -35,106 +29,12 @@ function getText(...values: unknown[]): string {
       return value.trim();
     }
 
-    if (typeof value === 'number' && Number.isFinite(value)) {
+    if (typeof value === 'number') {
       return String(value);
     }
   }
 
   return '';
-}
-
-function extractArrays(
-  value: unknown,
-  path = ''
-): {
-  key: string;
-  path: string;
-  items: AnyObject[];
-}[] {
-  const result: {
-    key: string;
-    path: string;
-    items: AnyObject[];
-  }[] = [];
-
-  if (!isObject(value)) {
-    return result;
-  }
-
-  for (const [key, child] of Object.entries(value)) {
-    const childPath = path ? `${path}.${key}` : key;
-
-    if (Array.isArray(child)) {
-      const objects = child.filter(isObject);
-
-      if (objects.length > 0) {
-        result.push({
-          key,
-          path: childPath,
-          items: objects,
-        });
-      }
-
-      continue;
-    }
-
-    if (isObject(child)) {
-      result.push(...extractArrays(child, childPath));
-    }
-  }
-
-  return result;
-}
-
-function normalizeKey(value: string): string {
-  return value
-    .toLowerCase()
-    .replace(/[_\-\s]/g, '');
-}
-
-function findId(
-  item: AnyObject,
-  candidates: string[]
-): number {
-  for (const key of candidates) {
-    const value = getNumber(item[key]);
-
-    if (value > 0) {
-      return value;
-    }
-  }
-
-  return 0;
-}
-
-function findNameBn(item: AnyObject): string {
-  return getText(
-    item.text_bn,
-    item.name_bn,
-    item.district_name_bn,
-    item.districtNameBn,
-    item.division_name_bn,
-    item.divisionNameBn,
-    item.textBn,
-    item.nameBn,
-    item.bn,
-    item.text
-  );
-}
-
-function findNameEn(item: AnyObject): string {
-  return getText(
-    item.text_en,
-    item.name_en,
-    item.district_name,
-    item.districtName,
-    item.division_name,
-    item.divisionName,
-    item.textEn,
-    item.nameEn,
-    item.en,
-    item.text
-  );
 }
 
 export async function GET() {
@@ -153,98 +53,83 @@ export async function GET() {
       );
     }
 
-    const data = await response.json();
+    const raw = await response.json();
 
-    const arrays = extractArrays(data);
+    const data: AnyObject = raw?.data ?? {};
 
-    const divisionCandidates = arrays.filter((array) => {
-      const key = normalizeKey(array.key);
+    /*
+     * Official DAM structure:
+     *
+     * regionsList = Division
+     * zonesList   = District
+     *
+     * Example:
+     * region:
+     * {
+     *   value: 17,
+     *   text_en: "Dhaka",
+     *   text_bn: "ঢাকা"
+     * }
+     *
+     * district:
+     * {
+     *   value: 31,
+     *   text_en: "Dhaka",
+     *   text_bn: "ঢাকা",
+     *   region_id: 17
+     * }
+     */
 
-      return (
-        key.includes('division') &&
-        !key.includes('district') &&
-        !key.includes('upazila') &&
-        !key.includes('market')
-      );
-    });
+    const regionsList: AnyObject[] = Array.isArray(data.regionsList)
+      ? data.regionsList
+      : [];
 
-    const districtCandidates = arrays.filter((array) => {
-      const key = normalizeKey(array.key);
+    const zonesList: AnyObject[] = Array.isArray(data.zonesList)
+      ? data.zonesList
+      : [];
 
-      return (
-        key.includes('district') &&
-        !key.includes('upazila') &&
-        !key.includes('market')
-      );
-    });
-
-    const divisionsMap = new Map<number, AnyObject>();
-
-    for (const candidate of divisionCandidates) {
-      for (const item of candidate.items) {
-        const id = findId(item, [
-          'value',
-          'id',
-          'division_id',
-          'divisionId',
-        ]);
-
-        if (id <= 0) {
-          continue;
-        }
-
-        if (!divisionsMap.has(id)) {
-          divisionsMap.set(id, item);
-        }
-      }
-    }
-
-    const districtsMap = new Map<number, AnyObject>();
-
-    for (const candidate of districtCandidates) {
-      for (const item of candidate.items) {
-        const id = findId(item, [
-          'value',
-          'id',
-          'district_id',
-          'districtId',
-        ]);
-
-        if (id <= 0) {
-          continue;
-        }
-
-        if (!districtsMap.has(id)) {
-          districtsMap.set(id, item);
-        }
-      }
-    }
-
-    const divisions = Array.from(divisionsMap.entries())
-      .map(([id, item]) => ({
-        id,
-        en: findNameEn(item),
-        bn: findNameBn(item),
+    const divisions = regionsList
+      .map((item) => ({
+        id: getNumber(item.value ?? item.id),
+        en: getText(
+          item.text_en,
+          item.text,
+          item.name_en
+        ),
+        bn: getText(
+          item.text_bn,
+          item.text,
+          item.name_bn
+        ),
       }))
-      .filter((item) => item.en || item.bn);
+      .filter(
+        (item) =>
+          item.id > 0 &&
+          (item.en || item.bn)
+      );
 
-    const districts = Array.from(districtsMap.entries())
-      .map(([id, item]) => {
-        const divisionId = findId(item, [
-          'division_id',
-          'divisionId',
-          'parent_division_id',
-          'parentDivisionId',
-        ]);
-
-        return {
-          id,
-          en: findNameEn(item),
-          bn: findNameBn(item),
-          divisionId,
-        };
-      })
-      .filter((item) => item.en || item.bn);
+    const districts = zonesList
+      .map((item) => ({
+        id: getNumber(item.value ?? item.id),
+        en: getText(
+          item.text_en,
+          item.text,
+          item.name_en
+        ),
+        bn: getText(
+          item.text_bn,
+          item.text,
+          item.name_bn
+        ),
+        divisionId: getNumber(
+          item.region_id
+        ),
+      }))
+      .filter(
+        (item) =>
+          item.id > 0 &&
+          (item.en || item.bn)
+      );
 
     return NextResponse.json({
       success: true,
@@ -254,7 +139,10 @@ export async function GET() {
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('DaamBD locations API error:', error);
+    console.error(
+      'DaamBD locations API error:',
+      error
+    );
 
     return NextResponse.json(
       {
