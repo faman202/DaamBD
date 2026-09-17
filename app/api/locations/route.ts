@@ -192,7 +192,7 @@ export async function GET() {
         });
       }
 
-      divisionRaw = [...map.values()];
+      divisionRaw = Array.from(map.values());
     }
 
     const divisions = divisionRaw
