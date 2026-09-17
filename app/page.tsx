@@ -3,6 +3,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { DailyPriceItem, Language, PriceType } from '@/lib/types';
 import { translations } from '@/lib/i18n';
+import { DISTRICTS } from '@/lib/mockData';
 
 import { Header } from '@/components/Header';
 import { HeroSearch } from '@/components/HeroSearch';
@@ -405,11 +406,8 @@ export default function Home() {
         setLoading(true);
         setError(null);
 
-        const districtId =
-          districtIds[selectedDistrict] || 46;
-
         const response = await fetch(
-          `/api/prices?district=${districtId}`,
+          `/api/prices?district=${encodeURIComponent(selectedDistrict)}`,
           {
             method: 'GET',
             cache: 'no-store',
@@ -782,10 +780,14 @@ export default function Home() {
   // District Display Name
   // =========================
 
+  const matchedDistrict = DISTRICTS.find(
+    (d) => d.en === selectedDistrict
+  );
+
   const districtDisplayName =
     lang === 'bn'
-      ? selectedDistrict === 'Dhaka'
-        ? 'ঢাকা'
+      ? matchedDistrict
+        ? matchedDistrict.bn
         : selectedDistrict
       : selectedDistrict;
 
