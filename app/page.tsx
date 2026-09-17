@@ -246,6 +246,20 @@ function categoryMatches(
       'egg',
       'poultry',
       'meat-eggs',
+      'meat eggs',
+    ],
+
+    'meat eggs': [
+      'মাংস ও ডিম',
+      'মাংস',
+      'ডিম',
+      'meat and eggs',
+      'meat',
+      'eggs',
+      'egg',
+      'poultry',
+      'meat-eggs',
+      'meat eggs',
     ],
 
     meat: [
@@ -338,8 +352,12 @@ function categoryMatches(
     ],
   };
 
+  const selectedRaw = String(selectedCategory || '').toLowerCase().trim();
+
   const allowed =
-    aliases[selected] || [selected];
+    aliases[selectedRaw] ||
+    aliases[selected] ||
+    [selectedRaw, selected];
 
   return possibleCategories.some(
     (category) =>
