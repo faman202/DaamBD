@@ -688,32 +688,32 @@ export default function Home() {
               Number(
                 item.priceChange || 0
               );
-
-            if (
-              movementFilter ===
-              'up'
-            ) {
-              return change > 0;
-            }
-
-            if (
-              movementFilter ===
-              'down'
-            ) {
-              return change < 0;
-            }
-
-            if (
-              movementFilter ===
-              'stable'
-            ) {
-              return change === 0;
-            }
-
-            return (
+            const m = (
               item as unknown as AnyObject
-            )?.movement ===
-              movementFilter;
+            )?.movement;
+
+            if (
+              movementFilter === 'up' ||
+              movementFilter === 'spike'
+            ) {
+              return change > 0 || m === 'up' || m === 'spike';
+            }
+
+            if (
+              movementFilter === 'down' ||
+              movementFilter === 'drop'
+            ) {
+              return change < 0 || m === 'down' || m === 'drop';
+            }
+
+            if (
+              movementFilter === 'stable' ||
+              movementFilter === 'unchanged'
+            ) {
+              return change === 0 || m === 'stable' || m === 'unchanged';
+            }
+
+            return true;
           }
         );
     }
