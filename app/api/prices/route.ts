@@ -212,6 +212,94 @@ async function fetchDAMData(date: string, districtId?: number): Promise<AnyObjec
 }
 
 /* =========================================================
+   HISTORY BATCH FETCH
+   Fetches past 30 days of data in parallel chunks (6 days at a time)
+   and builds a commodity-keyed map of price history.
+========================================================= */
+
+async function fetchHistory30Days(
+  baseDate: string,
+  districtId: number | undefined,
+  commodityMap: Map<number, AnyObject>,
+  unitMap: Map<number, AnyObject>
+): Promise<Map<number, Array<{ date: string; avgPrice: number; minPrice: number; maxPrice: number }>>> {
+  // Build list of dates: past 30 days (oldest first)
+  const dates: string[] = [];
+  for (let i = 30; i >= 1; i--) {
+    const d = new Date(baseDate);
+    d.setDate(d.getDate() - i);
+    dates.push(d.toISOString().slice(0, 10));
+  }
+
+  // Split into 5 parallel batches of 6 dates each
+  const BATCH_SIZE = 6;
+  const batches: string[][] = [];
+  for (let i = 0; i < dates.length; i += BATCH_SIZE) {
+    batches.push(dates.slice(i, i + BATCH_SIZE));
+  }
+
+  // historyMap: commodityId -> array of daily price points
+  const historyMap = new Map<number, Array<{ date: string; avgPrice: number; minPrice: number; maxPrice: number }>>();
+
+  // Fetch each batch in parallel
+  await Promise.all(
+    batches.map(async (batchDates) => {
+      await Promise.all(
+        batchDates.map(async (dateStr) => {
+          try {
+            const rows = await fetchDAMData(dateStr, districtId);
+            for (const row of rows) {
+              const id = toNumber(row?.commodity_id);
+              if (id <= 0) continue;
+
+              const comm = commodityMap.get(id) || {};
+              const uRetailId = toNumber(row?.unit_retail || comm?.unit_retail || 2);
+              const uWholesaleId = toNumber(row?.unit_wholesale || comm?.unit_whole_sale || 1);
+              const ratio = getWholesaleToRetailRatio(uWholesaleId, uRetailId);
+
+              const rLow = toNumber(row?.r_lowestPrice);
+              const rHigh = toNumber(row?.r_highestPrice);
+              let rAvg = (rLow > 0 && rHigh > 0) ? Number(((rLow + rHigh) / 2).toFixed(2)) : (rLow || rHigh);
+
+              const wLow = toNumber(row?.w_lowestPrice);
+              const wHigh = toNumber(row?.w_highestPrice);
+              const wAvg = (wLow > 0 && wHigh > 0) ? Number(((wLow + wHigh) / 2).toFixed(2)) : (wLow || wHigh);
+
+              if (rAvg === 0 && wAvg > 0) {
+                rAvg = Number((wAvg / ratio).toFixed(2));
+              }
+
+              if (rAvg <= 0) continue;
+
+              const point = {
+                date: dateStr,
+                avgPrice: rAvg,
+                minPrice: rLow > 0 ? rLow : rAvg,
+                maxPrice: rHigh > 0 ? rHigh : rAvg,
+              };
+
+              if (!historyMap.has(id)) {
+                historyMap.set(id, []);
+              }
+              historyMap.get(id)!.push(point);
+            }
+          } catch {
+            // Silently skip dates that fail — partial history is better than none
+          }
+        })
+      );
+    })
+  );
+
+  // Sort each commodity's history by date ascending
+  for (const [, points] of historyMap) {
+    points.sort((a, b) => a.date.localeCompare(b.date));
+  }
+
+  return historyMap;
+}
+
+/* =========================================================
    GET ROUTE HANDLER
 ========================================================= */
 
@@ -428,10 +516,38 @@ export async function GET(request: NextRequest) {
             : "stable",
         source: "Ministry of Agriculture / DAM",
         reportDate: actualDataDate,
+        // history30Days will be populated below after batch fetch
+        history30Days: [],
       });
     }
 
     const items = Array.from(uniqueProducts.values());
+
+    // 5a. Fetch 30-day price history for all items in parallel batches
+    const historyMap = await fetchHistory30Days(
+      actualDataDate,
+      isNationalFallback ? undefined : districtId,
+      commodityMap,
+      unitMap
+    );
+
+    // 5b. Inject history into each item + add today's price as last point
+    for (const item of items) {
+      const cId = toNumber(item.commodityId);
+      const existing = historyMap.get(cId) || [];
+
+      // Append today's price as the final point
+      const todayPoint = {
+        date: actualDataDate,
+        avgPrice: toNumber(item.retailAvg),
+        minPrice: toNumber(item.retailLow) || toNumber(item.retailAvg),
+        maxPrice: toNumber(item.retailHigh) || toNumber(item.retailAvg),
+      };
+
+      // Avoid duplicate for today if already fetched
+      const alreadyHasToday = existing.some((p) => p.date === actualDataDate);
+      item.history30Days = alreadyHasToday ? existing : [...existing, todayPoint];
+    }
 
     // 5. Category and Price Change statistics
     const categoryCounts: Record<string, number> = {};

@@ -387,13 +387,26 @@ export const PriceCard: React.FC<
     ]) || ''
   ).toLowerCase();
 
+  // Also read priceChangeType for accurate badge rendering
+  const priceChangeType = String(
+    getValue(rawItem, [
+      'priceChangeType',
+      'price_change_type',
+      'changeType',
+    ]) || 'no_data'
+  ).toLowerCase();
+
   const movement =
     movementValue === 'up' ||
-    movementValue === 'spike'
+    movementValue === 'spike' ||
+    priceChangeType === 'increase'
       ? 'spike'
       : movementValue === 'down' ||
-        movementValue === 'drop'
+        movementValue === 'drop' ||
+        priceChangeType === 'decrease'
       ? 'drop'
+      : priceChangeType === 'no_data'
+      ? 'no_data'
       : 'stable';
 
   /* =========================
@@ -447,6 +460,21 @@ export const PriceCard: React.FC<
               : `↑ ৳${Math.abs(
                   priceChange
                 )} increased`}
+          </span>
+        </span>
+      );
+    }
+
+    // No previous-day data available — show neutral "no comparison" badge
+    if (movement === 'no_data') {
+      return (
+        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] sm:text-xs font-semibold bg-blue-50 text-blue-600 border border-blue-200 whitespace-nowrap">
+          <Minus className="w-3.5 h-3.5 shrink-0" />
+
+          <span>
+            {lang === 'bn'
+              ? '— তুলনামূলক তথ্য নেই'
+              : '— No prev. data'}
           </span>
         </span>
       );

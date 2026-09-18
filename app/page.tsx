@@ -534,37 +534,45 @@ export default function Home() {
     const totalItems =
       allDistrictItems.length;
 
+    // priceChangeType is reliably set by the API
+    // ("increase" | "decrease" | "unchanged" | "no_data")
+    // Using it is more accurate than comparing the numeric priceChange
+    // which can be 0 when no previous-day data is available.
     const increasedCount =
       allDistrictItems.filter(
-        (item) =>
-          Number(item.priceChange || 0) > 0
+        (item) => item.priceChangeType === 'increase'
       ).length;
 
     const decreasedCount =
       allDistrictItems.filter(
-        (item) =>
-          Number(item.priceChange || 0) < 0
+        (item) => item.priceChangeType === 'decrease'
       ).length;
 
     const stableCount =
       allDistrictItems.filter(
         (item) =>
-          Number(item.priceChange || 0) === 0
+          item.priceChangeType === 'unchanged' ||
+          item.priceChangeType === 'no_data'
       ).length;
 
+    // Sort by absolute priceChange for top movers
     const sortedByChange =
-      [...allDistrictItems].sort(
-        (a, b) =>
-          Number(b.priceChange || 0) -
-          Number(a.priceChange || 0)
-      );
+      [...allDistrictItems]
+        .filter((item) => item.priceChangeType === 'increase')
+        .sort(
+          (a, b) =>
+            Number(b.priceChange || 0) -
+            Number(a.priceChange || 0)
+        );
 
     const sortedByDrop =
-      [...allDistrictItems].sort(
-        (a, b) =>
-          Number(a.priceChange || 0) -
-          Number(b.priceChange || 0)
-      );
+      [...allDistrictItems]
+        .filter((item) => item.priceChangeType === 'decrease')
+        .sort(
+          (a, b) =>
+            Number(a.priceChange || 0) -
+            Number(b.priceChange || 0)
+        );
 
     const topSpike =
       sortedByChange[0];
@@ -582,34 +590,22 @@ export default function Home() {
       stableCount,
 
       topSpikeItem:
-        topSpike &&
-        Number(topSpike.priceChange || 0) > 0
+        topSpike
           ? {
               nameBn: topSpike.nameBn,
               nameEn: topSpike.nameEn,
-              change: Number(
-                topSpike.priceChange || 0
-              ),
-              pctChange: Number(
-                topSpike.priceChange || 0
-              ),
+              change: Math.abs(Number(topSpike.priceChange || 0)),
+              pctChange: Math.abs(Number(topSpike.priceChangePercent || 0)),
             }
           : null,
 
       topDropItem:
-        topDrop &&
-        Number(topDrop.priceChange || 0) < 0
+        topDrop
           ? {
               nameBn: topDrop.nameBn,
               nameEn: topDrop.nameEn,
-              change: Number(
-                topDrop.priceChange || 0
-              ),
-              pctChange: Math.abs(
-                Number(
-                  topDrop.priceChange || 0
-                )
-              ),
+              change: Math.abs(Number(topDrop.priceChange || 0)),
+              pctChange: Math.abs(Number(topDrop.priceChangePercent || 0)),
             }
           : null,
 
