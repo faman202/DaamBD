@@ -292,9 +292,9 @@ async function fetchHistory30Days(
   );
 
   // Sort each commodity's history by date ascending
-  for (const [, points] of historyMap) {
-    points.sort((a, b) => a.date.localeCompare(b.date));
-  }
+  Array.from(historyMap.values()).forEach((points) => {
+    points.sort((a: { date: string }, b: { date: string }) => a.date.localeCompare(b.date));
+  });
 
   return historyMap;
 }
